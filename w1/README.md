@@ -24,6 +24,14 @@ cmake --build --preset default
 .\build\w1.exe
 ```
 
+전체 테스트 케이스를 채점하려면 프로젝트 루트에서 grader를 실행합니다.
+
+```powershell
+.\build\grader.exe
+```
+
+grader는 `main.c`를 다시 컴파일한 뒤 `tc` 폴더의 모든 입력과 출력을 비교합니다.
+
 새 소스 파일을 실행 파일에 포함하려면 `CMakeLists.txt`의 `add_executable`에 파일명을
 추가합니다. 단일 파일은 CMake 수정 없이 `<Space>rb` 또는 `<Space>rr`로 바로 실행할 수
 있습니다.
