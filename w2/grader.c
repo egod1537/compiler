@@ -199,6 +199,38 @@ static int read_normalized_file(const char *path, unsigned char **contents,
   return 1;
 }
 
+/*
+ * A test may provide an optional .exit file next to its .in/.out files.
+ * If it is omitted, a successful exit (0) is expected.
+ */
+static int read_expected_exit_code(const char *path, int *exit_code) {
+  FILE *file = fopen(path, "r");
+  int value;
+  int ch;
+
+  if (file == NULL) {
+    *exit_code = 0;
+    return 1;
+  }
+
+  if (fscanf(file, "%d", &value) != 1 || value < 0 || value > 255) {
+    fclose(file);
+    return 0;
+  }
+
+  do {
+    ch = fgetc(file);
+  } while (ch != EOF && isspace((unsigned char)ch));
+
+  fclose(file);
+  if (ch != EOF) {
+    return 0;
+  }
+
+  *exit_code = value;
+  return 1;
+}
+
 static size_t print_visible(const unsigned char *contents, size_t length) {
   size_t i;
   size_t width = 2;
@@ -328,6 +360,7 @@ int main(void) {
     size_t input_path_length = strlen(input_path);
     size_t name_length = strlen(name) - 3;
     char expected_path[PATH_BUFFER_SIZE];
+    char expected_exit_path[PATH_BUFFER_SIZE];
     unsigned char *expected = NULL;
     unsigned char *actual = NULL;
     unsigned char *error_output = NULL;
@@ -335,12 +368,31 @@ int main(void) {
     size_t actual_length = 0;
     size_t error_length = 0;
     int run_status;
+    int actual_exit;
+    int expected_exit;
     int correct;
 
     if (snprintf(expected_path, sizeof(expected_path), "%.*s.out",
                  (int)(input_path_length - 3), input_path) >=
         (int)sizeof(expected_path)) {
       printf("[FAIL] %.*s: path is too long\n", (int)name_length, name);
+      ++failed;
+      continue;
+    }
+
+    if (snprintf(expected_exit_path, sizeof(expected_exit_path), "%.*s.exit",
+                 (int)(input_path_length - 3), input_path) >=
+        (int)sizeof(expected_exit_path)) {
+      printf("[FAIL] %.*s: exit-code path is too long\n", (int)name_length,
+             name);
+      free(expected);
+      ++failed;
+      continue;
+    }
+
+    if (!read_expected_exit_code(expected_exit_path, &expected_exit)) {
+      printf("[FAIL] %.*s: malformed .exit file\n", (int)name_length, name);
+      free(expected);
       ++failed;
       continue;
     }
@@ -356,6 +408,7 @@ int main(void) {
              "%s < \"%s\" > \"%s\" 2> \"%s\"", run_target, input_path,
              actual_path, stderr_path);
     run_status = system(command);
+    actual_exit = exit_code_from_system(run_status);
 
     if (!read_normalized_file(actual_path, &actual, &actual_length)) {
       printf("[FAIL] %.*s: could not read program output\n", (int)name_length,
@@ -365,7 +418,7 @@ int main(void) {
       continue;
     }
 
-    correct = run_status == 0 && expected_length == actual_length &&
+    correct = expected_exit == actual_exit && expected_length == actual_length &&
               memcmp(expected, actual, expected_length) == 0;
 
     if (correct) {
@@ -382,8 +435,9 @@ int main(void) {
       print_output_field(actual, actual_length);
       printf(" | %.*s\n", (int)name_length, name);
 
-      if (run_status != 0) {
-        printf("  exit code: %d\n", exit_code_from_system(run_status));
+      if (expected_exit != actual_exit) {
+        printf("  exit code: expected %d, actual %d\n", expected_exit,
+               actual_exit);
       }
 
       if (read_normalized_file(stderr_path, &error_output, &error_length) &&

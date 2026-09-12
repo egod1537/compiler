@@ -1,0 +1,4 @@
+C:/Users/egod1/proj/compiler/w2/build-w2/CMakeFiles/w2.dir
+C:/Users/egod1/proj/compiler/w2/build-w2/CMakeFiles/grader.dir
+C:/Users/egod1/proj/compiler/w2/build-w2/CMakeFiles/edit_cache.dir
+C:/Users/egod1/proj/compiler/w2/build-w2/CMakeFiles/rebuild_cache.dir
