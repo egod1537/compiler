@@ -442,13 +442,3 @@ int yyerror(const char *s)
     fprintf(stderr, "line %d: %s\n", line_no, s);
     return 0;
 }
-
-A_NODE *makeNode(NODE_NAME n, A_NODE* a, ANODE_* b, A_NODE* c){
-  A_NODE* p;
-  p = (ANODE_*)  malloc(sizeof(A_NODE));
-  p->name = n;
-  p->llink = a;
-  p->clink = b;
-  p->rlink = c;
-  return p;
-}
