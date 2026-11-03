@@ -5,9 +5,7 @@ line        [\n]
 ws          {delim}+
 
 %{
-#define YYSTYPE_IS_DECLARED 1
-typedef long long YYSTYPE;
-
+#include "parse_value.h"
 #include "y.tab.h"
 #include <string.h>
 

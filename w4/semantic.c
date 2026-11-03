@@ -1,4 +1,5 @@
 #include "semantic.h"
+#include "logger.h"
 #include "type.h"
 #include <assert.h>
 #include <stdio.h>
@@ -208,7 +209,7 @@ void leaveScope(void) {
 }
 
 void semanticError(const char *message) {
-  fprintf(stderr, "Semantic error: %s\n", message);
+  logMsg(LOG_ERROR, "Semantic error: %s\n", message);
   exit(EXIT_FAILURE);
 }
 
@@ -283,7 +284,7 @@ A_SPECIFIER *makeSpecifier(A_TYPE *type, S_KIND stor) {
   A_SPECIFIER *specifier = calloc(1, sizeof(A_SPECIFIER));
 
   if (specifier == NULL)
-    semanticError("NULL type in setTypeField");
+    semanticError("NULL type in makeSpecifier");
 
   specifier->type = type;
   specifier->stor = stor;

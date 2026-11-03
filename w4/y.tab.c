@@ -69,11 +69,10 @@
 /* First part of user prologue.  */
 #line 1 "c.y"
 
-#define YYSTYPE_IS_DECLARED 1
-typedef long long YYSTYPE;
-
+#include "parse_value.h"
 #include <stdio.h>
 #include "type.h"
+#include "logger.h"
 
 int yylex(void);
 int yyerror(const char *s);
@@ -86,7 +85,7 @@ A_NODE* makeNode(
   A_NODE* right
 );
 
-#line 90 "y.tab.c"
+#line 89 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -821,25 +820,25 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    46,    46,    50,    51,    55,    56,    60,    61,    65,
-      66,    70,    74,    75,    76,    77,    78,    79,    83,    84,
-      85,    86,    87,    91,    92,    96,    97,   101,   102,   106,
-     107,   108,   112,   113,   114,   118,   119,   123,   124,   128,
-     132,   133,   134,   135,   139,   140,   144,   145,   146,   150,
-     151,   152,   156,   157,   161,   162,   166,   167,   171,   172,
-     176,   177,   181,   182,   186,   187,   188,   189,   193,   194,
-     198,   199,   203,   204,   208,   209,   213,   214,   218,   219,
-     223,   224,   225,   229,   230,   231,   232,   233,   237,   238,
-     239,   243,   244,   248,   249,   250,   251,   252,   253,   257,
-     258,   259,   263,   267,   268,   272,   273,   277,   278,   282,
-     283,   284,   288,   289,   290,   294,   295,   299,   300,   301,
-     302,   306,   307,   313,   314,   315,   316,   320,   321,   322,
-     323,   324,   325,   326,   330,   331,   335,   336,   340,   341,
-     342,   343,   344,   345,   346,   347,   348,   349,   350,   354,
-     355,   359,   360,   364,   365,   366,   367,   371,   372,   373,
-     377,   378,   379,   383,   384,   385,   386,   387,   391,   392,
-     393,   397,   398,   402,   403,   407,   408,   412,   413,   417,
-     418,   422,   423,   427,   428,   432,   433,   437,   441
+       0,    45,    45,    49,    50,    54,    55,    59,    60,    64,
+      65,    69,    73,    74,    75,    76,    77,    78,    82,    83,
+      84,    85,    86,    90,    91,    95,    96,   100,   101,   105,
+     106,   107,   111,   112,   113,   117,   118,   122,   123,   127,
+     131,   132,   133,   134,   138,   139,   143,   144,   145,   149,
+     150,   151,   155,   156,   160,   161,   165,   166,   170,   171,
+     175,   176,   180,   181,   185,   186,   187,   188,   192,   193,
+     197,   198,   202,   203,   207,   208,   212,   213,   217,   218,
+     222,   223,   224,   228,   229,   230,   231,   232,   236,   237,
+     238,   242,   243,   247,   248,   249,   250,   251,   252,   256,
+     257,   258,   262,   266,   267,   271,   272,   276,   277,   281,
+     282,   283,   287,   288,   289,   293,   294,   298,   299,   300,
+     301,   305,   306,   312,   313,   314,   315,   319,   320,   321,
+     322,   323,   324,   325,   329,   330,   334,   335,   339,   340,
+     341,   342,   343,   344,   345,   346,   347,   348,   349,   353,
+     354,   358,   359,   363,   364,   365,   366,   370,   371,   372,
+     376,   377,   378,   382,   383,   384,   385,   386,   390,   391,
+     392,   396,   397,   401,   402,   406,   407,   411,   412,   416,
+     417,   421,   422,   426,   427,   431,   432,   436,   440
 };
 #endif
 
@@ -1724,18 +1723,18 @@ yyreduce:
   switch (yyn)
     {
   case 122: /* primary_expression: INTEGER_CONSTANT  */
-#line 307 "c.y"
+#line 306 "c.y"
                        {
-      yyval =(long long)makeNode(N_EXP_INT_CONST, NULL, (A_NODE*)yyvsp[0], NULL);
+      yyval =(YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE*)yyvsp[0], NULL);
       
       A_NODE *node = (A_NODE*)yyval;
-      fprintf(stderr, "[AST] N_EXP_INT_CONST: %ld\n", (long long)node->clink);
+      fprintf(stderr, "[AST] N_EXP_INT_CONST: %ld\n", (YYSTYPE)node->clink);
     }
-#line 1735 "y.tab.c"
+#line 1734 "y.tab.c"
     break;
 
 
-#line 1739 "y.tab.c"
+#line 1738 "y.tab.c"
 
       default: break;
     }
@@ -1928,7 +1927,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 444 "c.y"
+#line 443 "c.y"
 
 
 int main(void)
@@ -1943,6 +1942,8 @@ int main(void)
 
 int yyerror(const char *s)
 {
-    fprintf(stderr, "line %d: %s\n", line_no, s);
+    logMsg(LOG_ERROR,
+               "Syntax error at line %d: %s",
+               line_no, s);
     return 0;
 }

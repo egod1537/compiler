@@ -1,9 +1,8 @@
 %{
-#define YYSTYPE_IS_DECLARED 1
-typedef long long YYSTYPE;
-
+#include "parse_value.h"
 #include <stdio.h>
 #include "type.h"
+#include "logger.h"
 
 int yylex(void);
 int yyerror(const char *s);
@@ -305,10 +304,10 @@ jump_statement
 primary_expression
     : IDENTIFIER
     | INTEGER_CONSTANT {
-      $$ =(long long)makeNode(N_EXP_INT_CONST, NULL, (A_NODE*)$1, NULL);
+      $$ =(YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE*)$1, NULL);
       
       A_NODE *node = (A_NODE*)$$;
-      fprintf(stderr, "[AST] N_EXP_INT_CONST: %ld\n", (long long)node->clink);
+      fprintf(stderr, "[AST] N_EXP_INT_CONST: %ld\n", (YYSTYPE)node->clink);
     }
     | FLOAT_CONSTANT
     | CHARACTER_CONSTANT
@@ -455,6 +454,8 @@ int main(void)
 
 int yyerror(const char *s)
 {
-    fprintf(stderr, "line %d: %s\n", line_no, s);
+    logMsg(LOG_ERROR,
+               "Syntax error at line %d: %s",
+               line_no, s);
     return 0;
 }
