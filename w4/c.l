@@ -5,6 +5,9 @@ line        [\n]
 ws          {delim}+
 
 %{
+#define YYSTYPE_IS_DECLARED 1
+typedef long long YYSTYPE;
+
 #include "y.tab.h"
 #include <string.h>
 
@@ -98,7 +101,10 @@ volatile                    { return(VOLATILE_SYM); }
 "/*"([^*]|\*+[^*/])*\*+"/"  { }
 
 {digit}+\.{digit}+          { return(FLOAT_CONSTANT); }
-{digit}+                    { return(INTEGER_CONSTANT); }
+{digit}+                    { 
+  yylval = atol(yytext); 
+  return(INTEGER_CONSTANT);
+  }
 
 \"([^"\n]|\\["\n])*\"        { return(STRING_LITERAL); }
 \'([^'\n]|\\.)\'             { return(CHARACTER_CONSTANT); }

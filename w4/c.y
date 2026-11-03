@@ -1,9 +1,20 @@
 %{
+#define YYSTYPE_IS_DECLARED 1
+typedef long long YYSTYPE;
+
 #include <stdio.h>
+#include "type.h"
 
 int yylex(void);
 int yyerror(const char *s);
 extern int line_no;
+
+A_NODE* makeNode(
+  NODE_NAME name,
+  A_NODE* left,
+  A_NODE* center,
+  A_NODE* right
+);
 %}
 
 %token IDENTIFIER TYPE_IDENTIFIER
@@ -293,7 +304,12 @@ jump_statement
 
 primary_expression
     : IDENTIFIER
-    | INTEGER_CONSTANT
+    | INTEGER_CONSTANT {
+      $$ =(long long)makeNode(N_EXP_INT_CONST, NULL, (A_NODE*)$1, NULL);
+      
+      A_NODE *node = (A_NODE*)$$;
+      fprintf(stderr, "[AST] N_EXP_INT_CONST: %ld\n", (long long)node->clink);
+    }
     | FLOAT_CONSTANT
     | CHARACTER_CONSTANT
     | STRING_LITERAL

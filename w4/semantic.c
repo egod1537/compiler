@@ -415,7 +415,7 @@ A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *body) {
   if (id == NULL)
     semanticError("Null identifier in setFunctionDeclaratorBody");
 
-  if (id->kind != ID_FUNC | id->type == NULL || id->type->kind != T_FUNC)
+  if (id->kind != ID_FUNC || id->type == NULL || id->type->kind != T_FUNC)
     semanticError("Illegal function declarator");
 
   if (body == NULL)
