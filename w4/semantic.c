@@ -209,7 +209,7 @@ void leaveScope(void) {
 }
 
 void semanticError(const char *message) {
-  logMsg(LOG_ERROR, "Semantic error: %s\n", message);
+  logMsg(LOG_ERROR, "Semantic error: %s", message);
   exit(EXIT_FAILURE);
 }
 
@@ -284,7 +284,7 @@ A_SPECIFIER *makeSpecifier(A_TYPE *type, S_KIND stor) {
   A_SPECIFIER *specifier = calloc(1, sizeof(A_SPECIFIER));
 
   if (specifier == NULL)
-    semanticError("NULL type in makeSpecifier");
+    semanticError("Memory allocation failed in makeSpecifier");
 
   specifier->type = type;
   specifier->stor = stor;

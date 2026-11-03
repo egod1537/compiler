@@ -307,7 +307,8 @@ primary_expression
       $$ =(YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE*)$1, NULL);
       
       A_NODE *node = (A_NODE*)$$;
-      fprintf(stderr, "[AST] N_EXP_INT_CONST: %ld\n", (YYSTYPE)node->clink);
+      logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld",
+             (long long)(intptr_t)node->clink);
     }
     | FLOAT_CONSTANT
     | CHARACTER_CONSTANT

@@ -7,6 +7,7 @@ ws          {delim}+
 %{
 #include "parse_value.h"
 #include "y.tab.h"
+#include <stdlib.h>
 #include <string.h>
 
 int line_no = 1;
