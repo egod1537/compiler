@@ -324,6 +324,9 @@ void prt_A_TYPE(A_TYPE *t, int s)
 				printf("(DONE:%p)\n", (void *)t);
 		else 
 		   switch (t->kind) {
+				case T_NULL:
+						printf("NULL\n");
+						break;
 				case T_ENUM:
 						t->prt=TRUE;
 						printf("ENUM\n");
@@ -370,6 +373,10 @@ void prt_A_TYPE(A_TYPE *t, int s)
 						if (t->expr) {
 								print_space(s); printf("|  BODY\n");
 								prt_statement(t->expr,s+2);}
+						break;
+				case T_VOID:
+						printf("VOID\n");
+						break;
 		   }
 }
 void prt_A_ID_LIST(A_ID *id, int s)

@@ -8,6 +8,106 @@
 A_ID *current_id = NULL;
 int current_level = 0;
 
+A_TYPE *int_type = NULL;
+A_TYPE *float_type = NULL;
+A_TYPE *char_type = NULL;
+A_TYPE *void_type = NULL;
+A_TYPE *string_type = NULL;
+
+void initialize(void) {
+  if (current_id != NULL || current_level != 0 || int_type != NULL ||
+      float_type != NULL || char_type != NULL || void_type != NULL ||
+      string_type != NULL)
+    semanticError("Semantic state already initialized");
+
+  int_type = makeType(T_ENUM);
+  int_type->size = sizeof(int);
+
+  float_type = makeType(T_ENUM);
+  float_type->size = sizeof(float);
+
+  char_type = makeType(T_ENUM);
+  char_type->size = sizeof(char);
+
+  void_type = makeType(T_VOID);
+  void_type->size = 0;
+
+  string_type = makeType(T_POINTER);
+  setTypeElementType(string_type, char_type);
+  string_type->size = sizeof(char *);
+
+  A_ID *id;
+
+  id = makeIdentifier("int");
+  id->kind = ID_TYPE;
+  id->type = int_type;
+
+  id = makeIdentifier("float");
+  id->kind = ID_TYPE;
+  id->type = float_type;
+
+  id = makeIdentifier("char");
+  id->kind = ID_TYPE;
+  id->type = char_type;
+
+  id = makeIdentifier("void");
+  id->kind = ID_TYPE;
+  id->type = void_type;
+  id = makeIdentifier("printf");
+  id->kind = ID_FUNC;
+  id->type = makeType(T_FUNC);
+  setTypeElementType(id->type, int_type);
+
+  id = makeIdentifier("scanf");
+  id->kind = ID_FUNC;
+  id->type = makeType(T_FUNC);
+  setTypeElementType(id->type, int_type);
+}
+
+static int isSameType(const A_TYPE *a, const A_TYPE *b);
+static int isSameFormalParameters(const A_ID *a, const A_ID *b);
+
+static int isSameType(const A_TYPE *a, const A_TYPE *b) {
+  if (a == b)
+    return 1;
+
+  if (a == NULL || b == NULL)
+    return 0;
+
+  if (a->kind != b->kind)
+    return 0;
+
+  switch (a->kind) {
+  case T_POINTER:
+    return isSameType(a->element_type, b->element_type);
+
+  case T_ARRAY:
+    return a->expr == b->expr && isSameType(a->element_type, b->element_type);
+
+  case T_FUNC:
+    return isSameType(a->element_type, b->element_type) &&
+           isSameFormalParameters(a->field, b->field);
+
+  case T_VOID:
+    return 1;
+
+  default:
+    return 0;
+  }
+}
+
+static int isSameFormalParameters(const A_ID *a, const A_ID *b) {
+  while (a != NULL && b != NULL) {
+    if (!isSameType(a->type, b->type))
+      return 0;
+
+    a = a->link;
+    b = b->link;
+  }
+
+  return a == NULL && b == NULL;
+}
+
 A_TYPE *makeType(T_KIND kind) {
   A_TYPE *t = calloc(1, sizeof(A_TYPE));
 
@@ -131,7 +231,7 @@ A_ID *linkDeclaratorList(A_ID *head, A_ID *tail) {
   return head;
 }
 
-// linkDeclaratorList type 버전, 뒤에 다가 연결한다
+// linkDeclaratorList type 버전, 뒤 연결한다
 // A_TYPE -> A_TYPE
 A_TYPE *setTypeElementType(A_TYPE *t1, A_TYPE *t2) {
   if (t1 == NULL)
@@ -182,7 +282,7 @@ A_TYPE *setTypeField(A_TYPE *type, A_ID *field) {
 A_SPECIFIER *makeSpecifier(A_TYPE *type, S_KIND stor) {
   A_SPECIFIER *specifier = calloc(1, sizeof(A_SPECIFIER));
 
-  if (type == NULL)
+  if (specifier == NULL)
     semanticError("NULL type in setTypeField");
 
   specifier->type = type;
@@ -190,4 +290,173 @@ A_SPECIFIER *makeSpecifier(A_TYPE *type, S_KIND stor) {
   specifier->line = 0;
 
   return specifier;
+}
+
+A_SPECIFIER *updateSpecifier(A_SPECIFIER *specifier, A_TYPE *type,
+                             S_KIND stor) {
+  if (specifier == NULL)
+    semanticError("Null specifier in updateSpecifier");
+
+  if (type != NULL) {
+    if (specifier->type != NULL)
+      semanticError("Duplicate type specifier");
+
+    specifier->type = type;
+  }
+
+  if (stor != S_NULL) {
+    if (specifier->stor != S_NULL)
+      semanticError("Duplicate storage class specifier");
+
+    specifier->stor = stor;
+  }
+
+  return specifier;
+}
+
+void setDefaultSpecifier(A_SPECIFIER *specifier) {
+  if (specifier == NULL)
+    semanticError("Null speicifer in setDefaultSpecifier");
+
+  if (specifier->type == NULL) {
+    if (int_type == NULL)
+      semanticError("Default int type is not initalized");
+
+    specifier->type = int_type;
+  }
+}
+
+A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *specifier) {
+  if (specifier == NULL)
+    semanticError("Null specifier in setDeclaratorListSpecifier");
+
+  setDefaultSpecifier(specifier);
+
+  A_ID *current = id;
+
+  while (current != NULL) {
+    // 현재 스코프 중복 검사
+    if (current->name != NULL && current->name[0] != '\0' &&
+        searchIdentifierAtCurrentLevel(current->name, current->prev) != NULL) {
+      semanticError("Redeclaration of identifier");
+    }
+
+    // 선언자의 최종 타입 결정
+    setDeclaratorElementType(current, specifier->type);
+
+    if (current->type == NULL)
+      semanticError("Unresolved declarator type");
+
+    // 식별자 종류 결정
+    if (specifier->stor == S_TYPEDEF) {
+      current->kind = ID_TYPE;
+    } else if (current->type->kind == T_FUNC) {
+      current->kind = ID_FUNC;
+    } else {
+      current->kind = ID_VAR;
+    }
+
+    // 저장 클래스 적용
+    current->specifier = specifier->stor;
+
+    if (current->specifier == S_NULL)
+      current->specifier = S_AUTO;
+
+    current = current->link;
+  }
+
+  return id;
+}
+
+A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
+  if (id == NULL || specifier == NULL)
+    semanticError("Null argument in setFunctionDeclaratorSpecifier");
+
+  if (specifier->stor != S_NULL)
+    semanticError("Illegal function specifiers");
+
+  setDefaultSpecifier(specifier);
+
+  if (id->type == NULL || id->type->kind != T_FUNC)
+    semanticError("Illegal function specifiers");
+
+  setDeclaratorElementType(id, specifier->type);
+  id->kind = ID_FUNC;
+
+  A_ID *previous = searchIdentifierAtCurrentLevel(id->name, id->prev);
+
+  if (previous != NULL) {
+    if (previous->kind != ID_FUNC || previous->type == NULL ||
+        previous->type->kind != T_FUNC || previous->type->expr != NULL)
+      semanticError("Redeclaration of function");
+
+    if (!isSameFormalParameters(previous->type->field, id->type->field))
+      semanticError("Redeclaration of function");
+
+    if (!isSameType(previous->type->element_type, id->type->element_type))
+      semanticError("Redeclaration of function");
+  }
+
+  A_ID *param = id->type->field;
+
+  while (param != NULL) {
+    if (param->name != NULL && param->name[0] != '\0')
+      current_id = param;
+    else if (param->type != NULL && param->type->kind != T_VOID)
+      semanticError("Empty parameter name");
+
+    param = param->link;
+  }
+
+  return id;
+}
+
+A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *body) {
+  if (id == NULL)
+    semanticError("Null identifier in setFunctionDeclaratorBody");
+
+  if (id->kind != ID_FUNC | id->type == NULL || id->type->kind != T_FUNC)
+    semanticError("Illegal function declarator");
+
+  if (body == NULL)
+    semanticError("Null function body");
+
+  if (id->type->expr != NULL)
+    semanticError("Function body already defined");
+
+  id->type->expr = body;
+
+  return id;
+}
+
+A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
+  if (id == NULL || specifier == NULL)
+    semanticError("Null argument in setParameterDeclaratorSpecifier");
+
+  // 파라미터에 허용되지 않는 저장 클래스 검사 (이번 과제는 하지 않음)
+  if (specifier->stor != S_NULL)
+    semanticError("Illegal storage class in formal parameter");
+
+  // 파라미터는 명시적인 타입이 있어야됨
+  if (specifier->type == NULL)
+    semanticError("Missing paramater type");
+
+  // 같이 스코프에서 이름 중복 검사
+  if (id->name != NULL && id->name[0] != '\0') {
+    if (searchIdentifierAtCurrentLevel(id->name, id->prev) != NULL)
+      semanticError("Redeclaration of parameter");
+  }
+
+  // 타입 설정
+  setDeclaratorElementType(id, specifier->type);
+
+  // 이름이 있는 void 파라미터는 X
+  if (id->type == void_type) {
+    if (id->name != NULL && id->name[0] != '\0')
+      semanticError("Named paramater of void type");
+  }
+
+  id->kind = ID_PARM;
+
+  return id;
 }

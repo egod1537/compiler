@@ -6,6 +6,14 @@
 extern A_ID *current_id;
 extern int current_level;
 
+extern A_TYPE *int_type;
+extern A_TYPE *float_type;
+extern A_TYPE *char_type;
+extern A_TYPE *void_type;
+extern A_TYPE *string_type;
+
+void initialize(void);
+
 A_TYPE *makeType(T_KIND kind);
 A_ID *makeIdentifier(char *name);
 
@@ -16,7 +24,6 @@ void enterScope(void);
 void leaveScope(void);
 
 void semanticError(const char *message);
-
 A_ID *linkDeclaratorList(A_ID *head, A_ID *tail);
 A_TYPE *setTypeElementType(A_TYPE *t1, A_TYPE *t2);
 
@@ -32,4 +39,15 @@ A_TYPE *setTypeField(A_TYPE *type, A_ID *field);
 // 저장 클래스랑 식별자를 하나로 묶음A
 // e.g) static int a;
 A_SPECIFIER *makeSpecifier(A_TYPE *type, S_KIND stor);
+
+A_SPECIFIER *updateSpecifier(A_SPECIFIER *specifier, A_TYPE *type, S_KIND stor);
+
+// 기본 타입(int)로 설정함
+void setDefaultSpecifier(A_SPECIFIER *specifier);
+
+A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *specifier);
+A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier);
+
+A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *body);
+A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier);
 #endif // !SEMANTIC_H
