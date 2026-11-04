@@ -29,7 +29,7 @@ void checkPrecedence(A_NODE *node) {
       (intptr_t)b->clink != 3)
     semanticError("Unexpected integer values");
 
-  logMsg(LOG_INFO, "AST precedence test passed");
+  logMsg(LOG_SUCCESS, "AST precedence test passed");
 }
 
 void checkParentheses(A_NODE *root) {
@@ -56,5 +56,5 @@ void checkParentheses(A_NODE *root) {
       (intptr_t)three->clink != 3)
     semanticError("Incorrect integer values");
 
-  logMsg(LOG_INFO, "AST parentheses test passed");
+  logMsg(LOG_SUCCESS, "AST parentheses test passed");
 }

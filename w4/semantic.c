@@ -461,3 +461,12 @@ A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
 
   return id;
 }
+
+A_ID *getIdentifierDeclared(const char *name) {
+  A_ID *id = searchIdentifier(name);
+
+  if (id == NULL)
+    semanticError("Undeclared identifier");
+
+  return id;
+}

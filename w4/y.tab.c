@@ -832,13 +832,13 @@ static const yytype_int16 yyrline[] =
      238,   242,   243,   247,   248,   249,   250,   251,   252,   256,
      257,   258,   262,   266,   267,   271,   272,   276,   277,   281,
      282,   283,   287,   288,   289,   293,   294,   298,   299,   300,
-     301,   305,   306,   312,   313,   314,   315,   320,   321,   322,
-     323,   324,   325,   326,   330,   331,   335,   336,   340,   341,
-     342,   343,   344,   345,   346,   347,   348,   349,   350,   354,
-     355,   359,   360,   364,   365,   369,   373,   380,   381,   385,
-     392,   393,   394,   398,   399,   400,   401,   402,   406,   407,
-     408,   412,   413,   417,   418,   422,   423,   427,   428,   432,
-     433,   437,   438,   442,   443,   447,   448,   452,   460
+     301,   305,   310,   316,   317,   318,   319,   324,   325,   326,
+     327,   328,   329,   330,   334,   335,   339,   340,   344,   345,
+     346,   347,   348,   349,   350,   351,   352,   353,   354,   358,
+     359,   363,   364,   368,   369,   373,   377,   384,   385,   389,
+     396,   397,   398,   402,   403,   404,   405,   406,   410,   411,
+     412,   416,   417,   421,   422,   426,   427,   431,   432,   436,
+     437,   441,   442,   446,   447,   451,   452,   456,   464
 };
 #endif
 
@@ -1722,104 +1722,114 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
+  case 121: /* primary_expression: IDENTIFIER  */
+#line 305 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                {
+  yyval = (YYSTYPE)makeNode(
+      N_EXP_IDENT, NULL,
+      (A_NODE *)getIdentifierDeclared((const char *)(intptr_t)yyvsp[0]), NULL);
+}
+#line 1733 "y.tab.c"
+    break;
+
   case 122: /* primary_expression: INTEGER_CONSTANT  */
-#line 306 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 310 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                        {
   yyval = (YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE *)yyvsp[0], NULL);
 
   A_NODE *node = (A_NODE *)yyval;
   logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
 }
-#line 1734 "y.tab.c"
+#line 1744 "y.tab.c"
     break;
 
   case 126: /* primary_expression: LP expression RP  */
-#line 316 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 320 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     { yyval = yyvsp[-1]; }
-#line 1740 "y.tab.c"
+#line 1750 "y.tab.c"
     break;
 
   case 127: /* postfix_expression: primary_expression  */
-#line 320 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 324 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                          { yyval = yyvsp[0]; }
-#line 1746 "y.tab.c"
+#line 1756 "y.tab.c"
     break;
 
   case 138: /* unary_expression: postfix_expression  */
-#line 340 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 344 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                          { yyval = yyvsp[0]; }
-#line 1752 "y.tab.c"
+#line 1762 "y.tab.c"
     break;
 
   case 149: /* cast_expression: unary_expression  */
-#line 354 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 358 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                        { yyval = yyvsp[0]; }
-#line 1758 "y.tab.c"
+#line 1768 "y.tab.c"
     break;
 
   case 153: /* multiplicative_expression: cast_expression  */
-#line 364 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 368 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                       { yyval = yyvsp[0]; }
-#line 1764 "y.tab.c"
+#line 1774 "y.tab.c"
     break;
 
   case 154: /* multiplicative_expression: multiplicative_expression STAR cast_expression  */
-#line 366 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 370 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = (YYSTYPE)makeNode(N_EXP_MUL, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
     }
-#line 1772 "y.tab.c"
+#line 1782 "y.tab.c"
     break;
 
   case 155: /* multiplicative_expression: multiplicative_expression SLASH cast_expression  */
-#line 370 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 374 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = (YYSTYPE)makeNode(N_EXP_DIV, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
     }
-#line 1780 "y.tab.c"
+#line 1790 "y.tab.c"
     break;
 
   case 156: /* multiplicative_expression: multiplicative_expression PERCENT cast_expression  */
-#line 374 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 378 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = (YYSTYPE)makeNode(N_EXP_MOD, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
     }
-#line 1788 "y.tab.c"
+#line 1798 "y.tab.c"
     break;
 
   case 157: /* additive_expression: multiplicative_expression  */
-#line 380 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 384 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                                 { yyval = yyvsp[0]; }
-#line 1794 "y.tab.c"
+#line 1804 "y.tab.c"
     break;
 
   case 158: /* additive_expression: additive_expression PLUS multiplicative_expression  */
-#line 382 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 386 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = (YYSTYPE)makeNode(N_EXP_ADD, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
     }
-#line 1802 "y.tab.c"
+#line 1812 "y.tab.c"
     break;
 
   case 159: /* additive_expression: additive_expression MINUS multiplicative_expression  */
-#line 386 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 390 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = (YYSTYPE)makeNode(N_EXP_SUB, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
     }
-#line 1810 "y.tab.c"
+#line 1820 "y.tab.c"
     break;
 
   case 187: /* expression: comma_expression  */
-#line 453 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 457 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
       expression_root = (A_NODE *)yyvsp[0];
     }
-#line 1819 "y.tab.c"
+#line 1829 "y.tab.c"
     break;
 
 
-#line 1823 "y.tab.c"
+#line 1833 "y.tab.c"
 
       default: break;
     }
@@ -2012,7 +2022,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 463 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 467 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
 
 
 int yyerror(const char *s) {

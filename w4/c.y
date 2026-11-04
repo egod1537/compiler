@@ -71,8 +71,16 @@ declaration
 
 declaration_specifiers
     : type_specifier
+    {
+      $$ = (YYSTYPE)(intptr_t)makeSpecifier((A_TYPE *)(intptr_t)$1, S_NULL);
+    }
     | storage_class_specifier
-    | type_qualifier
+    {
+      $$ = (YYSTYPE)(intptr_t)makeSpecifier(NULL, (S_KIND)$1);
+    }
+    | type_qualifier{
+  $$ = (YYSTYPE)(intptr_t)updateSpecifier((A_SPECIFIER *)(intptr_t))
+}
     | type_specifier declaration_specifiers
     | storage_class_specifier declaration_specifiers
     | type_qualifier declaration_specifiers
@@ -104,7 +112,7 @@ init_declarator
 type_specifier
     : struct_specifier
     | enum_specifier
-    | TYPE_IDENTIFIER
+    | TYPE_IDENTIFIER { $$ = $1; }
     ;
 
 struct_specifier
@@ -302,7 +310,11 @@ jump_statement
     ;
 
 primary_expression
-    : IDENTIFIER
+    : IDENTIFIER{
+  $$ = (YYSTYPE)makeNode(
+      N_EXP_IDENT, NULL,
+      (A_NODE *)getIdentifierDeclared((const char *)(intptr_t)$1), NULL);
+}
     | INTEGER_CONSTANT {
   $$ = (YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE *)$1, NULL);
 

@@ -26,6 +26,11 @@ if not exist "%INPUT_FILE%" (
     goto :finish
 )
 
+set "PARSER_ARGS="
+for %%F in ("%INPUT_FILE%") do set "INPUT_NAME=%%~nxF"
+if /I "%INPUT_NAME%"=="03_precedence.c" set "PARSER_ARGS=--ast-test precedence"
+if /I "%INPUT_NAME%"=="04_parentheses.c" set "PARSER_ARGS=--ast-test parentheses"
+
 type nul > "%BUILD_LOG%"
 
 call :run_logged bison -y -d "%ROOT%c.y"
@@ -49,7 +54,7 @@ if errorlevel 1 (
     goto :finish
 )
 
-"%ROOT%parser.exe" < "%INPUT_FILE%"
+"%ROOT%parser.exe" %PARSER_ARGS% < "%INPUT_FILE%"
 if errorlevel 1 (
     set "EXIT_CODE=%ERRORLEVEL%"
     echo [ERROR] Parser test failed: "%INPUT_FILE%" 1>&2
