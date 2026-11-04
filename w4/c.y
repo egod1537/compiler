@@ -3,70 +3,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "type.h"
 #include "logger.h"
 #include "semantic.h"
+#include "syntax_tree.h"
+#include "tests/ast_assert.h"
+#include "type.h"
 
 int yylex(void);
 int yyerror(const char *s);
 extern int line_no;
 
-A_NODE* makeNode(
-  NODE_NAME name,
-  A_NODE* left,
-  A_NODE* center,
-  A_NODE* right
-);
-
-static void checkBinaryNode(A_NODE* node){
-  if(node == NULL || node->llink == NULL || node->rlink == NULL)
-  semanticError("Invalid binary AST Node");
-
-if(node->name != N_EXP_ADD && node->name != N_EXP_SUB)
-  semanticError("Unexpected binary operator");
-
-if(node->llink->name != N_EXP_INT_CONST || node->rlink->name != N_EXP_INT_CONST)
-  semanticError("Expected interger operands");
-
-    logMsg(
-        LOG_DEBUG,
-        "%s: %lld, %lld",
-        node->name == N_EXP_ADD ? "ADD" : "SUB",
-        (long long)(intptr_t)node->llink->clink,
-        (long long)(intptr_t)node->rlink->clink
-    );
-}
-
-static void checkPrecedence(A_NODE *node)
-{
-    if (node == NULL || node->name != N_EXP_ADD)
-        semanticError("Expected N_EXP_ADD");
-
-    A_NODE *left = node->llink;
-    A_NODE *right = node->rlink;
-
-    if (left == NULL || right == NULL)
-        semanticError("Missing AST operand");
-
-    if (left->name != N_EXP_INT_CONST ||
-        right->name != N_EXP_MUL)
-        semanticError("Incorrect operator precedence");
-
-    A_NODE *mul_left = right->llink;
-    A_NODE *mul_right = right->rlink;
-
-    if (mul_left == NULL || mul_right == NULL ||
-        mul_left->name != N_EXP_INT_CONST ||
-        mul_right->name != N_EXP_INT_CONST)
-        semanticError("Invalid multiplication operands");
-
-    if ((intptr_t)left->clink != 1 ||
-        (intptr_t)mul_left->clink != 2 ||
-        (intptr_t)mul_right->clink != 3)
-        semanticError("Unexpected integer values");
-
-    logMsg(LOG_INFO, "AST precedence test passed");
-}
+A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right);
 %}
 
 %token IDENTIFIER TYPE_IDENTIFIER
@@ -357,20 +304,20 @@ jump_statement
 primary_expression
     : IDENTIFIER
     | INTEGER_CONSTANT {
-      $$ =(YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE*)$1, NULL);
-      
-      A_NODE *node = (A_NODE*)$$;
-      logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld",
-             (long long)(intptr_t)node->clink);
-    }
+  $$ = (YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE *)$1, NULL);
+
+  A_NODE *node = (A_NODE *)$$;
+  logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
+}
     | FLOAT_CONSTANT
     | CHARACTER_CONSTANT
     | STRING_LITERAL
     | LP expression RP
+    { $$ = $2; }
     ;
 
 postfix_expression
-    : primary_expression { $$ = $1;}
+    : primary_expression { $$ = $1; }
     | postfix_expression LB expression RB
     | postfix_expression LP arg_expression_list_opt RP
     | postfix_expression PERIOD IDENTIFIER
@@ -390,7 +337,7 @@ arg_expression_list
     ;
 
 unary_expression
-    : postfix_expression {$$ = $1;}
+    : postfix_expression { $$ = $1; }
     | PLUSPLUS unary_expression
     | MINUSMINUS unary_expression
     | AMP cast_expression
@@ -404,7 +351,7 @@ unary_expression
     ;
 
 cast_expression
-    : unary_expression { $$=$1;}
+    : unary_expression { $$ = $1; }
     | LP type_name RP cast_expression
     ;
 
@@ -414,52 +361,30 @@ type_name
     ;
 
 multiplicative_expression
-    : cast_expression {$$=$1;}
+    : cast_expression { $$ = $1; }
     | multiplicative_expression STAR cast_expression
     {
-      $$ = (YYSTYPE) makeNode(
-        N_EXP_MUL,
-        (A_NODE*) $1,
-        NULL,
-        (A_NODE*) $3
-      );
+      $$ = (YYSTYPE)makeNode(N_EXP_MUL, (A_NODE *)$1, NULL, (A_NODE *)$3);
     }
     | multiplicative_expression SLASH cast_expression
     {
-$$ = (YYSTYPE) makeNode(
-        N_EXP_DIV,
-        (A_NODE*) $1,
-        NULL,
-        (A_NODE*) $3
-      );
-
+      $$ = (YYSTYPE)makeNode(N_EXP_DIV, (A_NODE *)$1, NULL, (A_NODE *)$3);
     }
     | multiplicative_expression PERCENT cast_expression
     {
-$$ = (YYSTYPE) makeNode(
-        N_EXP_MOD,
-        (A_NODE*) $1,
-        NULL,
-        (A_NODE*) $3
-      );
-
+      $$ = (YYSTYPE)makeNode(N_EXP_MOD, (A_NODE *)$1, NULL, (A_NODE *)$3);
     }
     ;
 
 additive_expression
-    : multiplicative_expression {$$ =$1;}
+    : multiplicative_expression { $$ = $1; }
     | additive_expression PLUS multiplicative_expression
     {
-      $$ = (YYSTYPE) makeNode(
-        N_EXP_ADD, (A_NODE*) $1, NULL, (A_NODE*)$3);
-
-      if(getenv("AST_TEST_PRECEDENCE") != NULL)
-        checkPrecedence((A_NODE*) $$);
+      $$ = (YYSTYPE)makeNode(N_EXP_ADD, (A_NODE *)$1, NULL, (A_NODE *)$3);
     }
     | additive_expression MINUS multiplicative_expression
     {
-      $$ = (YYSTYPE) makeNode(
-        N_EXP_SUB, (A_NODE*) $1, NULL, (A_NODE*)$3);
+      $$ = (YYSTYPE)makeNode(N_EXP_SUB, (A_NODE *)$1, NULL, (A_NODE *)$3);
     }
     ;
 
@@ -525,6 +450,10 @@ comma_expression
 
 expression
     : comma_expression
+    {
+      $$ = $1;
+      expression_root = (A_NODE *)$1;
+    }
     ;
 
 constant_expression
@@ -533,20 +462,7 @@ constant_expression
 
 %%
 
-int main(void)
-{
-    int result = yyparse();
-
-    if (result == 0)
-        printf("Parsing success\n");
-
-    return result;
-}
-
-int yyerror(const char *s)
-{
-    logMsg(LOG_ERROR,
-               "Syntax error at line %d: %s",
-               line_no, s);
-    return 0;
+int yyerror(const char *s) {
+  logMsg(LOG_ERROR, "Syntax error at line %d: %s", line_no, s);
+  return 0;
 }

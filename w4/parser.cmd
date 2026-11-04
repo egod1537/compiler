@@ -28,28 +28,28 @@ if not exist "%INPUT_FILE%" (
 
 type nul > "%BUILD_LOG%"
 
-call :run_logged bison -y -d c.y
+call :run_logged bison -y -d "%ROOT%c.y"
 if errorlevel 1 (
     set "EXIT_CODE=%ERRORLEVEL%"
     echo [ERROR] bison failed. See "%BUILD_LOG%". 1>&2
     goto :finish
 )
 
-call :run_logged flex c.l
+call :run_logged flex "%ROOT%c.l"
 if errorlevel 1 (
     set "EXIT_CODE=%ERRORLEVEL%"
     echo [ERROR] flex failed. See "%BUILD_LOG%". 1>&2
     goto :finish
 )
 
-call :run_logged gcc -Wall -Wextra -std=c11 -g -O0 y.tab.c lex.yy.c semantic.c syntax_tree.c logger.c -o parser.exe
+call :run_logged gcc -Wall -Wextra -std=c11 -g -O0 "%ROOT%y.tab.c" "%ROOT%lex.yy.c" "%ROOT%semantic.c" "%ROOT%syntax_tree.c" "%ROOT%logger.c" "%ROOT%tests\ast_assert.c" "%ROOT%parser_main.c" -o "%ROOT%parser.exe"
 if errorlevel 1 (
     set "EXIT_CODE=%ERRORLEVEL%"
     echo [ERROR] gcc failed. See "%BUILD_LOG%". 1>&2
     goto :finish
 )
 
-parser.exe < "%INPUT_FILE%"
+"%ROOT%parser.exe" < "%INPUT_FILE%"
 if errorlevel 1 (
     set "EXIT_CODE=%ERRORLEVEL%"
     echo [ERROR] Parser test failed: "%INPUT_FILE%" 1>&2

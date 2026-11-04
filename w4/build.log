@@ -1,6 +1,3 @@
-c.y:21:13: warning: 'checkBinaryNode' defined but not used [-Wunused-function]
-   21 | static void checkBinaryNode(A_NODE* node){
-      |             ^~~~~~~~~~~~~~~
 lex.yy.c:1571:16: warning: 'input' defined but not used [-Wunused-function]
  1571 | #else
       |                ^    

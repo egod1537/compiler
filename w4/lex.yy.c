@@ -551,8 +551,8 @@ int yy_flex_debug = 0;
 #define YY_MORE_ADJ 0
 #define YY_RESTORE_YY_MORE_OFFSET
 char *yytext;
-#line 1 "c.l"
-#line 8 "c.l"
+#line 1 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
+#line 8 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 #include "parse_value.h"
 #include "y.tab.h"
 #include <stdlib.h>
@@ -779,7 +779,7 @@ YY_DECL
 		}
 
 	{
-#line 18 "c.l"
+#line 18 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 
 
 #line 785 "lex.yy.c"
@@ -841,329 +841,329 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 20 "c.l"
+#line 20 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 21 "c.l"
+#line 21 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { line_no++; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 23 "c.l"
+#line 23 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(AUTO_SYM); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 24 "c.l"
+#line 24 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(STATIC_SYM); }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 25 "c.l"
+#line 25 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(TYPEDEF_SYM); }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 26 "c.l"
+#line 26 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(REGISTER_SYM); }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 27 "c.l"
+#line 27 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(EXTERN_SYM); }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 29 "c.l"
+#line 29 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(BREAK_SYM); }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 30 "c.l"
+#line 30 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(CASE_SYM); }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 31 "c.l"
+#line 31 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(CONTINUE_SYM); }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 32 "c.l"
+#line 32 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(DEFAULT_SYM); }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 33 "c.l"
+#line 33 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(DO_SYM); }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 34 "c.l"
+#line 34 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(ELSE_SYM); }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 35 "c.l"
+#line 35 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(ENUM_SYM); }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 36 "c.l"
+#line 36 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(FOR_SYM); }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 37 "c.l"
+#line 37 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(GOTO_SYM); }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 38 "c.l"
+#line 38 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(IF_SYM); }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 39 "c.l"
+#line 39 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(RETURN_SYM); }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 40 "c.l"
+#line 40 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(SIZEOF_SYM); }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 41 "c.l"
+#line 41 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(STRUCT_SYM); }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 42 "c.l"
+#line 42 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(SWITCH_SYM); }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 43 "c.l"
+#line 43 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(UNION_SYM); }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 44 "c.l"
+#line 44 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(WHILE_SYM); }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 46 "c.l"
+#line 46 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(CONST_SYM); }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 47 "c.l"
+#line 47 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(VOLATILE_SYM); }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 49 "c.l"
+#line 49 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(PLUSPLUS); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 50 "c.l"
+#line 50 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(MINUSMINUS); }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 51 "c.l"
+#line 51 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(ARROW); }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 53 "c.l"
+#line 53 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(LEQ); }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 54 "c.l"
+#line 54 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(GEQ); }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 55 "c.l"
+#line 55 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(EQL); }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 56 "c.l"
+#line 56 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(NEQ); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 58 "c.l"
+#line 58 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(AMPAMP); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 59 "c.l"
+#line 59 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(BARBAR); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 61 "c.l"
+#line 61 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(LSHIFT); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 62 "c.l"
+#line 62 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(RSHIFT); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 64 "c.l"
+#line 64 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(DOTDOTDOT); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 66 "c.l"
+#line 66 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(LSS); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 67 "c.l"
+#line 67 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(GTR); }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 69 "c.l"
+#line 69 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(LP); }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 70 "c.l"
+#line 70 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(RP); }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 71 "c.l"
+#line 71 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(LB); }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 72 "c.l"
+#line 72 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(RB); }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 73 "c.l"
+#line 73 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(LR); }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 74 "c.l"
+#line 74 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(RR); }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 76 "c.l"
+#line 76 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(COLON); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 77 "c.l"
+#line 77 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(PERIOD); }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 78 "c.l"
+#line 78 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(COMMA); }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 79 "c.l"
+#line 79 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(EXCL); }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 80 "c.l"
+#line 80 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(TILDE); }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 82 "c.l"
+#line 82 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(STAR); }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 83 "c.l"
+#line 83 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(SLASH); }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 84 "c.l"
+#line 84 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(PERCENT); }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 86 "c.l"
+#line 86 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(AMP); }
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 87 "c.l"
+#line 87 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(BAR); }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 88 "c.l"
+#line 88 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(CARET); }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 90 "c.l"
+#line 90 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(SEMICOLON); }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 92 "c.l"
+#line 92 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(PLUS); }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 93 "c.l"
+#line 93 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(MINUS); }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 95 "c.l"
+#line 95 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(ASSIGN); }
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 97 "c.l"
+#line 97 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(QUESTION); }
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 99 "c.l"
+#line 99 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { }
 	YY_BREAK
 case 63:
 /* rule 63 can match eol */
 YY_RULE_SETUP
-#line 100 "c.l"
+#line 100 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { }
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 102 "c.l"
+#line 102 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(FLOAT_CONSTANT); }
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 103 "c.l"
+#line 103 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { 
   yylval = atol(yytext); 
   return(INTEGER_CONSTANT);
@@ -1172,22 +1172,22 @@ YY_RULE_SETUP
 case 66:
 /* rule 66 can match eol */
 YY_RULE_SETUP
-#line 108 "c.l"
+#line 108 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(STRING_LITERAL); }
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 109 "c.l"
+#line 109 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(CHARACTER_CONSTANT); }
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 111 "c.l"
+#line 111 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 { return(checkIdentifier(yytext)); }
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 113 "c.l"
+#line 113 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 ECHO;
 	YY_BREAK
 #line 1193 "lex.yy.c"
@@ -2195,7 +2195,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 113 "c.l"
+#line 113 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 
 
 int checkIdentifier(char *s)

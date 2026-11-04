@@ -67,78 +67,25 @@
 
 
 /* First part of user prologue.  */
-#line 1 "c.y"
+#line 1 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
 
 #include "parse_value.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "type.h"
 #include "logger.h"
 #include "semantic.h"
+#include "syntax_tree.h"
+#include "tests/ast_assert.h"
+#include "type.h"
 
 int yylex(void);
 int yyerror(const char *s);
 extern int line_no;
 
-A_NODE* makeNode(
-  NODE_NAME name,
-  A_NODE* left,
-  A_NODE* center,
-  A_NODE* right
-);
+A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right);
 
-static void checkBinaryNode(A_NODE* node){
-  if(node == NULL || node->llink == NULL || node->rlink == NULL)
-  semanticError("Invalid binary AST Node");
-
-if(node->name != N_EXP_ADD && node->name != N_EXP_SUB)
-  semanticError("Unexpected binary operator");
-
-if(node->llink->name != N_EXP_INT_CONST || node->rlink->name != N_EXP_INT_CONST)
-  semanticError("Expected interger operands");
-
-    logMsg(
-        LOG_DEBUG,
-        "%s: %lld, %lld",
-        node->name == N_EXP_ADD ? "ADD" : "SUB",
-        (long long)(intptr_t)node->llink->clink,
-        (long long)(intptr_t)node->rlink->clink
-    );
-}
-
-static void checkPrecedence(A_NODE *node)
-{
-    if (node == NULL || node->name != N_EXP_ADD)
-        semanticError("Expected N_EXP_ADD");
-
-    A_NODE *left = node->llink;
-    A_NODE *right = node->rlink;
-
-    if (left == NULL || right == NULL)
-        semanticError("Missing AST operand");
-
-    if (left->name != N_EXP_INT_CONST ||
-        right->name != N_EXP_MUL)
-        semanticError("Incorrect operator precedence");
-
-    A_NODE *mul_left = right->llink;
-    A_NODE *mul_right = right->rlink;
-
-    if (mul_left == NULL || mul_right == NULL ||
-        mul_left->name != N_EXP_INT_CONST ||
-        mul_right->name != N_EXP_INT_CONST)
-        semanticError("Invalid multiplication operands");
-
-    if ((intptr_t)left->clink != 1 ||
-        (intptr_t)mul_left->clink != 2 ||
-        (intptr_t)mul_right->clink != 3)
-        semanticError("Unexpected integer values");
-
-    logMsg(LOG_INFO, "AST precedence test passed");
-}
-
-#line 142 "y.tab.c"
+#line 89 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -873,25 +820,25 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    98,    98,   102,   103,   107,   108,   112,   113,   117,
-     118,   122,   126,   127,   128,   129,   130,   131,   135,   136,
-     137,   138,   139,   143,   144,   148,   149,   153,   154,   158,
-     159,   160,   164,   165,   166,   170,   171,   175,   176,   180,
-     184,   185,   186,   187,   191,   192,   196,   197,   198,   202,
-     203,   204,   208,   209,   213,   214,   218,   219,   223,   224,
-     228,   229,   233,   234,   238,   239,   240,   241,   245,   246,
-     250,   251,   255,   256,   260,   261,   265,   266,   270,   271,
-     275,   276,   277,   281,   282,   283,   284,   285,   289,   290,
-     291,   295,   296,   300,   301,   302,   303,   304,   305,   309,
-     310,   311,   315,   319,   320,   324,   325,   329,   330,   334,
-     335,   336,   340,   341,   342,   346,   347,   351,   352,   353,
-     354,   358,   359,   366,   367,   368,   369,   373,   374,   375,
-     376,   377,   378,   379,   383,   384,   388,   389,   393,   394,
-     395,   396,   397,   398,   399,   400,   401,   402,   403,   407,
-     408,   412,   413,   417,   418,   427,   437,   450,   451,   459,
-     467,   468,   469,   473,   474,   475,   476,   477,   481,   482,
-     483,   487,   488,   492,   493,   497,   498,   502,   503,   507,
-     508,   512,   513,   517,   518,   522,   523,   527,   531
+       0,    45,    45,    49,    50,    54,    55,    59,    60,    64,
+      65,    69,    73,    74,    75,    76,    77,    78,    82,    83,
+      84,    85,    86,    90,    91,    95,    96,   100,   101,   105,
+     106,   107,   111,   112,   113,   117,   118,   122,   123,   127,
+     131,   132,   133,   134,   138,   139,   143,   144,   145,   149,
+     150,   151,   155,   156,   160,   161,   165,   166,   170,   171,
+     175,   176,   180,   181,   185,   186,   187,   188,   192,   193,
+     197,   198,   202,   203,   207,   208,   212,   213,   217,   218,
+     222,   223,   224,   228,   229,   230,   231,   232,   236,   237,
+     238,   242,   243,   247,   248,   249,   250,   251,   252,   256,
+     257,   258,   262,   266,   267,   271,   272,   276,   277,   281,
+     282,   283,   287,   288,   289,   293,   294,   298,   299,   300,
+     301,   305,   306,   312,   313,   314,   315,   320,   321,   322,
+     323,   324,   325,   326,   330,   331,   335,   336,   340,   341,
+     342,   343,   344,   345,   346,   347,   348,   349,   350,   354,
+     355,   359,   360,   364,   365,   369,   373,   380,   381,   385,
+     392,   393,   394,   398,   399,   400,   401,   402,   406,   407,
+     408,   412,   413,   417,   418,   422,   423,   427,   428,   432,
+     433,   437,   438,   442,   443,   447,   448,   452,   460
 };
 #endif
 
@@ -1776,111 +1723,103 @@ yyreduce:
   switch (yyn)
     {
   case 122: /* primary_expression: INTEGER_CONSTANT  */
-#line 359 "c.y"
+#line 306 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                        {
-      yyval =(YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE*)yyvsp[0], NULL);
-      
-      A_NODE *node = (A_NODE*)yyval;
-      logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld",
-             (long long)(intptr_t)node->clink);
+  yyval = (YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE *)yyvsp[0], NULL);
+
+  A_NODE *node = (A_NODE *)yyval;
+  logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
+}
+#line 1734 "y.tab.c"
+    break;
+
+  case 126: /* primary_expression: LP expression RP  */
+#line 316 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    { yyval = yyvsp[-1]; }
+#line 1740 "y.tab.c"
+    break;
+
+  case 127: /* postfix_expression: primary_expression  */
+#line 320 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                         { yyval = yyvsp[0]; }
+#line 1746 "y.tab.c"
+    break;
+
+  case 138: /* unary_expression: postfix_expression  */
+#line 340 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                         { yyval = yyvsp[0]; }
+#line 1752 "y.tab.c"
+    break;
+
+  case 149: /* cast_expression: unary_expression  */
+#line 354 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                       { yyval = yyvsp[0]; }
+#line 1758 "y.tab.c"
+    break;
+
+  case 153: /* multiplicative_expression: cast_expression  */
+#line 364 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                      { yyval = yyvsp[0]; }
+#line 1764 "y.tab.c"
+    break;
+
+  case 154: /* multiplicative_expression: multiplicative_expression STAR cast_expression  */
+#line 366 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = (YYSTYPE)makeNode(N_EXP_MUL, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
+    }
+#line 1772 "y.tab.c"
+    break;
+
+  case 155: /* multiplicative_expression: multiplicative_expression SLASH cast_expression  */
+#line 370 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = (YYSTYPE)makeNode(N_EXP_DIV, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
+    }
+#line 1780 "y.tab.c"
+    break;
+
+  case 156: /* multiplicative_expression: multiplicative_expression PERCENT cast_expression  */
+#line 374 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = (YYSTYPE)makeNode(N_EXP_MOD, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
     }
 #line 1788 "y.tab.c"
     break;
 
-  case 127: /* postfix_expression: primary_expression  */
-#line 373 "c.y"
-                         { yyval = yyvsp[0];}
+  case 157: /* additive_expression: multiplicative_expression  */
+#line 380 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                                { yyval = yyvsp[0]; }
 #line 1794 "y.tab.c"
     break;
 
-  case 138: /* unary_expression: postfix_expression  */
-#line 393 "c.y"
-                         {yyval = yyvsp[0];}
-#line 1800 "y.tab.c"
-    break;
-
-  case 149: /* cast_expression: unary_expression  */
-#line 407 "c.y"
-                       { yyval=yyvsp[0];}
-#line 1806 "y.tab.c"
-    break;
-
-  case 153: /* multiplicative_expression: cast_expression  */
-#line 417 "c.y"
-                      {yyval=yyvsp[0];}
-#line 1812 "y.tab.c"
-    break;
-
-  case 154: /* multiplicative_expression: multiplicative_expression STAR cast_expression  */
-#line 419 "c.y"
-    {
-      yyval = (YYSTYPE) makeNode(
-        N_EXP_MUL,
-        (A_NODE*) yyvsp[-2],
-        NULL,
-        (A_NODE*) yyvsp[0]
-      );
-    }
-#line 1825 "y.tab.c"
-    break;
-
-  case 155: /* multiplicative_expression: multiplicative_expression SLASH cast_expression  */
-#line 428 "c.y"
-    {
-yyval = (YYSTYPE) makeNode(
-        N_EXP_DIV,
-        (A_NODE*) yyvsp[-2],
-        NULL,
-        (A_NODE*) yyvsp[0]
-      );
-
-    }
-#line 1839 "y.tab.c"
-    break;
-
-  case 156: /* multiplicative_expression: multiplicative_expression PERCENT cast_expression  */
-#line 438 "c.y"
-    {
-yyval = (YYSTYPE) makeNode(
-        N_EXP_MOD,
-        (A_NODE*) yyvsp[-2],
-        NULL,
-        (A_NODE*) yyvsp[0]
-      );
-
-    }
-#line 1853 "y.tab.c"
-    break;
-
-  case 157: /* additive_expression: multiplicative_expression  */
-#line 450 "c.y"
-                                {yyval =yyvsp[0];}
-#line 1859 "y.tab.c"
-    break;
-
   case 158: /* additive_expression: additive_expression PLUS multiplicative_expression  */
-#line 452 "c.y"
+#line 382 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = (YYSTYPE) makeNode(
-        N_EXP_ADD, (A_NODE*) yyvsp[-2], NULL, (A_NODE*)yyvsp[0]);
-
-      if(getenv("AST_TEST_PRECEDENCE") != NULL)
-        checkPrecedence((A_NODE*) yyval);
+      yyval = (YYSTYPE)makeNode(N_EXP_ADD, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
     }
-#line 1871 "y.tab.c"
+#line 1802 "y.tab.c"
     break;
 
   case 159: /* additive_expression: additive_expression MINUS multiplicative_expression  */
-#line 460 "c.y"
+#line 386 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = (YYSTYPE) makeNode(
-        N_EXP_SUB, (A_NODE*) yyvsp[-2], NULL, (A_NODE*)yyvsp[0]);
+      yyval = (YYSTYPE)makeNode(N_EXP_SUB, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
     }
-#line 1880 "y.tab.c"
+#line 1810 "y.tab.c"
+    break;
+
+  case 187: /* expression: comma_expression  */
+#line 453 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = yyvsp[0];
+      expression_root = (A_NODE *)yyvsp[0];
+    }
+#line 1819 "y.tab.c"
     break;
 
 
-#line 1884 "y.tab.c"
+#line 1823 "y.tab.c"
 
       default: break;
     }
@@ -2073,23 +2012,10 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 534 "c.y"
+#line 463 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
 
 
-int main(void)
-{
-    int result = yyparse();
-
-    if (result == 0)
-        printf("Parsing success\n");
-
-    return result;
-}
-
-int yyerror(const char *s)
-{
-    logMsg(LOG_ERROR,
-               "Syntax error at line %d: %s",
-               line_no, s);
-    return 0;
+int yyerror(const char *s) {
+  logMsg(LOG_ERROR, "Syntax error at line %d: %s", line_no, s);
+  return 0;
 }
