@@ -461,3 +461,5 @@ A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
 
   return id;
 }
+
+A_ID *makeDummyIdentifier(void) { return makeIdentifier(""); }

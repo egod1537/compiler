@@ -40,5 +40,32 @@ int main(void) {
   if (getenv("AST_TEST_PRE_INC") != NULL)
     AST_checkPreIncrement(expression_root);
 
+  if (getenv("AST_TEST_PRE_DEC") != NULL)
+    AST_checkPreDecrement(expression_root);
+
+  if (getenv("AST_TEST_POST_INC") != NULL)
+    AST_checkPostIncrement(expression_root);
+
+  if (getenv("AST_TEST_POST_DEC") != NULL)
+    AST_checkPostDecrement(expression_root);
+
+  if (getenv("AST_TEST_ARRAY_ACCESS") != NULL)
+    AST_checkArrayAccess(expression_root);
+
+  if (getenv("AST_TEST_ARRAY_DECL") != NULL)
+    AST_checkArrayDeclaration();
+
+  if (getenv("AST_TEST_FUNCTION_DECL") != NULL)
+    AST_checkFunctionDeclarator();
+
+  if (getenv("AST_TEST_FUNCTION_PARAMS") != NULL)
+    AST_checkFunctionParameters();
+
+  if (getenv("AST_TEST_RETURN") != NULL)
+    AST_checkReturn(statement_root);
+
+  if (getenv("AST_TEST_COMPOUND") != NULL)
+    AST_checkCompoundReturn(compound_root);
+
   return 0;
 }

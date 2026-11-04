@@ -61,8 +61,8 @@ function_definition
     ;
 
 declaration_list_opt
-    :
-    | declaration_list
+    : { $$ = YY(NULL); }
+    | declaration_list{ $$ = $1; }
     ;
 
 declaration
@@ -218,17 +218,28 @@ direct_declarator
     }
     | LP declarator RP
     | direct_declarator LB constant_expression_opt RB
+    {
+      $$ = YY(setDeclaratorElementType(
+          PTR(A_ID, $1), setTypeExpr(makeType(T_ARRAY), PTR(A_NODE, $3))));
+    }
     | direct_declarator LP parameter_type_list_opt RP
+    {
+      $$ = YY(setDeclaratorElementType(
+          PTR(A_ID, $1), setTypeField(makeType(T_FUNC), PTR(A_ID, $3))));
+    }
     ;
 
 constant_expression_opt
-    :
+    : { $$ = YY(NULL); }
     | constant_expression
+    { $$ = $1; }
+
     ;
 
 parameter_type_list_opt
-    :
+    :{ $$ = YY(NULL); }
     | parameter_type_list
+    { $$ = $1; }
     ;
 
 parameter_type_list
@@ -243,12 +254,24 @@ parameter_list
 
 parameter_declaration
     : declaration_specifiers declarator
+    {
+      $$ = YY(setParameterDeclaratorSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1)));
+    }
     | declaration_specifiers abstract_declarator_opt
+    {
+      A_ID *id = makeDummyIdentifier();
+    
+      setDeclaratorElementType(id, PTR(A_TYPE, $2));
+    
+      $$ = YY(setParameterDeclaratorSpecifier(id, PTR(A_SPECIFIER, $1)));
+    }
     ;
 
 abstract_declarator_opt
-    :
+    : { $$ = YY(NULL); }
     | abstract_declarator
+    { $$ = $1; }
+
     ;
 
 abstract_declarator
@@ -282,7 +305,7 @@ statement
     | expression_statement
     | selection_statement
     | iteration_statement
-    | jump_statement
+    | jump_statement { $$ = $1; }
     ;
 
 labeled_statement
@@ -293,6 +316,11 @@ labeled_statement
 
 compound_statement
     : LR declaration_list_opt statement_list RR
+    {
+      $$ = YY(makeNode(N_STMT_COMPOUND, PTR(A_NODE, $2), NULL, PTR(A_NODE, $3)));
+    
+      compound_root = PTR(A_NODE, $$);
+    }
     ;
 
 declaration_list
@@ -300,9 +328,25 @@ declaration_list
     | declaration_list declaration
     ;
 
+statement_list_opt 
+  :
+    {
+      $$ = YY(makeNode(N_STMT_LIST_NIL, NULL, NULL, NULL));
+    }
+    | statement_list
+    { $$ = $1; }
+    ;
+
 statement_list
-    :
+    : statement
+    {
+      $$ = YY(makeNode(N_STMT_LIST, PTR(A_NODE, $1), NULL,
+                       makeNode(N_STMT_LIST_NIL, NULL, NULL, NULL)));
+    }
     | statement_list statement
+    {
+      $$ = YY(makeNodeList(N_STMT_LIST, PTR(A_NODE, $1), PTR(A_NODE, $2)));
+    }
     ;
 
 expression_statement
@@ -323,12 +367,17 @@ iteration_statement
     ;
 
 expression_opt
-    :
-    | expression
+    : { $$ = YY(NULL); }
+    | expression{ $$ = $1; }
     ;
 
 jump_statement
     : RETURN_SYM expression_opt SEMICOLON
+    {
+      $$ = YY(makeNode(N_STMT_RETURN, NULL, PTR(A_NODE, $2), NULL));
+    
+      statement_root = PTR(A_NODE, $$);
+    }
     | CONTINUE_SYM SEMICOLON
     | BREAK_SYM SEMICOLON
     | GOTO_SYM IDENTIFIER SEMICOLON
@@ -353,11 +402,20 @@ primary_expression
 postfix_expression
     : primary_expression { $$ = $1; }
     | postfix_expression LB expression RB
+    {
+      $$ = YY(makeNode(N_EXP_ARRAY, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     | postfix_expression LP arg_expression_list_opt RP
     | postfix_expression PERIOD IDENTIFIER
     | postfix_expression ARROW IDENTIFIER
     | postfix_expression PLUSPLUS
+    {
+      $$ = YY(makeNode(N_EXP_POST_INC, NULL, PTR(A_NODE, $1), NULL));
+    }
     | postfix_expression MINUSMINUS
+    {
+      $$ = YY(makeNode(N_EXP_POST_DEC, NULL, PTR(A_NODE, $1), NULL));
+    }
     ;
 
 arg_expression_list_opt
@@ -373,7 +431,13 @@ arg_expression_list
 unary_expression
     : postfix_expression { $$ = $1; }
     | PLUSPLUS unary_expression
+    {
+      $$ = YY(makeNode(N_EXP_PRE_INC, NULL, PTR(A_NODE, $2), NULL));
+    }
     | MINUSMINUS unary_expression
+    {
+      $$ = YY(makeNode(N_EXP_PRE_DEC, NULL, PTR(A_NODE, $2), NULL));
+    }
     | AMP cast_expression
     {
       $$ = YY(makeNode(N_EXP_AMP, NULL, PTR(A_NODE, $2), NULL));
@@ -392,9 +456,7 @@ unary_expression
     }
     | TILDE cast_expression
     | PLUS cast_expression
-    {
-      $$ = YY(makeNode(N_EXP_PRE_INC, NULL, PTR(A_NODE, $2), NULL));
-    }
+    { $$ = $2; }
     | SIZEOF_SYM unary_expression
     | SIZEOF_SYM LP type_name RP
     ;
