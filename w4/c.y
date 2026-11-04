@@ -67,14 +67,28 @@ declaration_list_opt
 
 declaration
     : declaration_specifiers init_declarator_list SEMICOLON
+    {
+      $$ = YY(setDeclaratorListSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1)));
+    }
     ;
 
 declaration_specifiers
     : type_specifier
+    {
+      $$ = YY(makeSpecifier(PTR(A_TYPE, $1), S_NULL));
+    }
     | storage_class_specifier
+    { $$ = YY(makeSpecifier(NULL, (S_KIND)$1)); }
+
     | type_qualifier
     | type_specifier declaration_specifiers
+    {
+      $$ = YY(updateSpecifier(PTR(A_SPECIFIER, $2), PTR(A_TYPE, $1), S_NULL));
+    }
     | storage_class_specifier declaration_specifiers
+    {
+      $$ = YY(updateSpecifier(PTR(A_SPECIFIER, $2), PTR(A_TYPE, $1), S_NULL));
+    }
     | type_qualifier declaration_specifiers
     ;
 
@@ -92,19 +106,22 @@ type_qualifier
     ;
 
 init_declarator_list
-    : init_declarator
+    : init_declarator { $$ = $1; }
     | init_declarator_list COMMA init_declarator
+    {
+      $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $3)));
+    }
     ;
 
 init_declarator
-    : declarator
+    : declarator { $$ = $1; }
     | declarator ASSIGN initializer
     ;
 
 type_specifier
     : struct_specifier
     | enum_specifier
-    | TYPE_IDENTIFIER
+    | TYPE_IDENTIFIER { $$ = $1; }
     ;
 
 struct_specifier
@@ -163,12 +180,20 @@ enumerator
 
 declarator
     : pointer direct_declarator
-    | direct_declarator
+    {
+      $$ = YY(setDeclaratorElementType(PTR(A_ID, $2), PTR(A_TYPE, $1)));
+    }
+    | direct_declarator { $$ = $1; }
     ;
 
 pointer
     : STAR type_qualifier_list_opt
+    { $$ = YY(makeType(T_POINTER)); }
+
     | STAR type_qualifier_list_opt pointer
+    {
+      $$ = YY(setTypeElementType(PTR(A_TYPE, $3), makeType(T_POINTER)));
+    }
     ;
 
 type_qualifier_list_opt
@@ -183,6 +208,14 @@ type_qualifier_list
 
 direct_declarator
     : IDENTIFIER
+    {
+      char *name = PTR(char, $1);
+    
+      A_ID *id = makeIdentifier(name);
+      free(name);
+    
+      $$ = YY(id);
+    }
     | LP declarator RP
     | direct_declarator LB constant_expression_opt RB
     | direct_declarator LP parameter_type_list_opt RP
@@ -303,12 +336,13 @@ jump_statement
 
 primary_expression
     : IDENTIFIER
-    | INTEGER_CONSTANT {
-  $$ = (YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE *)$1, NULL);
-
-  A_NODE *node = (A_NODE *)$$;
-  logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
-}
+    | INTEGER_CONSTANT
+    {
+      $$ = YY(makeNode(N_EXP_INT_CONST, NULL, PTR(A_NODE, $1), NULL));
+    
+      A_NODE *node = PTR(A_NODE, $$);
+      logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
+    }
     | FLOAT_CONSTANT
     | CHARACTER_CONSTANT
     | STRING_LITERAL
@@ -341,11 +375,26 @@ unary_expression
     | PLUSPLUS unary_expression
     | MINUSMINUS unary_expression
     | AMP cast_expression
+    {
+      $$ = YY(makeNode(N_EXP_AMP, NULL, PTR(A_NODE, $2), NULL));
+    }
     | STAR cast_expression
+    {
+      $$ = YY(makeNode(N_EXP_STAR, NULL, PTR(A_NODE, $2), NULL));
+    }
     | EXCL cast_expression
+    {
+      $$ = YY(makeNode(N_EXP_NOT, NULL, PTR(A_NODE, $2), NULL));
+    }
     | MINUS cast_expression
+    {
+      $$ = YY(makeNode(N_EXP_MINUS, NULL, PTR(A_NODE, $2), NULL));
+    }
     | TILDE cast_expression
     | PLUS cast_expression
+    {
+      $$ = YY(makeNode(N_EXP_PRE_INC, NULL, PTR(A_NODE, $2), NULL));
+    }
     | SIZEOF_SYM unary_expression
     | SIZEOF_SYM LP type_name RP
     ;
@@ -364,15 +413,15 @@ multiplicative_expression
     : cast_expression { $$ = $1; }
     | multiplicative_expression STAR cast_expression
     {
-      $$ = (YYSTYPE)makeNode(N_EXP_MUL, (A_NODE *)$1, NULL, (A_NODE *)$3);
+      $$ = YY(makeNode(N_EXP_MUL, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
     }
     | multiplicative_expression SLASH cast_expression
     {
-      $$ = (YYSTYPE)makeNode(N_EXP_DIV, (A_NODE *)$1, NULL, (A_NODE *)$3);
+      $$ = YY(makeNode(N_EXP_DIV, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
     }
     | multiplicative_expression PERCENT cast_expression
     {
-      $$ = (YYSTYPE)makeNode(N_EXP_MOD, (A_NODE *)$1, NULL, (A_NODE *)$3);
+      $$ = YY(makeNode(N_EXP_MOD, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
     }
     ;
 
@@ -380,11 +429,11 @@ additive_expression
     : multiplicative_expression { $$ = $1; }
     | additive_expression PLUS multiplicative_expression
     {
-      $$ = (YYSTYPE)makeNode(N_EXP_ADD, (A_NODE *)$1, NULL, (A_NODE *)$3);
+      $$ = YY(makeNode(N_EXP_ADD, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
     }
     | additive_expression MINUS multiplicative_expression
     {
-      $$ = (YYSTYPE)makeNode(N_EXP_SUB, (A_NODE *)$1, NULL, (A_NODE *)$3);
+      $$ = YY(makeNode(N_EXP_SUB, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
     }
     ;
 
@@ -452,7 +501,7 @@ expression
     : comma_expression
     {
       $$ = $1;
-      expression_root = (A_NODE *)$1;
+      expression_root = PTR(A_NODE, $1);
     }
     ;
 
@@ -461,7 +510,6 @@ constant_expression
     ;
 
 %%
-
 int yyerror(const char *s) {
   logMsg(LOG_ERROR, "Syntax error at line %d: %s", line_no, s);
   return 0;

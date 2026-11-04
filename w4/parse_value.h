@@ -15,6 +15,9 @@ typedef long long YYSTYPE;
 #error "No suitable integer type for YYSTYPE"
 #endif
 
+#define YY(x) ((YYSTYPE)(intptr_t)(x))
+#define PTR(type, x) ((type *)(intptr_t)(x))
+
 _Static_assert(sizeof(YYSTYPE) >= sizeof(void *),
                "YYSTYPE must be able to hold a pointer");
 

@@ -821,24 +821,24 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int16 yyrline[] =
 {
        0,    45,    45,    49,    50,    54,    55,    59,    60,    64,
-      65,    69,    73,    74,    75,    76,    77,    78,    82,    83,
-      84,    85,    86,    90,    91,    95,    96,   100,   101,   105,
-     106,   107,   111,   112,   113,   117,   118,   122,   123,   127,
-     131,   132,   133,   134,   138,   139,   143,   144,   145,   149,
-     150,   151,   155,   156,   160,   161,   165,   166,   170,   171,
-     175,   176,   180,   181,   185,   186,   187,   188,   192,   193,
-     197,   198,   202,   203,   207,   208,   212,   213,   217,   218,
-     222,   223,   224,   228,   229,   230,   231,   232,   236,   237,
-     238,   242,   243,   247,   248,   249,   250,   251,   252,   256,
-     257,   258,   262,   266,   267,   271,   272,   276,   277,   281,
-     282,   283,   287,   288,   289,   293,   294,   298,   299,   300,
-     301,   305,   306,   312,   313,   314,   315,   320,   321,   322,
-     323,   324,   325,   326,   330,   331,   335,   336,   340,   341,
-     342,   343,   344,   345,   346,   347,   348,   349,   350,   354,
-     355,   359,   360,   364,   365,   369,   373,   380,   381,   385,
-     392,   393,   394,   398,   399,   400,   401,   402,   406,   407,
-     408,   412,   413,   417,   418,   422,   423,   427,   428,   432,
-     433,   437,   438,   442,   443,   447,   448,   452,   460
+      65,    69,    76,    80,    83,    84,    88,    92,    96,    97,
+      98,    99,   100,   104,   105,   109,   110,   117,   118,   122,
+     123,   124,   128,   129,   130,   134,   135,   139,   140,   144,
+     148,   149,   150,   151,   155,   156,   160,   161,   162,   166,
+     167,   168,   172,   173,   177,   178,   182,   186,   190,   193,
+     200,   201,   205,   206,   210,   219,   220,   221,   225,   226,
+     230,   231,   235,   236,   240,   241,   245,   246,   250,   251,
+     255,   256,   257,   261,   262,   263,   264,   265,   269,   270,
+     271,   275,   276,   280,   281,   282,   283,   284,   285,   289,
+     290,   291,   295,   299,   300,   304,   305,   309,   310,   314,
+     315,   316,   320,   321,   322,   326,   327,   331,   332,   333,
+     334,   338,   339,   346,   347,   348,   349,   354,   355,   356,
+     357,   358,   359,   360,   364,   365,   369,   370,   374,   375,
+     376,   377,   381,   385,   389,   393,   394,   398,   399,   403,
+     404,   408,   409,   413,   414,   418,   422,   429,   430,   434,
+     441,   442,   443,   447,   448,   449,   450,   451,   455,   456,
+     457,   461,   462,   466,   467,   471,   472,   476,   477,   481,
+     482,   486,   487,   491,   492,   496,   497,   501,   509
 };
 #endif
 
@@ -1722,104 +1722,249 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-  case 122: /* primary_expression: INTEGER_CONSTANT  */
-#line 306 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                       {
-  yyval = (YYSTYPE)makeNode(N_EXP_INT_CONST, NULL, (A_NODE *)yyvsp[0], NULL);
+  case 11: /* declaration: declaration_specifiers init_declarator_list SEMICOLON  */
+#line 70 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(setDeclaratorListSpecifier(PTR(A_ID, yyvsp[-1]), PTR(A_SPECIFIER, yyvsp[-2])));
+    }
+#line 1731 "y.tab.c"
+    break;
 
-  A_NODE *node = (A_NODE *)yyval;
-  logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
-}
-#line 1734 "y.tab.c"
+  case 12: /* declaration_specifiers: type_specifier  */
+#line 77 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeSpecifier(PTR(A_TYPE, yyvsp[0]), S_NULL));
+    }
+#line 1739 "y.tab.c"
+    break;
+
+  case 13: /* declaration_specifiers: storage_class_specifier  */
+#line 81 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    { yyval = YY(makeSpecifier(NULL, (S_KIND)yyvsp[0])); }
+#line 1745 "y.tab.c"
+    break;
+
+  case 15: /* declaration_specifiers: type_specifier declaration_specifiers  */
+#line 85 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(updateSpecifier(PTR(A_SPECIFIER, yyvsp[0]), PTR(A_TYPE, yyvsp[-1]), S_NULL));
+    }
+#line 1753 "y.tab.c"
+    break;
+
+  case 16: /* declaration_specifiers: storage_class_specifier declaration_specifiers  */
+#line 89 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(updateSpecifier(PTR(A_SPECIFIER, yyvsp[0]), PTR(A_TYPE, yyvsp[-1]), S_NULL));
+    }
+#line 1761 "y.tab.c"
+    break;
+
+  case 25: /* init_declarator_list: init_declarator  */
+#line 109 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                      { yyval = yyvsp[0]; }
+#line 1767 "y.tab.c"
+    break;
+
+  case 26: /* init_declarator_list: init_declarator_list COMMA init_declarator  */
+#line 111 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-2]), PTR(A_ID, yyvsp[0])));
+    }
+#line 1775 "y.tab.c"
+    break;
+
+  case 27: /* init_declarator: declarator  */
+#line 117 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                 { yyval = yyvsp[0]; }
+#line 1781 "y.tab.c"
+    break;
+
+  case 31: /* type_specifier: TYPE_IDENTIFIER  */
+#line 124 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                      { yyval = yyvsp[0]; }
+#line 1787 "y.tab.c"
+    break;
+
+  case 56: /* declarator: pointer direct_declarator  */
+#line 183 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(setDeclaratorElementType(PTR(A_ID, yyvsp[0]), PTR(A_TYPE, yyvsp[-1])));
+    }
+#line 1795 "y.tab.c"
+    break;
+
+  case 57: /* declarator: direct_declarator  */
+#line 186 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                        { yyval = yyvsp[0]; }
+#line 1801 "y.tab.c"
+    break;
+
+  case 58: /* pointer: STAR type_qualifier_list_opt  */
+#line 191 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    { yyval = YY(makeType(T_POINTER)); }
+#line 1807 "y.tab.c"
+    break;
+
+  case 59: /* pointer: STAR type_qualifier_list_opt pointer  */
+#line 194 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(setTypeElementType(PTR(A_TYPE, yyvsp[0]), makeType(T_POINTER)));
+    }
+#line 1815 "y.tab.c"
+    break;
+
+  case 64: /* direct_declarator: IDENTIFIER  */
+#line 211 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      char *name = PTR(char, yyvsp[0]);
+    
+      A_ID *id = makeIdentifier(name);
+      free(name);
+    
+      yyval = YY(id);
+    }
+#line 1828 "y.tab.c"
+    break;
+
+  case 122: /* primary_expression: INTEGER_CONSTANT  */
+#line 340 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_INT_CONST, NULL, PTR(A_NODE, yyvsp[0]), NULL));
+    
+      A_NODE *node = PTR(A_NODE, yyval);
+      logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
+    }
+#line 1839 "y.tab.c"
     break;
 
   case 126: /* primary_expression: LP expression RP  */
-#line 316 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 350 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     { yyval = yyvsp[-1]; }
-#line 1740 "y.tab.c"
+#line 1845 "y.tab.c"
     break;
 
   case 127: /* postfix_expression: primary_expression  */
-#line 320 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 354 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                          { yyval = yyvsp[0]; }
-#line 1746 "y.tab.c"
+#line 1851 "y.tab.c"
     break;
 
   case 138: /* unary_expression: postfix_expression  */
-#line 340 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 374 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                          { yyval = yyvsp[0]; }
-#line 1752 "y.tab.c"
+#line 1857 "y.tab.c"
+    break;
+
+  case 141: /* unary_expression: AMP cast_expression  */
+#line 378 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_AMP, NULL, PTR(A_NODE, yyvsp[0]), NULL));
+    }
+#line 1865 "y.tab.c"
+    break;
+
+  case 142: /* unary_expression: STAR cast_expression  */
+#line 382 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_STAR, NULL, PTR(A_NODE, yyvsp[0]), NULL));
+    }
+#line 1873 "y.tab.c"
+    break;
+
+  case 143: /* unary_expression: EXCL cast_expression  */
+#line 386 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_NOT, NULL, PTR(A_NODE, yyvsp[0]), NULL));
+    }
+#line 1881 "y.tab.c"
+    break;
+
+  case 144: /* unary_expression: MINUS cast_expression  */
+#line 390 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_MINUS, NULL, PTR(A_NODE, yyvsp[0]), NULL));
+    }
+#line 1889 "y.tab.c"
+    break;
+
+  case 146: /* unary_expression: PLUS cast_expression  */
+#line 395 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_PRE_INC, NULL, PTR(A_NODE, yyvsp[0]), NULL));
+    }
+#line 1897 "y.tab.c"
     break;
 
   case 149: /* cast_expression: unary_expression  */
-#line 354 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 403 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                        { yyval = yyvsp[0]; }
-#line 1758 "y.tab.c"
+#line 1903 "y.tab.c"
     break;
 
   case 153: /* multiplicative_expression: cast_expression  */
-#line 364 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 413 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                       { yyval = yyvsp[0]; }
-#line 1764 "y.tab.c"
+#line 1909 "y.tab.c"
     break;
 
   case 154: /* multiplicative_expression: multiplicative_expression STAR cast_expression  */
-#line 366 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 415 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = (YYSTYPE)makeNode(N_EXP_MUL, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
+      yyval = YY(makeNode(N_EXP_MUL, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 1772 "y.tab.c"
+#line 1917 "y.tab.c"
     break;
 
   case 155: /* multiplicative_expression: multiplicative_expression SLASH cast_expression  */
-#line 370 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 419 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = (YYSTYPE)makeNode(N_EXP_DIV, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
+      yyval = YY(makeNode(N_EXP_DIV, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 1780 "y.tab.c"
+#line 1925 "y.tab.c"
     break;
 
   case 156: /* multiplicative_expression: multiplicative_expression PERCENT cast_expression  */
-#line 374 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 423 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = (YYSTYPE)makeNode(N_EXP_MOD, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
+      yyval = YY(makeNode(N_EXP_MOD, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 1788 "y.tab.c"
+#line 1933 "y.tab.c"
     break;
 
   case 157: /* additive_expression: multiplicative_expression  */
-#line 380 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 429 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                                 { yyval = yyvsp[0]; }
-#line 1794 "y.tab.c"
+#line 1939 "y.tab.c"
     break;
 
   case 158: /* additive_expression: additive_expression PLUS multiplicative_expression  */
-#line 382 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 431 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = (YYSTYPE)makeNode(N_EXP_ADD, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
+      yyval = YY(makeNode(N_EXP_ADD, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 1802 "y.tab.c"
+#line 1947 "y.tab.c"
     break;
 
   case 159: /* additive_expression: additive_expression MINUS multiplicative_expression  */
-#line 386 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 435 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = (YYSTYPE)makeNode(N_EXP_SUB, (A_NODE *)yyvsp[-2], NULL, (A_NODE *)yyvsp[0]);
+      yyval = YY(makeNode(N_EXP_SUB, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 1810 "y.tab.c"
+#line 1955 "y.tab.c"
     break;
 
   case 187: /* expression: comma_expression  */
-#line 453 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 502 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
-      expression_root = (A_NODE *)yyvsp[0];
+      expression_root = PTR(A_NODE, yyvsp[0]);
     }
-#line 1819 "y.tab.c"
+#line 1964 "y.tab.c"
     break;
 
 
-#line 1823 "y.tab.c"
+#line 1968 "y.tab.c"
 
       default: break;
     }
@@ -2012,8 +2157,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 463 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-
+#line 512 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
 
 int yyerror(const char *s) {
   logMsg(LOG_ERROR, "Syntax error at line %d: %s", line_no, s);

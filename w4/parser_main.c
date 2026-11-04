@@ -14,10 +14,31 @@ int main(void) {
   printf("Parsing success\n");
 
   if (getenv("AST_TEST_PRECEDENCE") != NULL)
-    checkPrecedence(expression_root);
+    AST_checkPrecedence(expression_root);
 
   if (getenv("AST_TEST_PARENTHESES") != NULL)
-    checkParentheses(expression_root);
+    AST_checkParentheses(expression_root);
+
+  if (getenv("AST_TEST_IDENTIFIER") != NULL)
+    AST_checkIdentifierAST(expression_root);
+
+  if (getenv("AST_TEST_POINTER") != NULL)
+    AST_checkPointerDeclaration();
+
+  if (getenv("AST_TEST_DEREFERENCE") != NULL)
+    AST_checkPointerDereference(expression_root);
+
+  if (getenv("AST_TEST_ADDRESS_OF") != NULL)
+    AST_checkAddressOf(expression_root);
+
+  if (getenv("AST_TEST_UNARY_MINUS") != NULL)
+    AST_checkUnaryMinus(expression_root);
+
+  if (getenv("AST_TEST_LOGICAL_NOT") != NULL)
+    AST_checkLogicalNot(expression_root);
+
+  if (getenv("AST_TEST_PRE_INC") != NULL)
+    AST_checkPreIncrement(expression_root);
 
   return 0;
 }
