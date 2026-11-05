@@ -1257,6 +1257,19 @@ void AST_checkStruct(int mode) {
     semanticError("Missing struct variable origin");
 
   A_TYPE *point = origin->type;
+  A_ID *point_tag = NULL;
+
+  for (A_ID *id = current_id; id != NULL; id = id->prev) {
+    if (id->kind == ID_STRUCT && strcmp(id->name, "Point") == 0) {
+      point_tag = id;
+      break;
+    }
+  }
+
+  if (point_tag == NULL || point_tag->type != point ||
+      point_tag->type->kind != T_STRUCT)
+    semanticError("Invalid struct tag type");
+
   A_ID *x = point->field;
   A_ID *y = x != NULL ? x->link : NULL;
 
@@ -1264,6 +1277,14 @@ void AST_checkStruct(int mode) {
       strcmp(y->name, "y") != 0 || x->kind != ID_FIELD || y->kind != ID_FIELD ||
       x->type != int_type || y->type != int_type)
     semanticError("Invalid struct fields");
+
+  if (searchIdentifier("x") != NULL || searchIdentifier("y") != NULL)
+    semanticError("Struct field leaked into ordinary identifier namespace");
+
+  for (A_ID *id = current_id; id != NULL; id = id->prev) {
+    if (id == x || id == y)
+      semanticError("Struct field leaked into identifier table");
+  }
 
   if (mode == 1) {
     logMsg(LOG_INFO, "AST struct fields test passed");
@@ -1302,7 +1323,8 @@ void AST_checkStruct(int mode) {
   NODE_NAME expected = mode == 2 ? N_EXP_STRUCT : N_EXP_ARROW;
 
   if (access == NULL || access->name != expected || access->llink == NULL ||
-      access->clink != (A_NODE *)x || access->rlink != NULL)
+      access->clink != NULL || access->rlink == NULL ||
+      strcmp(PTR(char, access->rlink), "x") != 0)
     semanticError("Invalid member access AST");
 
   A_NODE *base = access->llink;

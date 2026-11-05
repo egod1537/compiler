@@ -196,29 +196,28 @@ type_specifier
     ;
 
 struct_specifier
-    : struct_or_union IDENTIFIER LR
+    : struct_or_union IDENTIFIER
     {
-      enterScope();
-    }
-      struct_declaration_list RR
-    {
-      char name = PTR(char, $2);
-      $$ = YY(defineAggregateType((T_KIND)$1, name, PTR(A_ID, $5)));
-
+      char *name = PTR(char, $2);
+      $$ = YY(setTypeStructOrEnumIdentifier((T_KIND)$1, name, ID_STRUCT));
       free(name);
     }
-    | struct_or_union LR
+      LR struct_declaration_list RR
     {
-      enterScope();
+      $$ = YY(setTypeField(PTR(A_TYPE, $3), PTR(A_ID, $5)));
     }
-      struct_declaration_list RR
+    | struct_or_union
     {
-      $$ = YY(defineAggregateType((T_KIND)$1, NULL, PTR(A_ID, $4)));
+      $$ = YY(makeType((T_KIND)$1));
+    }
+      LR struct_declaration_list RR
+    {
+      $$ = YY(setTypeField(PTR(A_TYPE, $2), PTR(A_ID, $4)));
     }
     | struct_or_union IDENTIFIER
     {
-      char name = PTR(char, $2);
-      $$ = YY(findAggregateType((T_KIND)$1, name));
+      char *name = PTR(char, $2);
+      $$ = YY(getTypeOfStructOrEnumIdentifier((T_KIND)$1, name, ID_STRUCT));
       free(name);
     }
     ;
@@ -237,31 +236,10 @@ struct_declaration_list
     ;
 
 struct_declaration
-    : specifier_qualifier_list struct_declarator_list SEMICOLON
+    : type_specifier struct_declarator_list SEMICOLON
     {
-      A_ID *fields = setDeclaratorListSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1));
-
-      for (A_ID *p = fields; p != NULL; p = p->link)
-        p->kind = ID_FIELD;
-
-      $$ = YY(fields);
+      $$ = YY(setStructDeclaratorListSpecifier(PTR(A_ID, $2), PTR(A_TYPE, $1)));
     }
-    ;
-
-specifier_qualifier_list
-    : type_specifier
-    {
-      $$ = YY(makeSpecifier(PTR(A_TYPE, $1), S_NULL));
-    }
-    | type_qualifier
-    {
-      $$ = YY(makeSpecifier(NULL, S_NULL));
-    }
-    | type_specifier specifier_qualifier_list
-    {
-      $$ = YY(updateSpecifier(PTR(A_SPECIFIER, $2), PTR(A_TYPE, $1), S_NULL));
-    }
-    | type_qualifier specifier_qualifier_list { $$ = $2; }
     ;
 
 struct_declarator_list
@@ -658,18 +636,12 @@ postfix_expression
     | postfix_expression PERIOD IDENTIFIER
     {
       char *name = PTR(char, $3);
-
-      $$ = YY(makeMemberAccessNode(N_EXP_STRUCT, PTR(A_NODE, $1), name));
-
-      free(name);
+      $$ = YY(makeNode(N_EXP_STRUCT, PTR(A_NODE, $1), NULL, PTR(A_NODE, name)));
     }
     | postfix_expression ARROW IDENTIFIER
     {
       char *name = PTR(char, $3);
-
-      $$ = YY(makeMemberAccessNode(N_EXP_ARROW, PTR(A_NODE, $1), name));
-
-      free(name);
+      $$ = YY(makeNode(N_EXP_ARROW, PTR(A_NODE, $1), NULL, PTR(A_NODE, name)));
     }
     | postfix_expression PLUSPLUS
     {

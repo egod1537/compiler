@@ -46,6 +46,7 @@ A_SPECIFIER *updateSpecifier(A_SPECIFIER *specifier, A_TYPE *type, S_KIND stor);
 void setDefaultSpecifier(A_SPECIFIER *specifier);
 
 A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *specifier);
+A_ID *setStructDeclaratorListSpecifier(A_ID *id, A_TYPE *type);
 A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier);
 
 A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *body);
@@ -56,8 +57,6 @@ A_ID *makeDummyIdentifier(void);
 
 A_TYPE *setTypeNameSpecifier(A_TYPE *type, A_SPECIFIER *specifier);
 
-A_TYPE *findAggregateType(T_KIND kind, const char *name);
-A_TYPE *defineAggregateType(T_KIND kind, const char *name, A_ID *fields);
-
-A_NODE *makeMemberAccessNode(NODE_NAME name, A_NODE *base, const char *field_name);
+A_TYPE *setTypeStructOrEnumIdentifier(T_KIND kind, char *name, ID_KIND id_kind);
+A_TYPE *getTypeOfStructOrEnumIdentifier(T_KIND kind, char *name, ID_KIND id_kind);
 #endif // !SEMANTIC_H

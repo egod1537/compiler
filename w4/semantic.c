@@ -148,7 +148,8 @@ A_ID *searchIdentifier(const char *name) {
   A_ID *id = current_id;
 
   while (id != NULL) {
-    if (strcmp(id->name, name) == 0)
+    if (id->kind != ID_STRUCT && id->kind != ID_ENUM && id->kind != ID_FIELD &&
+        strcmp(id->name, name) == 0)
       return id;
 
     id = id->prev;
@@ -164,7 +165,8 @@ A_ID *searchIdentifierAtCurrentLevel(const char *name, A_ID *start) {
     if (id->level < current_level)
       break;
 
-    if (id->level == current_level && strcmp(id->name, name) == 0)
+    if (id->level == current_level && id->kind != ID_STRUCT && id->kind != ID_ENUM &&
+        id->kind != ID_FIELD && strcmp(id->name, name) == 0)
       return id;
 
     id = id->prev;
@@ -277,7 +279,36 @@ A_TYPE *setTypeField(A_TYPE *type, A_ID *field) {
   if (type == NULL)
     semanticError("NULL type in setTypeField");
 
+  if (type->kind == T_STRUCT || type->kind == T_UNION) {
+    for (A_ID *member = field; member != NULL; member = member->link) {
+      for (A_ID *previous = field; previous != member; previous = previous->link) {
+        if (strcmp(previous->name, member->name) == 0)
+          semanticError("Duplicate struct field");
+      }
+    }
+  }
+
   type->field = field;
+
+  if (type->kind == T_STRUCT || type->kind == T_UNION) {
+    for (A_ID *member = field; member != NULL; member = member->link) {
+      if (current_id == member) {
+        current_id = member->prev;
+        continue;
+      }
+
+      A_ID *id = current_id;
+
+      while (id != NULL && id->prev != member)
+        id = id->prev;
+
+      if (id == NULL)
+        semanticError("Struct field is missing from identifier table");
+
+      id->prev = member->prev;
+    }
+  }
+
   return type;
 }
 
@@ -364,6 +395,26 @@ A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *specifier) {
       current->specifier = S_AUTO;
 
     current = current->link;
+  }
+
+  return id;
+}
+
+A_ID *setStructDeclaratorListSpecifier(A_ID *id, A_TYPE *type) {
+  if (id == NULL || type == NULL)
+    semanticError("Null struct field declaration");
+
+  for (A_ID *field = id; field != NULL; field = field->link) {
+    if (field->name == NULL || field->name[0] == '\0')
+      semanticError("Missing struct field name");
+
+    for (A_ID *previous = id; previous != field; previous = previous->link) {
+      if (strcmp(previous->name, field->name) == 0)
+        semanticError("Duplicate struct field");
+    }
+
+    setDeclaratorElementType(field, type);
+    field->kind = ID_FIELD;
   }
 
   return id;
@@ -491,114 +542,72 @@ A_TYPE *setTypeNameSpecifier(A_TYPE *type, A_SPECIFIER *specifier) {
   return setTypeElementType(type, specifier->type);
 }
 
-typedef struct s_aggregate_tag {
-  char *name;
-  T_KIND kind;
-  A_TYPE *type;
-  struct s_aggregate_tag *next;
-} AggregateTag;
+static int isTagIdentifier(const A_ID *id) {
+  return id != NULL && (id->kind == ID_STRUCT || id->kind == ID_ENUM);
+}
 
-static AggregateTag *aggregate_tags = NULL;
+static void validateTagKind(T_KIND kind, ID_KIND id_kind) {
+  if (id_kind == ID_STRUCT) {
+    if (kind != T_STRUCT && kind != T_UNION)
+      semanticError("Invalid struct or union tag kind");
+  } else if (id_kind == ID_ENUM) {
+    if (kind != T_ENUM)
+      semanticError("Invalid enum tag kind");
+  } else {
+    semanticError("Invalid tag identifier kind");
+  }
+}
 
-A_TYPE *findAggrregateType(T_KIND kind, const char *name) {
-  if (name == NULL)
-    semanticError("Missing aggregate tag");
+static A_ID *searchTagIdentifier(const char *name, int current_scope_only) {
+  for (A_ID *id = current_id; id != NULL; id = id->prev) {
+    if (current_scope_only && id->level < current_level)
+      break;
 
-  for (AggregateTag *p = aggregate_tags; p != NULL; p = p->next) {
-    if (p->kind == kind && strcpy(p->name, name) == 0)
-      return p->type;
+    if (isTagIdentifier(id) && strcmp(id->name, name) == 0)
+      return id;
   }
 
-  semanticError("Unknown struct or union tag");
   return NULL;
 }
 
-A_TYPE *defineAggregateType(T_KIND kind, const char *name, A_ID *fields) {
-  if (kind != T_STRUCT && kind != T_UNION)
-    semanticError("Invalid aggregate kind");
+A_TYPE *setTypeStructOrEnumIdentifier(T_KIND kind, char *name, ID_KIND id_kind) {
+  if (name == NULL || name[0] == '\0')
+    semanticError("Missing struct or enum tag");
 
-  if (fields == NULL)
-    semanticError("Missing aggregate fields");
+  validateTagKind(kind, id_kind);
 
-  A_TYPE *type = setTypeField(makeType(kind), fields);
+  A_ID *id = searchTagIdentifier(name, 1);
 
-  leaveScope();
+  if (id != NULL) {
+    if (id->kind != id_kind || id->type == NULL || id->type->kind != kind)
+      semanticError("Conflicting struct or enum tag declaration");
 
-  if (name != NULL) {
-    for (AggregateTag *p = aggregate_tags; p != NULL; p = p->next) {
-      if (p->kind == kind && strcmp(p->name, name) == 0)
-        semanticError("Aggregate tag redefinition");
-    }
-
-    AggregateTag *tag = calloc(1, sizeof(*tag));
-
-    if (tag == NULL)
-      semanticError("Memory allocation failed");
-
-    tag->name = malloc(strlen(name) + 1);
-
-    if (tag->name == NULL)
-      semanticError("Memory allocation failed");
-
-    strcpy(tag->name, name);
-
-    tag->kind = kind;
-    tag->type = type;
-    tag->next = aggregate_tags;
-    aggregate_tags = tag;
-  }
-
-  return type;
-}
-
-static A_TYPE *memberBaseType(A_NODE *expr) {
-  if (expr == NULL)
-    semanticError("Missing member access base");
-
-  if (expr->name == N_EXP_IDENT) {
-    A_ID *id = (A_ID *)expr->clink;
-
-    if (id == NULL)
-      semanticError("Invalid identifier expression");
+    if (id->type->field != NULL)
+      semanticError("Redefinition of struct or enum tag");
 
     return id->type;
   }
 
-  if (expr->name == N_EXP_STRUCT || expr->name == N_EXP_ARROW) {
-    A_ID *field = (A_ID *)expr->clink;
+  id = makeIdentifier(name);
+  id->kind = id_kind;
+  id->type = makeType(kind);
 
-    if (field == NULL)
-      semanticError("Invalid member expression");
-
-    return field->type;
-  }
-
-  semanticError("Unsupported member access base");
-  return NULL;
+  return id->type;
 }
 
-A_NODE *makeMemberAccessNode(NODE_NAME name, A_NODE *base, const char *field_name) {
-  A_TYPE *type = memberBaseType(base);
+A_TYPE *getTypeOfStructOrEnumIdentifier(T_KIND kind, char *name, ID_KIND id_kind) {
+  if (name == NULL || name[0] == '\0')
+    semanticError("Missing struct or enum tag");
 
-  if (name == N_EXP_ARROW) {
-    if (type == NULL || type->kind != T_POINTER)
-      semanticError("Arrow requires pointer");
+  validateTagKind(kind, id_kind);
 
-    type = type->element_type;
-  } else if (name != N_EXP_STRUCT) {
-    semanticError("Invalid member access operator");
-  }
+  A_ID *id = searchTagIdentifier(name, 0);
 
-  if (type == NULL || (type->kind != T_STRUCT && type->kind != T_UNION))
-    semanticError("Member access requires struct of union");
+  if (id == NULL)
+    return setTypeStructOrEnumIdentifier(kind, name, id_kind);
 
-  for (A_ID *field = type->field; field != NULL; field = field->link) {
+  if (id->kind != id_kind || id->type == NULL || id->type->kind != kind)
+    semanticError("Struct or enum tag kind mismatch");
 
-    if (strcmp(field->name, field_name) == 0) {
-      return makeNode(name, base, (A_NODE *)field, NULL);
-    }
-  }
-
-  semanticError("Unknown aggregate field");
-  return NULL;
+  return id->type;
 }
