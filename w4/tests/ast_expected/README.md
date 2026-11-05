@@ -12,9 +12,9 @@ copying runtime pointer values.
 Run one test or all numbered inputs from the repository root:
 
 ```powershell
-.\check-ast.cmd 24
-.\check-ast.cmd 24 --diff
-.\check-ast.cmd --all
+.\tests\check-ast.cmd 24
+.\tests\check-ast.cmd 24 --diff
+.\tests\check-ast.cmd --all
 ```
 
 Inputs without a manual TXT/JSON answer are reported as `UNVERIFIABLE`, never `PASS`.

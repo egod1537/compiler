@@ -1,5 +1,19 @@
 # Parser tests
 
+Run the semantic unit tests from the project root:
+
+```powershell
+.\tests\run-unit.cmd
+```
+
+Run a manual AST comparison with the current parser sources:
+
+```powershell
+.\tests\check-ast.cmd 24
+.\tests\check-ast.cmd 24 --diff
+.\tests\check-ast.cmd --all
+```
+
 `valid/` contains inputs that must parse successfully. `invalid/` contains
 inputs that must produce a syntax error.
 

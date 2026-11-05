@@ -42,7 +42,7 @@ A_ID *makeIdentifier(char *name);
 A_ID *searchIdentifier(const char *name);
 A_ID *searchIdentifierAtCurrentLevel(const char *name, A_ID *start);
 
-/* 어휘적 스코프 진입 및 종료 */
+/* 스코프 진입 및 종료 */
 void enterScope(void);
 void leaveScope(void);
 

@@ -17,7 +17,7 @@ foreach ($argument in $args) {
     }
 }
 if ($All -eq ($null -ne $Number)) {
-    Write-Host "Usage: check-ast.cmd TEST_NUMBER [--diff] | --all [--diff]"
+    Write-Host "Usage: tests\check-ast.cmd TEST_NUMBER [--diff] | --all [--diff]"
     exit 2
 }
 
@@ -62,7 +62,7 @@ function Build-CurrentParser {
     $parserC = Join-Path $Directory "y.tab.c"
     $parserH = Join-Path $Directory "y.tab.h"
     $lexerC = Join-Path $Directory "lex.yy.c"
-    $executable = Join-Path $Directory "parser.exe"
+    $executable = Join-Path $Directory "ast_tests.exe"
     Invoke-BuildStep "bison" @("-y","-d","--defines=$parserH","-o",$parserC,(Join-Path $Root "c.y")) "bison"
     Invoke-BuildStep "flex" @("-o",$lexerC,(Join-Path $Root "c.l")) "flex"
     $sources = @(

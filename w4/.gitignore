@@ -1,0 +1,15 @@
+# Compiler and test executables
+*.exe
+*.obj
+*.o
+/parser
+
+# Generated parser sources and build logs
+/build.log
+/.build-step.log
+/lex.yy.c
+/y.tab.c
+/y.tab.h
+
+# Test build output
+/tests/bin/
