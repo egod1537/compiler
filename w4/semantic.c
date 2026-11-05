@@ -611,3 +611,14 @@ A_TYPE *getTypeOfStructOrEnumIdentifier(T_KIND kind, char *name, ID_KIND id_kind
 
   return id->type;
 }
+
+A_ID *setDeclaratorKind(A_ID *id, ID_KIND kind) {
+  if (id == NULL)
+    semanticError("Null identifier");
+
+  if (searchIdentifierAtCurrentLevel(id->name, id->prev) != NULL)
+    semanticError("Redeclaration of identifier");
+
+  id->kind = kind;
+  return id;
+}

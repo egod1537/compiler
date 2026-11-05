@@ -319,12 +319,18 @@ void AST_checkArrayAccess(A_NODE *root) {
   if (id == NULL || strcmp(id->name, "a") != 0)
     semanticError("Expected identifier a");
 
-  if (id->kind != ID_VAR || id->type == NULL || id->type->kind != T_POINTER ||
-      id->type->element_type != int_type)
+  if (id->kind != ID_VAR || id->level != 1 || id->type == NULL ||
+      id->type->kind != T_POINTER || id->type->element_type != int_type)
     semanticError("Expected int pointer");
 
-  if (searchIdentifier("a") != id)
-    semanticError("Identifier mismatch");
+  A_ID *main_func = searchIdentifier("main");
+
+  if (main_func == NULL || main_func->type == NULL || main_func->type->kind != T_FUNC ||
+      main_func->type->expr == NULL || PTR(A_ID, main_func->type->expr->llink) != id)
+    semanticError("Array declaration and expression identifier mismatch");
+
+  if (searchIdentifier("a") != NULL)
+    semanticError("Array local leaked from function scope");
 
   if (index == NULL || index->name != N_EXP_INT_CONST)
     semanticError("Expected integer index");
@@ -1251,6 +1257,9 @@ void AST_checkProgram(A_NODE *root) {
   logMsg(LOG_INFO, "AST program root test passed");
 }
 void AST_checkStruct(int mode) {
+  if (current_level != 0)
+    semanticError("Struct declaration changed current scope level");
+
   A_ID *origin = searchIdentifier("origin");
 
   if (origin == NULL || origin->type == NULL || origin->type->kind != T_STRUCT)
@@ -1266,7 +1275,7 @@ void AST_checkStruct(int mode) {
     }
   }
 
-  if (point_tag == NULL || point_tag->type != point ||
+  if (point_tag == NULL || point_tag->level != 0 || point_tag->type != point ||
       point_tag->type->kind != T_STRUCT)
     semanticError("Invalid struct tag type");
 

@@ -101,7 +101,7 @@ function_definition
 
         p->level = current_level;
         p->prev = current_id;
-        current_id = id;
+        current_id = p;
       }
 
       $$ = YY(id);
@@ -265,9 +265,26 @@ struct_declarator
     ;
 
 enum_specifier
-    : ENUM_SYM IDENTIFIER LR enumerator_list RR
-    | ENUM_SYM LR enumerator_list RR
+    : ENUM_SYM IDENTIFIER
+    {
+      $$ = YY(setTypeStructOrEnumIdentifier(T_ENUM, PTR(char, $2), ID_ENUM));
+    }
+      LR enumerator_list RR
+    {
+      $$ = YY(setTypeField(PTR(A_TYPE, $3), PTR(A_ID, $5)));
+    }
+    | ENUM_SYM
+    {
+      $$ = YY(makeType(T_ENUM));
+    }
+      LR enumerator_list RR
+    {
+      $$ = YY(setTypeField(PTR(A_TYPE, $2), PTR(A_ID, $4)));
+    }
     | ENUM_SYM IDENTIFIER
+    {
+      $$ = YY(getTypeOfStructOrEnumIdentifier(T_ENUM, PTR(char, $2), ID_ENUM));
+    }
     ;
 
 enumerator_list
@@ -277,6 +294,13 @@ enumerator_list
 
 enumerator
     : IDENTIFIER
+    {
+      char *name = PTR(char, $1);
+      A_ID *id = makeIdentifier(name);
+      free(name);
+
+      $$ = YY(setDeclaratorKind(id, ID_ENUM_LITERAL));
+    }
     | IDENTIFIER ASSIGN constant_expression
     ;
 
