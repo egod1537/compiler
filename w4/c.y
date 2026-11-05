@@ -196,41 +196,94 @@ type_specifier
     ;
 
 struct_specifier
-    : struct_or_union IDENTIFIER LR struct_declaration_list RR
-    | struct_or_union LR struct_declaration_list RR
+    : struct_or_union IDENTIFIER LR
+    {
+      enterScope();
+    }
+      struct_declaration_list RR
+    {
+      char name = PTR(char, $2);
+      $$ = YY(defineAggregateType((T_KIND)$1, name, PTR(A_ID, $5)));
+
+      free(name);
+    }
+    | struct_or_union LR
+    {
+      enterScope();
+    }
+      struct_declaration_list RR
+    {
+      $$ = YY(defineAggregateType((T_KIND)$1, NULL, PTR(A_ID, $4)));
+    }
     | struct_or_union IDENTIFIER
+    {
+      char name = PTR(char, $2);
+      $$ = YY(findAggregateType((T_KIND)$1, name));
+      free(name);
+    }
     ;
 
 struct_or_union
-    : STRUCT_SYM
-    | UNION_SYM
+    : STRUCT_SYM { $$ = YY(T_STRUCT); }
+    | UNION_SYM { $$ = YY(T_UNION); }
     ;
 
 struct_declaration_list
-    : struct_declaration
+    : struct_declaration { $$ = $1; }
     | struct_declaration_list struct_declaration
+    {
+      $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $2)));
+    }
     ;
 
 struct_declaration
     : specifier_qualifier_list struct_declarator_list SEMICOLON
+    {
+      A_ID *fields = setDeclaratorListSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1));
+
+      for (A_ID *p = fields; p != NULL; p = p->link)
+        p->kind = ID_FIELD;
+
+      $$ = YY(fields);
+    }
     ;
 
 specifier_qualifier_list
     : type_specifier
+    {
+      $$ = YY(makeSpecifier(PTR(A_TYPE, $1), S_NULL));
+    }
     | type_qualifier
+    {
+      $$ = YY(makeSpecifier(NULL, S_NULL));
+    }
     | type_specifier specifier_qualifier_list
-    | type_qualifier specifier_qualifier_list
+    {
+      $$ = YY(updateSpecifier(PTR(A_SPECIFIER, $2), PTR(A_TYPE, $1), S_NULL));
+    }
+    | type_qualifier specifier_qualifier_list { $$ = $2; }
     ;
 
 struct_declarator_list
-    : struct_declarator
+    : struct_declarator { $$ = $1; }
     | struct_declarator_list COMMA struct_declarator
+    {
+      $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $3)));
+    }
     ;
 
 struct_declarator
-    : declarator
+    : declarator { $$ = $1; }
     | COLON constant_expression
+    {
+      semanticError("Bit-fields are not implemented");
+      $$ = YY(NULL);
+    }
     | declarator COLON constant_expression
+    {
+      semanticError("Bit-fields are not implemented");
+      $$ = YY(NULL);
+    }
     ;
 
 enum_specifier
@@ -603,7 +656,21 @@ postfix_expression
       $$ = YY(makeNode(N_EXP_FUNCTION_CALL, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
     }
     | postfix_expression PERIOD IDENTIFIER
+    {
+      char *name = PTR(char, $3);
+
+      $$ = YY(makeMemberAccessNode(N_EXP_STRUCT, PTR(A_NODE, $1), name));
+
+      free(name);
+    }
     | postfix_expression ARROW IDENTIFIER
+    {
+      char *name = PTR(char, $3);
+
+      $$ = YY(makeMemberAccessNode(N_EXP_ARROW, PTR(A_NODE, $1), name));
+
+      free(name);
+    }
     | postfix_expression PLUSPLUS
     {
       $$ = YY(makeNode(N_EXP_POST_INC, NULL, PTR(A_NODE, $1), NULL));

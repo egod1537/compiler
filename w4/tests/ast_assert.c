@@ -1250,3 +1250,78 @@ void AST_checkProgram(A_NODE *root) {
 
   logMsg(LOG_INFO, "AST program root test passed");
 }
+void AST_checkStruct(int mode) {
+  A_ID *origin = searchIdentifier("origin");
+
+  if (origin == NULL || origin->type == NULL || origin->type->kind != T_STRUCT)
+    semanticError("Missing struct variable origin");
+
+  A_TYPE *point = origin->type;
+  A_ID *x = point->field;
+  A_ID *y = x != NULL ? x->link : NULL;
+
+  if (x == NULL || y == NULL || y->link != NULL || strcmp(x->name, "x") != 0 ||
+      strcmp(y->name, "y") != 0 || x->kind != ID_FIELD || y->kind != ID_FIELD ||
+      x->type != int_type || y->type != int_type)
+    semanticError("Invalid struct fields");
+
+  if (mode == 1) {
+    logMsg(LOG_INFO, "AST struct fields test passed");
+    return;
+  }
+
+  A_ID *main_func = searchIdentifier("main");
+
+  if (main_func == NULL || main_func->type == NULL)
+    semanticError("Missing main");
+
+  A_NODE *body = main_func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing main body");
+
+  A_NODE *list = body->rlink;
+
+  // mode 3: p = &origin; 다음의 return 문
+  if (mode == 3) {
+    if (list == NULL || list->rlink == NULL)
+      semanticError("Missing assignment");
+
+    list = list->rlink;
+  }
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing return statement list");
+
+  A_NODE *ret = list->llink;
+
+  if (ret == NULL || ret->name != N_STMT_RETURN)
+    semanticError("Expected return");
+
+  A_NODE *access = ret->clink;
+  NODE_NAME expected = mode == 2 ? N_EXP_STRUCT : N_EXP_ARROW;
+
+  if (access == NULL || access->name != expected || access->llink == NULL ||
+      access->clink != (A_NODE *)x || access->rlink != NULL)
+    semanticError("Invalid member access AST");
+
+  A_NODE *base = access->llink;
+
+  if (base->name != N_EXP_IDENT)
+    semanticError("Invalid member base");
+
+  A_ID *id = (A_ID *)base->clink;
+
+  if (mode == 2) {
+    if (id != origin)
+      semanticError("Expected origin.x");
+  } else if (mode == 3) {
+    if (id == NULL || strcmp(id->name, "p") != 0 || id->type == NULL ||
+        id->type->kind != T_POINTER || id->type->element_type != point)
+      semanticError("Expected p->x");
+  } else {
+    semanticError("Unknown struct test mode");
+  }
+
+  logMsg(LOG_INFO, "AST struct member test passed");
+}

@@ -55,4 +55,9 @@ A_ID *getIdentifierDeclared(const char *name);
 A_ID *makeDummyIdentifier(void);
 
 A_TYPE *setTypeNameSpecifier(A_TYPE *type, A_SPECIFIER *specifier);
+
+A_TYPE *findAggregateType(T_KIND kind, const char *name);
+A_TYPE *defineAggregateType(T_KIND kind, const char *name, A_ID *fields);
+
+A_NODE *makeMemberAccessNode(NODE_NAME name, A_NODE *base, const char *field_name);
 #endif // !SEMANTIC_H

@@ -213,5 +213,20 @@ int main(int argc, char **argv) {
   if (getenv("AST_TEST_PROGRAM") != NULL)
     AST_checkProgram(program_root);
 
+  {
+    const char *struct_test = getenv("AST_TEST_STRUCT");
+
+    if (struct_test != NULL) {
+      if (strcmp(struct_test, "fields") == 0)
+        AST_checkStruct(1);
+      else if (strcmp(struct_test, "dot") == 0)
+        AST_checkStruct(2);
+      else if (strcmp(struct_test, "arrow") == 0)
+        AST_checkStruct(3);
+      else
+        semanticError("Unknown struct test mode");
+    }
+  }
+
   return 0;
 }

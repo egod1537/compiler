@@ -37,5 +37,6 @@ void AST_checkCastExpression(void);
 void AST_checkSwitch(void);
 void AST_checkCharString(void);
 void AST_checkProgram(A_NODE *root);
+void AST_checkStruct(int mode);
 
 #endif // !AST_ASSERT_H

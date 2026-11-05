@@ -1,6 +1,7 @@
 #include "semantic.h"
 #include "logger.h"
 #include "type.h"
+#include "syntax_tree.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -488,4 +489,116 @@ A_TYPE *setTypeNameSpecifier(A_TYPE *type, A_SPECIFIER *specifier) {
     return specifier->type;
 
   return setTypeElementType(type, specifier->type);
+}
+
+typedef struct s_aggregate_tag {
+  char *name;
+  T_KIND kind;
+  A_TYPE *type;
+  struct s_aggregate_tag *next;
+} AggregateTag;
+
+static AggregateTag *aggregate_tags = NULL;
+
+A_TYPE *findAggrregateType(T_KIND kind, const char *name) {
+  if (name == NULL)
+    semanticError("Missing aggregate tag");
+
+  for (AggregateTag *p = aggregate_tags; p != NULL; p = p->next) {
+    if (p->kind == kind && strcpy(p->name, name) == 0)
+      return p->type;
+  }
+
+  semanticError("Unknown struct or union tag");
+  return NULL;
+}
+
+A_TYPE *defineAggregateType(T_KIND kind, const char *name, A_ID *fields) {
+  if (kind != T_STRUCT && kind != T_UNION)
+    semanticError("Invalid aggregate kind");
+
+  if (fields == NULL)
+    semanticError("Missing aggregate fields");
+
+  A_TYPE *type = setTypeField(makeType(kind), fields);
+
+  leaveScope();
+
+  if (name != NULL) {
+    for (AggregateTag *p = aggregate_tags; p != NULL; p = p->next) {
+      if (p->kind == kind && strcmp(p->name, name) == 0)
+        semanticError("Aggregate tag redefinition");
+    }
+
+    AggregateTag *tag = calloc(1, sizeof(*tag));
+
+    if (tag == NULL)
+      semanticError("Memory allocation failed");
+
+    tag->name = malloc(strlen(name) + 1);
+
+    if (tag->name == NULL)
+      semanticError("Memory allocation failed");
+
+    strcpy(tag->name, name);
+
+    tag->kind = kind;
+    tag->type = type;
+    tag->next = aggregate_tags;
+    aggregate_tags = tag;
+  }
+
+  return type;
+}
+
+static A_TYPE *memberBaseType(A_NODE *expr) {
+  if (expr == NULL)
+    semanticError("Missing member access base");
+
+  if (expr->name == N_EXP_IDENT) {
+    A_ID *id = (A_ID *)expr->clink;
+
+    if (id == NULL)
+      semanticError("Invalid identifier expression");
+
+    return id->type;
+  }
+
+  if (expr->name == N_EXP_STRUCT || expr->name == N_EXP_ARROW) {
+    A_ID *field = (A_ID *)expr->clink;
+
+    if (field == NULL)
+      semanticError("Invalid member expression");
+
+    return field->type;
+  }
+
+  semanticError("Unsupported member access base");
+  return NULL;
+}
+
+A_NODE *makeMemberAccessNode(NODE_NAME name, A_NODE *base, const char *field_name) {
+  A_TYPE *type = memberBaseType(base);
+
+  if (name == N_EXP_ARROW) {
+    if (type == NULL || type->kind != T_POINTER)
+      semanticError("Arrow requires pointer");
+
+    type = type->element_type;
+  } else if (name != N_EXP_STRUCT) {
+    semanticError("Invalid member access operator");
+  }
+
+  if (type == NULL || (type->kind != T_STRUCT && type->kind != T_UNION))
+    semanticError("Member access requires struct of union");
+
+  for (A_ID *field = type->field; field != NULL; field = field->link) {
+
+    if (strcmp(field->name, field_name) == 0) {
+      return makeNode(name, base, (A_NODE *)field, NULL);
+    }
+  }
+
+  semanticError("Unknown aggregate field");
+  return NULL;
 }
