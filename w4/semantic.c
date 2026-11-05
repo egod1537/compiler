@@ -622,3 +622,20 @@ A_ID *setDeclaratorKind(A_ID *id, ID_KIND kind) {
   id->kind = kind;
   return id;
 }
+
+void checkForwardReference(void) {
+  A_ID *id = current_id;
+
+  while (id != NULL) {
+    if (id->level < current_level)
+      break;
+
+    if (id->kind == ID_NULL)
+      semanticError("Undefined identifier");
+
+    if (id->kind == ID_STRUCT && id->type != NULL && id->type->field == NULL)
+      semanticError("Incomplete forward reference");
+
+    id = id->prev;
+  }
+}

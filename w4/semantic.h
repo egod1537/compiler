@@ -61,4 +61,6 @@ A_TYPE *setTypeStructOrEnumIdentifier(T_KIND kind, char *name, ID_KIND id_kind);
 A_TYPE *getTypeOfStructOrEnumIdentifier(T_KIND kind, char *name, ID_KIND id_kind);
 
 A_ID *setDeclaratorKind(A_ID *id, ID_KIND kind);
+
+void checkForwardReference(void);
 #endif // !SEMANTIC_H

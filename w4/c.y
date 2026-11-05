@@ -43,6 +43,8 @@ A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right);
 program
     : translation_unit
     {
+      checkForwardReference();
+
       program_root = makeNode(N_PROGRAM, NULL, PTR(A_NODE, current_id), NULL);
 
       $$ = YY(program_root);
@@ -127,7 +129,7 @@ declaration_list_opt
     ;
 
 declaration
-    : declaration_specifiers init_declarator_list SEMICOLON
+    : declaration_specifiers init_declarator_list_opt SEMICOLON
     {
       $$ = YY(setDeclaratorListSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1)));
     }
@@ -181,6 +183,17 @@ storage_class_specifier
 type_qualifier
     : CONST_SYM
     | VOLATILE_SYM
+    ;
+
+init_declarator_list_opt
+    :
+    {
+      $$ = YY(NULL);
+    }
+    | init_declarator_list
+    {
+      $$ = $1;
+    }
     ;
 
 init_declarator_list
@@ -366,6 +379,9 @@ direct_declarator
       $$ = YY(id);
     }
     | LP declarator RP
+    {
+      $$ = $2;
+    }
     | direct_declarator LB constant_expression_opt RB
     {
       $$ = YY(setDeclaratorElementType(PTR(A_ID, $1),
