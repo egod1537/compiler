@@ -117,5 +117,74 @@ int main(int argc, char **argv) {
   if (getenv("AST_TEST_BLOCK_SHADOWING") != NULL)
     AST_checkBlockShadowing();
 
+  if (getenv("AST_TEST_ASSIGNMENT") != NULL)
+    AST_checkAssignment();
+
+  {
+    const char *comparison = getenv("AST_TEST_COMPARISON");
+
+    if (comparison != NULL) {
+      if (strcmp(comparison, "lt") == 0)
+        AST_checkComparison(expression_root, N_EXP_LSS, 1, 2);
+      else if (strcmp(comparison, "gt") == 0)
+        AST_checkComparison(expression_root, N_EXP_GTR, 3, 2);
+      else if (strcmp(comparison, "le") == 0)
+        AST_checkComparison(expression_root, N_EXP_LEQ, 1, 2);
+      else if (strcmp(comparison, "ge") == 0)
+        AST_checkComparison(expression_root, N_EXP_GEQ, 3, 2);
+      else if (strcmp(comparison, "eq") == 0)
+        AST_checkComparison(expression_root, N_EXP_EQL, 1, 1);
+      else if (strcmp(comparison, "ne") == 0)
+        AST_checkComparison(expression_root, N_EXP_NEQ, 1, 2);
+      else
+        semanticError("Unknown comparison test");
+    }
+  }
+
+  {
+    const char *logical = getenv("AST_TEST_LOGICAL");
+
+    if (logical != NULL) {
+      if (strcmp(logical, "and") == 0)
+        AST_checkLogical(expression_root, 1);
+      else if (strcmp(logical, "or") == 0)
+        AST_checkLogical(expression_root, 2);
+      else if (strcmp(logical, "precedence") == 0)
+        AST_checkLogical(expression_root, 3);
+      else
+        semanticError("Unknown logical test");
+    }
+  }
+
+  {
+    const char *selection = getenv("AST_TEST_SELECTION");
+
+    if (selection != NULL) {
+      if (strcmp(selection, "if") == 0)
+        AST_checkSelection(1);
+      else if (strcmp(selection, "ifelse") == 0)
+        AST_checkSelection(2);
+      else if (strcmp(selection, "nested") == 0)
+        AST_checkSelection(3);
+      else
+        semanticError("Unknown selection test");
+    }
+  }
+
+  {
+    const char *iteration = getenv("AST_TEST_ITERATION");
+
+    if (iteration != NULL) {
+      if (strcmp(iteration, "while") == 0)
+        AST_checkIteration(1);
+      else if (strcmp(iteration, "do") == 0)
+        AST_checkIteration(2);
+      else if (strcmp(iteration, "for") == 0)
+        AST_checkIteration(3);
+      else
+        semanticError("Unknown iteration test");
+    }
+  }
+
   return 0;
 }

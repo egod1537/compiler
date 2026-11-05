@@ -55,29 +55,30 @@ external_declaration
     ;
 
 // 이전이랑 달라진 듯?
+
 function_definition
     : declaration_specifiers declarator
     {
       A_ID *id = setFunctionDeclaratorSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1));
-    
+
       current_id = id;
       enterScope();
-    
+
       for (A_ID *p = id->type->field; p != NULL; p = p->link) {
         if (p->name == NULL || p->name[0] == '\0')
           continue;
-    
+
         p->level = current_level;
         p->prev = current_id;
         current_id = p;
       }
-    
+
       $$ = YY(id);
     }
-    compound_statement
+      compound_statement
     {
       A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $3), PTR(A_NODE, $4));
-    
+
       leaveScope();
       $$ = YY(id);
     }
@@ -85,25 +86,25 @@ function_definition
     {
       A_ID *id =
           setFunctionDeclaratorSpecifier(PTR(A_ID, $1), makeSpecifier(int_type, S_NULL));
-    
+
       current_id = id;
       enterScope();
-    
+
       for (A_ID *p = id->type->field; p != NULL; p = p->link) {
         if (p->name == NULL || p->name[0] == '\0')
           continue;
-    
+
         p->level = current_level;
         p->prev = current_id;
         current_id = id;
       }
-    
+
       $$ = YY(id);
     }
-    compound_statement
+      compound_statement
     {
       A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE, $3));
-    
+
       leaveScope();
       $$ = YY(id);
     }
@@ -279,10 +280,10 @@ direct_declarator
     : IDENTIFIER
     {
       char *name = PTR(char, $1);
-    
+
       A_ID *id = makeIdentifier(name);
       free(name);
-    
+
       $$ = YY(id);
     }
     | LP declarator RP
@@ -344,9 +345,9 @@ parameter_declaration
     | declaration_specifiers abstract_declarator_opt
     {
       A_ID *id = makeDummyIdentifier();
-    
+
       setDeclaratorElementType(id, PTR(A_TYPE, $2));
-    
+
       $$ = YY(setParameterDeclaratorSpecifier(id, PTR(A_SPECIFIER, $1)));
     }
     ;
@@ -389,12 +390,16 @@ initializer_list
 
 statement
     : labeled_statement
-    | scoped_compound_statement {
-  $$ = $1;
-}
+    | scoped_compound_statement
+    {
+      $$ = $1;
+    }
     | expression_statement
-    | selection_statement
-    | iteration_statement
+    {
+      $$ = $1;
+    }
+    | selection_statement { $$ = $1; }
+    | iteration_statement { $$ = $1; }
     | jump_statement
     {
       $$ = $1;
@@ -402,16 +407,16 @@ statement
     ;
 
 scoped_compound_statement
-  : 
-  {
-    enterScope();
-  }
-  compound_statement
-  {
-    $$ = $2;
-    leaveScope();
-  }
-  ;
+    :
+    {
+      enterScope();
+    }
+      compound_statement
+    {
+      $$ = $2;
+      leaveScope();
+    }
+    ;
 
 labeled_statement
     : CASE_SYM constant_expression COLON statement
@@ -423,18 +428,20 @@ compound_statement
     : LR declaration_list_opt statement_list_opt RR
     {
       $$ = YY(makeNode(N_STMT_COMPOUND, PTR(A_NODE, $2), NULL, PTR(A_NODE, $3)));
-    
+
       compound_root = PTR(A_NODE, $$);
     }
     ;
 
 declaration_list
-    : declaration {
-  $$ = $1;
-}
-    | declaration_list declaration{
-  $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $2)));
-}
+    : declaration
+    {
+      $$ = $1;
+    }
+    | declaration_list declaration
+    {
+      $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $2)));
+    }
     ;
 
 statement_list_opt
@@ -462,19 +469,40 @@ statement_list
 
 expression_statement
     : SEMICOLON
+    {
+      $$ = YY(makeNode(N_STMT_EMPTY, NULL, NULL, NULL));
+    }
     | expression SEMICOLON
+    {
+      $$ = YY(makeNode(N_STMT_EXPRESSION, NULL, PTR(A_NODE, $1), NULL));
+    }
     ;
 
 selection_statement
     : IF_SYM LP expression RP statement %prec LOWER_THAN_ELSE
+    {
+      $$ = YY(makeNode(N_STMT_IF, PTR(A_NODE, $3), NULL, PTR(A_NODE, $5)));
+    }
     | IF_SYM LP expression RP statement ELSE_SYM statement
+    {
+      $$ = YY(makeNode(N_STMT_IF_ELSE, PTR(A_NODE, $3), PTR(A_NODE, $5), PTR(A_NODE, $7)));
+    }
     | SWITCH_SYM LP expression RP statement
     ;
 
 iteration_statement
     : WHILE_SYM LP expression RP statement
+    {
+      $$ = YY(makeNode(N_STMT_WHILE, PTR(A_NODE, $3), NULL, PTR(A_NODE, $5)));
+    }
     | DO_SYM statement WHILE_SYM LP expression RP SEMICOLON
-    | FOR_SYM LP expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP
+    {
+      $$ = YY(makeNode(N_STMT_DO, PTR(A_NODE, $2), NULL, PTR(A_NODE, $5)));
+    }
+    | FOR_SYM LP for_expression RP statement
+    {
+      $$ = YY(makeNode(N_STMT_FOR, PTR(A_NODE, $3), NULL, PTR(A_NODE, $5)));
+    }
       statement
     ;
 
@@ -489,11 +517,15 @@ expression_opt
     }
     ;
 
-jump_statement
-    : RETURN_SYM expression_opt SEMICOLON
+for_expression
+    : expression_opt SEMICOLON expression_opt SEMICOLON expression_opt
+    {
+      $$ = YY(makeNode(N_FOR_EXP, PTR(A_NODE, $1), PTR(A_NODE, $3), PTR(A_NODE, $5)));
+    }
+      jump_statement : RETURN_SYM expression_opt SEMICOLON
     {
       $$ = YY(makeNode(N_STMT_RETURN, NULL, PTR(A_NODE, $2), NULL));
-    
+
       statement_root = PTR(A_NODE, $$);
     }
     | CONTINUE_SYM SEMICOLON
@@ -507,13 +539,13 @@ primary_expression
       char *name = PTR(char, $1);
       A_ID *id = getIdentifierDeclared(name);
       free(name);
-    
+
       $$ = YY(makeNode(N_EXP_IDENT, NULL, PTR(A_NODE, id), NULL));
     }
     | INTEGER_CONSTANT
     {
       $$ = YY(makeNode(N_EXP_INT_CONST, NULL, PTR(A_NODE, $1), NULL));
-    
+
       A_NODE *node = PTR(A_NODE, $$);
       logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
     }
@@ -644,48 +676,78 @@ additive_expression
     ;
 
 shift_expression
-    : additive_expression
+    : additive_expression { $$ = $1; }
     | shift_expression LSHIFT additive_expression
     | shift_expression RSHIFT additive_expression
     ;
 
 relational_expression
     : shift_expression
+    {
+      $$ = $1;
+    }
     | relational_expression LSS shift_expression
+    {
+      $$ = YY(makeNode(N_EXP_LSS, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     | relational_expression GTR shift_expression
+    {
+      $$ = YY(makeNode(N_EXP_GTR, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     | relational_expression LEQ shift_expression
+    {
+      $$ = YY(makeNode(N_EXP_LEQ, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     | relational_expression GEQ shift_expression
+    {
+      $$ = YY(makeNode(N_EXP_GEQ, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     ;
 
 equality_expression
     : relational_expression
+    {
+      $$ = $1;
+    }
     | equality_expression EQL relational_expression
+    {
+      $$ = YY(makeNode(N_EXP_EQL, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     | equality_expression NEQ relational_expression
+    {
+      $$ = YY(makeNode(N_EXP_NEQ, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     ;
 
 AND_expression
-    : equality_expression
+    : equality_expression { $$ = $1; }
     | AND_expression AMP equality_expression
     ;
 
 exclusive_OR_expression
-    : AND_expression
+    : AND_expression { $$ = $1; }
     | exclusive_OR_expression CARET AND_expression
     ;
 
 inclusive_OR_expression
-    : exclusive_OR_expression
+    : exclusive_OR_expression { $$ = $1; }
     | inclusive_OR_expression BAR exclusive_OR_expression
     ;
 
 logical_AND_expression
-    : inclusive_OR_expression
+    : inclusive_OR_expression { $$ = $1; }
     | logical_AND_expression AMPAMP inclusive_OR_expression
+    {
+      $$ = YY(makeNode(N_EXP_AND, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     ;
 
 logical_OR_expression
-    : logical_AND_expression
+    : logical_AND_expression { $$ = $1; }
     | logical_OR_expression BARBAR logical_AND_expression
+    {
+      $$ = YY(makeNode(N_EXP_OR, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     ;
 
 conditional_expression
@@ -695,7 +757,13 @@ conditional_expression
 
 assignment_expression
     : conditional_expression
+    {
+      $$ = $1;
+    }
     | unary_expression ASSIGN assignment_expression
+    {
+      $$ = YY(makeNode(N_EXP_ASSIGN, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     ;
 
 comma_expression

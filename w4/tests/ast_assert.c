@@ -576,3 +576,254 @@ void AST_checkBlockShadowing(void) {
 
   logMsg(LOG_INFO, "AST block shadowing test passed");
 }
+
+void AST_checkAssignment(void) {
+  A_ID *func = searchIdentifier("main");
+
+  if (func == NULL || func->type == NULL)
+    semanticError("Missing main function");
+
+  A_NODE *body = func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Expected compound statement");
+
+  A_ID *x = PTR(A_ID, body->llink);
+
+  if (x == NULL || strcmp(x->name, "x") != 0 || x->kind != ID_VAR ||
+      x->type != int_type)
+    semanticError("Invalid variable x");
+
+  A_NODE *list = body->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Expected statement list");
+
+  A_NODE *stmt = list->llink;
+
+  if (stmt == NULL || stmt->name != N_STMT_EXPRESSION)
+    semanticError("Expected expression statement");
+
+  A_NODE *assign = stmt->clink;
+
+  if (assign == NULL || assign->name != N_EXP_ASSIGN)
+    semanticError("Expected N_EXP_ASSIGN");
+
+  A_NODE *left = assign->llink;
+  A_NODE *right = assign->rlink;
+
+  if (left == NULL || left->name != N_EXP_IDENT || PTR(A_ID, left->clink) != x)
+    semanticError("Invalid assignment target");
+
+  if (right == NULL || right->name != N_EXP_INT_CONST || (intptr_t)right->clink != 10)
+    semanticError("Invalid assignment value");
+
+  list = list->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing return statement list");
+
+  A_NODE *ret = list->llink;
+
+  if (ret == NULL || ret->name != N_STMT_RETURN || ret->clink == NULL ||
+      ret->clink->name != N_EXP_IDENT || PTR(A_ID, ret->clink->clink) != x)
+    semanticError("Invalid return identifier");
+
+  logMsg(LOG_INFO, "AST assignment test passed");
+}
+void AST_checkComparison(A_NODE *root, NODE_NAME expected, int lhs, int rhs) {
+  if (root == NULL || root->name != expected)
+    semanticError("Incorrect comparison node");
+
+  if (root->clink != NULL)
+    semanticError("Invalid comparison structure");
+
+  A_NODE *left = root->llink;
+  A_NODE *right = root->rlink;
+
+  if (left == NULL || right == NULL)
+    semanticError("Missing operands");
+
+  if (left->name != N_EXP_INT_CONST || right->name != N_EXP_INT_CONST)
+    semanticError("Expected integer operands");
+
+  if ((intptr_t)left->clink != lhs || (intptr_t)right->clink != rhs)
+    semanticError("Incorrect operand values");
+
+  logMsg(LOG_INFO, "AST comparison test passed");
+}
+static void AST_checkIntValue(A_NODE *node, int value) {
+  if (node == NULL || node->name != N_EXP_INT_CONST)
+    semanticError("Expected N_EXP_INT_CONST");
+
+  if ((intptr_t)node->clink != value)
+    semanticError("Incorrect integer value");
+}
+
+void AST_checkLogical(A_NODE *root, int mode) {
+  NODE_NAME expected = mode == 1 ? N_EXP_AND : N_EXP_OR;
+
+  if (root == NULL || root->name != expected)
+    semanticError("Incorrect logical AST root");
+
+  if (root->clink != NULL)
+    semanticError("Invalid logical AST structure");
+
+  if (mode == 1) {
+    AST_checkIntValue(root->llink, 1);
+    AST_checkIntValue(root->rlink, 0);
+  } else if (mode == 2) {
+    AST_checkIntValue(root->llink, 0);
+    AST_checkIntValue(root->rlink, 1);
+  } else if (mode == 3) {
+    AST_checkIntValue(root->llink, 1);
+
+    A_NODE *and = root->rlink;
+
+    if (and== NULL || and->name != N_EXP_AND || and->clink != NULL)
+      semanticError("Incorrect logical precedence");
+
+    AST_checkIntValue(and->llink, 0);
+    AST_checkIntValue(and->rlink, 1);
+  } else {
+    semanticError("Unknown logical test mode");
+  }
+
+  logMsg(LOG_INFO, "AST logical test passed");
+}
+
+static A_NODE *AST_nthStatement(A_NODE *body, int n) {
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Expected compound statement");
+
+  A_NODE *list = body->rlink;
+
+  while (n-- > 0) {
+    if (list == NULL || list->name != N_STMT_LIST)
+      semanticError("Statement index out of range");
+
+    list = list->rlink;
+  }
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing statement");
+
+  return list->llink;
+}
+
+void AST_checkSelection(int mode) {
+  A_ID *func = searchIdentifier("main");
+
+  if (func == NULL || func->type == NULL)
+    semanticError("Missing main function");
+
+  A_NODE *body = func->type->expr;
+  A_NODE *node;
+
+  if (mode == 1) {
+    // 36_if_statement.c
+    node = AST_nthStatement(body, 1);
+
+    if (node == NULL || node->name != N_STMT_IF || node->clink != NULL)
+      semanticError("Expected N_STMT_IF");
+
+    if (node->llink == NULL || node->llink->name != N_EXP_IDENT ||
+        node->rlink == NULL || node->rlink->name != N_STMT_RETURN)
+      semanticError("Invalid if structure");
+  } else if (mode == 2) {
+    // 07_if_else.c
+    node = AST_nthStatement(body, 1);
+
+    if (node == NULL || node->name != N_STMT_IF_ELSE)
+      semanticError("Expected N_STMT_IF_ELSE");
+
+    if (node->llink == NULL || node->llink->name != N_EXP_GTR || node->clink == NULL ||
+        node->clink->name != N_STMT_RETURN || node->rlink == NULL ||
+        node->rlink->name != N_STMT_RETURN)
+      semanticError("Invalid if-else structure");
+  } else if (mode == 3) {
+    // 37_if_else_nested.c
+    node = AST_nthStatement(body, 2);
+
+    if (node == NULL || node->name != N_STMT_IF || node->clink != NULL)
+      semanticError("Expected outer if");
+
+    A_NODE *inner = node->rlink;
+
+    if (inner == NULL || inner->name != N_STMT_IF_ELSE)
+      semanticError("Dangling else bound incorrectly");
+
+    if (inner->llink == NULL || inner->llink->name != N_EXP_IDENT ||
+        inner->clink == NULL || inner->clink->name != N_STMT_RETURN ||
+        inner->rlink == NULL || inner->rlink->name != N_STMT_RETURN)
+      semanticError("Invalid nested if-else");
+  } else {
+    semanticError("Unknown selection test mode");
+  }
+
+  logMsg(LOG_INFO, "AST selection test passed");
+}
+
+static A_NODE *AST_iterationStatement(A_NODE *body, int index) {
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Expected compound body");
+
+  A_NODE *list = body->rlink;
+
+  while (index-- > 0) {
+    if (list == NULL || list->name != N_STMT_LIST)
+      semanticError("Missing statement");
+    list = list->rlink;
+  }
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing iteration statement");
+
+  return list->llink;
+}
+
+void AST_checkIteration(int mode) {
+  A_ID *func = searchIdentifier("main");
+
+  if (func == NULL || func->type == NULL)
+    semanticError("Missing main function");
+
+  A_NODE *body = func->type->expr;
+  A_NODE *node = AST_iterationStatement(body, mode == 3 ? 0 : 1);
+
+  if (node == NULL)
+    semanticError("Null iteration statement");
+
+  if (mode == 1) {
+    // while
+    if (node->name != N_STMT_WHILE || node->llink == NULL ||
+        node->llink->name != N_EXP_LSS || node->clink != NULL || node->rlink == NULL ||
+        node->rlink->name != N_STMT_EXPRESSION)
+      semanticError("Invalid while AST");
+  } else if (mode == 2) {
+    // do-while
+    if (node->name != N_STMT_DO || node->llink == NULL ||
+        node->llink->name != N_STMT_EXPRESSION || node->clink != NULL ||
+        node->rlink == NULL || node->rlink->name != N_EXP_LSS)
+      semanticError("Invalid do-while AST");
+  } else if (mode == 3) {
+    // for
+    if (node->name != N_STMT_FOR || node->clink != NULL || node->rlink == NULL ||
+        node->rlink->name != N_STMT_EMPTY)
+      semanticError("Invalid for AST");
+
+    A_NODE *exp = node->llink;
+
+    if (exp == NULL || exp->name != N_FOR_EXP)
+      semanticError("Missing N_FOR_EXP");
+
+    if (exp->llink == NULL || exp->llink->name != N_EXP_ASSIGN || exp->clink == NULL ||
+        exp->clink->name != N_EXP_LSS || exp->rlink == NULL ||
+        exp->rlink->name != N_EXP_POST_INC)
+      semanticError("Invalid for expressions");
+  } else {
+    semanticError("Unknown iteration test");
+  }
+
+  logMsg(LOG_INFO, "AST iteration test passed");
+}

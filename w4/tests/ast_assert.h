@@ -23,5 +23,10 @@ void AST_checkReturn(A_NODE *root);
 void AST_checkCompoundReturn(A_NODE *root);
 void AST_checkFunctionScope(void);
 void AST_checkBlockShadowing(void);
+void AST_checkAssignment(void);
+void AST_checkComparison(A_NODE *root, NODE_NAME expected, int lhs, int rhs);
+void AST_checkLogical(A_NODE *root, int mode);
+void AST_checkSelection(int mode);
+void AST_checkIteration(int mode);
 
 #endif // !AST_ASSERT_H
