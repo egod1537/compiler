@@ -18,15 +18,10 @@ def node(
     llink: AstValue = None,
     clink: AstValue = None,
     rlink: AstValue = None,
-    *,
-    node_type: AstValue = None,
-    value: int = 0,
 ) -> Dict[str, AstValue]:
     return {
         "class": "A_NODE",
         "name": name,
-        "type": node_type,
-        "value": value,
         "llink": llink,
         "clink": clink,
         "rlink": rlink,
@@ -53,38 +48,24 @@ def declaration(
     name: str,
     kind: str,
     level: int,
-    declared_type: Optional[Dict[str, AstValue]],
-    *,
-    specifier: str = "S_NULL",
-    value: int = 0,
-    address: int = 0,
-    init: AstValue = None,
+    declared_type: Dict[str, AstValue],
 ) -> Dict[str, AstValue]:
     return {
         "class": "A_ID",
         "name": name,
         "kind": kind,
         "level": level,
-        "specifier": specifier,
-        "value": value,
-        "address": address,
         "type": declared_type,
-        "init": init,
         "link": None,
     }
 
 
-def reference(target: Dict[str, AstValue]) -> Dict[str, AstValue]:
+def reference(name: str, kind: str, level: int) -> Dict[str, AstValue]:
     return {
         "class": "A_ID_REF",
-        "name": target["name"],
-        "kind": target["kind"],
-        "level": target["level"],
-        "specifier": target["specifier"],
-        "value": target["value"],
-        "address": target["address"],
-        "type": target["type"],
-        "target": target,
+        "name": name,
+        "kind": kind,
+        "level": level,
     }
 
 
@@ -97,16 +78,12 @@ def id_list(*items: Dict[str, AstValue]) -> Optional[Dict[str, AstValue]]:
     return head
 
 
-INT_TYPE = type_("T_INT")
-VOID_TYPE = type_("T_VOID")
-
-
 def int_type() -> Dict[str, AstValue]:
-    return INT_TYPE
+    return type_("T_INT")
 
 
 def void_type() -> Dict[str, AstValue]:
-    return VOID_TYPE
+    return type_("T_VOID")
 
 
 def int_parameter(name: str) -> Dict[str, AstValue]:
@@ -134,8 +111,8 @@ def integer(value: int) -> Dict[str, AstValue]:
     return node("N_EXP_INT_CONST", clink=value)
 
 
-def identifier(target: Dict[str, AstValue]) -> Dict[str, AstValue]:
-    return node("N_EXP_IDENT", clink=reference(target))
+def identifier(name: str, kind: str, level: int) -> Dict[str, AstValue]:
+    return node("N_EXP_IDENT", clink=reference(name, kind, level))
 
 
 def statement_list(*statements: Dict[str, AstValue]) -> Dict[str, AstValue]:
@@ -160,24 +137,21 @@ def return_(expression: AstValue) -> Dict[str, AstValue]:
     return node("N_STMT_RETURN", clink=expression)
 
 
-def assignment(target: Dict[str, AstValue], value: int) -> Dict[str, AstValue]:
+def assignment(name: str, level: int, value: int) -> Dict[str, AstValue]:
     expression = node(
         "N_EXP_ASSIGN",
-        llink=identifier(target),
+        llink=identifier(name, "ID_VAR", level),
         rlink=integer(value),
     )
     return node("N_STMT_EXPRESSION", clink=expression)
 
 
 def case_24() -> Dict[str, AstValue]:
-    parameter_a = int_parameter("a")
-    parameter_b = int_parameter("b")
     add_declaration = declaration(
         "add",
         "ID_FUNC",
         0,
-        function_type((parameter_a, parameter_b)),
-        specifier="S_AUTO",
+        function_type((int_parameter("a"), int_parameter("b"))),
     )
 
     main_body = compound(None, return_(integer(0)))
@@ -185,44 +159,52 @@ def case_24() -> Dict[str, AstValue]:
         "main", "ID_FUNC", 0, function_type((void_parameter(),), main_body)
     )
 
-    return node("N_PROGRAM", clink=id_list(add_declaration, main_definition))
+    add_expression = node(
+        "N_EXP_ADD",
+        llink=identifier("a", "ID_PARM", 1),
+        rlink=identifier("b", "ID_PARM", 1),
+    )
+    add_body = compound(None, return_(add_expression))
+    add_definition = declaration(
+        "add",
+        "ID_FUNC",
+        0,
+        function_type((int_parameter("a"), int_parameter("b")), add_body),
+    )
+
+    return node(
+        "N_PROGRAM",
+        clink=id_list(add_declaration, main_definition, add_definition),
+    )
 
 
 def case_25() -> Dict[str, AstValue]:
-    parameter_a = int_parameter("a")
-    parameter_b = int_parameter("b")
     add_expression = node(
         "N_EXP_ADD",
-        llink=identifier(parameter_a),
-        rlink=identifier(parameter_b),
+        llink=identifier("a", "ID_PARM", 1),
+        rlink=identifier("b", "ID_PARM", 1),
     )
     add_body = compound(None, return_(add_expression))
     add = declaration(
         "add",
         "ID_FUNC",
         0,
-        function_type((parameter_a, parameter_b), add_body),
+        function_type((int_parameter("a"), int_parameter("b")), add_body),
     )
     return node("N_PROGRAM", clink=id_list(add))
 
 
 def case_44() -> Dict[str, AstValue]:
-    global_x = declaration(
-        "x", "ID_VAR", 0, int_type(), specifier="S_AUTO"
-    )
+    global_x = declaration("x", "ID_VAR", 0, int_type())
 
-    outer_x = declaration(
-        "x", "ID_VAR", 1, int_type(), specifier="S_AUTO"
-    )
-    inner_x = declaration(
-        "x", "ID_VAR", 2, int_type(), specifier="S_AUTO"
-    )
-    inner_block = compound(id_list(inner_x), assignment(inner_x, 2))
+    outer_x = declaration("x", "ID_VAR", 1, int_type())
+    inner_x = declaration("x", "ID_VAR", 2, int_type())
+    inner_block = compound(id_list(inner_x), assignment("x", 2, 2))
     main_body = compound(
         id_list(outer_x),
-        assignment(outer_x, 1),
+        assignment("x", 1, 1),
         inner_block,
-        return_(identifier(outer_x)),
+        return_(identifier("x", "ID_VAR", 1)),
     )
     main = declaration(
         "main", "ID_FUNC", 0, function_type((void_parameter(),), main_body)
@@ -232,9 +214,7 @@ def case_44() -> Dict[str, AstValue]:
 
 
 def case_59() -> Dict[str, AstValue]:
-    function = declaration(
-        "f", "ID_FUNC", 0, function_type(()), specifier="S_AUTO"
-    )
+    function = declaration("f", "ID_FUNC", 0, function_type(()))
     return node("N_PROGRAM", clink=id_list(function))
 
 

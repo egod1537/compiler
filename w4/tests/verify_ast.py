@@ -33,7 +33,6 @@ class Token:
     kind: str
     value: Any
     line: int
-    depth: int
 
 
 @dataclass
@@ -60,12 +59,10 @@ class CaseResult:
     differences: Optional[List[Difference]] = None
 
 
-NODE_RE = re.compile(r"^(N_[A-Z0-9_]+)\s+\(([^,]+),(-?\d+)\)$")
+NODE_RE = re.compile(r"^(N_[A-Z0-9_]+)\s+\(.+,-?\d+\)$")
 ID_RE = re.compile(
-    r'^\(ID="([^"]*)"\)\s+TYPE:(\S+)\s+KIND:([A-Z_]+)\s+'
-    r'SPEC=([A-Z_]+)\s+LEV=(-?\d+)\s+VAL=(-?\d+)\s+ADDR=(-?\d+)'
+    r'^\(ID="([^"]*)"\).*\bKIND:([A-Z_]+).*\bLEV=(-?\d+)\b'
 )
-DONE_RE = re.compile(r"^\(DONE:([^\)]+)\)$")
 INTEGER_RE = re.compile(r"^-?\d+$")
 LABELS = {"PARAMETER", "TYPE", "BODY", "ELEMENT_TYPE", "INDEX", "FIELD", "ENUMERATORS", "INIT"}
 TYPE_WORDS = {
@@ -80,22 +77,11 @@ TYPE_WORDS = {
 }
 
 
-def parse_address(text: str) -> Optional[int]:
-    value = text.strip().lower()
-    if value in {"(nil)", "nil", "null", "0x0"} or set(value) == {"0"}:
-        return None
-    if value.startswith("0x"):
-        value = value[2:]
-    return int(value, 16)
-
-
-def _content(line: str) -> Tuple[int, str]:
-    text = line.lstrip()
-    depth = 0
-    while text.startswith("|  "):
-        depth += 1
-        text = text[3:]
-    return depth, text.strip()
+def _content(line: str) -> str:
+    text = line.strip()
+    while text.startswith("|"):
+        text = text[1:].lstrip()
+    return text
 
 
 def tokenize(output: str) -> List[Token]:
@@ -110,24 +96,13 @@ def tokenize(output: str) -> List[Token]:
 
     tokens: List[Token] = []
     for line_number, raw_line in enumerate(tree_output.splitlines(), start=1):
-        depth, content = _content(raw_line)
+        content = _content(raw_line)
         if not content:
             continue
 
         node_match = NODE_RE.match(content)
         if node_match:
-            tokens.append(
-                Token(
-                    "NODE",
-                    {
-                        "name": node_match.group(1),
-                        "type_address": parse_address(node_match.group(2)),
-                        "value": int(node_match.group(3)),
-                    },
-                    line_number,
-                    depth,
-                )
-            )
+            tokens.append(Token("NODE", node_match.group(1), line_number))
             continue
 
         id_match = ID_RE.match(content)
@@ -137,57 +112,45 @@ def tokenize(output: str) -> List[Token]:
                     "ID",
                     {
                         "name": id_match.group(1),
-                        "type_address": parse_address(id_match.group(2)),
-                        "kind": "ID_" + id_match.group(3),
-                        "specifier": "S_" + id_match.group(4),
-                        "level": int(id_match.group(5)),
-                        "value": int(id_match.group(6)),
-                        "address": int(id_match.group(7)),
+                        "kind": "ID_" + id_match.group(2),
+                        "level": int(id_match.group(3)),
                     },
                     line_number,
-                    depth,
                 )
             )
             continue
 
         if content in LABELS:
-            tokens.append(Token("LABEL", content, line_number, depth))
+            tokens.append(Token("LABEL", content, line_number))
             continue
 
         if content == "(int)":
-            tokens.append(Token("TYPE_KIND", "T_INT", line_number, depth))
+            tokens.append(Token("TYPE_KIND", "T_INT", line_number))
             continue
         if content == "(float)":
-            tokens.append(Token("TYPE_KIND", "T_FLOAT", line_number, depth))
+            tokens.append(Token("TYPE_KIND", "T_FLOAT", line_number))
             continue
         if content.startswith("(char ") and content.endswith(")"):
-            tokens.append(Token("TYPE_KIND", "T_CHAR", line_number, depth))
+            tokens.append(Token("TYPE_KIND", "T_CHAR", line_number))
             continue
         if content == "(void)":
-            tokens.append(Token("TYPE_KIND", "T_VOID", line_number, depth))
+            tokens.append(Token("TYPE_KIND", "T_VOID", line_number))
             continue
         if content == "(null)":
-            tokens.append(Token("TYPE_KIND", "T_NULL", line_number, depth))
+            tokens.append(Token("TYPE_KIND", "T_NULL", line_number))
             continue
-        done_match = DONE_RE.match(content)
-        if done_match:
-            tokens.append(
-                Token(
-                    "TYPE_REF",
-                    parse_address(done_match.group(1)),
-                    line_number,
-                    depth,
-                )
+        if content.startswith("(DONE:"):
+            raise VerificationError(
+                "print.c elided a repeated type as DONE; this verifier cannot infer its structure"
             )
-            continue
         if content in TYPE_WORDS:
-            tokens.append(Token("TYPE_KIND", TYPE_WORDS[content], line_number, depth))
+            tokens.append(Token("TYPE_KIND", TYPE_WORDS[content], line_number))
             continue
         if content == "(none)":
-            tokens.append(Token("NONE", None, line_number, depth))
+            tokens.append(Token("NONE", None, line_number))
             continue
         if INTEGER_RE.match(content):
-            tokens.append(Token("INTEGER", int(content), line_number, depth))
+            tokens.append(Token("INTEGER", int(content), line_number))
             continue
 
         raise VerificationError(
@@ -231,74 +194,29 @@ class AstPrintParser:
     def __init__(self, tokens: Sequence[Token]):
         self.tokens = tokens
         self.position = 0
-        self.types_by_address: Dict[int, Dict[str, Any]] = {}
-        self.builtin_types: Dict[str, Dict[str, Any]] = {}
-        self.unaddressed_types: List[Dict[str, Any]] = []
-        self.scopes: List[List[Dict[str, Any]]] = [[]]
 
-    def peek(
-        self,
-        kind: Optional[str] = None,
-        value: Any = None,
-        depth: Optional[int] = None,
-    ) -> bool:
+    def peek(self, kind: Optional[str] = None, value: Any = None) -> bool:
         if self.position >= len(self.tokens):
             return False
         token = self.tokens[self.position]
-        return (
-            (kind is None or token.kind == kind)
-            and (value is None or token.value == value)
-            and (depth is None or token.depth == depth)
-        )
+        return (kind is None or token.kind == kind) and (value is None or token.value == value)
 
-    def take(
-        self, kind: str, value: Any = None, depth: Optional[int] = None
-    ) -> Token:
+    def take(self, kind: str, value: Any = None) -> Token:
         if self.position >= len(self.tokens):
             raise VerificationError(f"unexpected end of AST_PRINT output; expected {value or kind}")
         token = self.tokens[self.position]
-        if (
-            token.kind != kind
-            or (value is not None and token.value != value)
-            or (depth is not None and token.depth != depth)
-        ):
+        if token.kind != kind or (value is not None and token.value != value):
             raise VerificationError(
-                f"tree line {token.line}: expected {value or kind} at depth {depth}, "
-                f"got {token.value!r} at depth {token.depth}"
+                f"tree line {token.line}: expected {value or kind}, got {token.value!r}"
             )
         self.position += 1
         return token
 
-    def type_at(self, address: Optional[int]) -> Optional[Dict[str, Any]]:
-        if address is None:
-            return None
-        if address not in self.types_by_address:
-            self.types_by_address[address] = self.make_type(None)
-        return self.types_by_address[address]
-
-    def bind_type_address(
-        self, type_object: Dict[str, Any], address: Optional[int]
-    ) -> Dict[str, Any]:
-        if address is None:
-            return type_object
-        existing = self.types_by_address.get(address)
-        if existing is None:
-            self.types_by_address[address] = type_object
-            return type_object
-        return existing
-
-    def make_node(
-        self,
-        token: Token,
-        llink: Any = None,
-        clink: Any = None,
-        rlink: Any = None,
-    ) -> Dict[str, Any]:
+    @staticmethod
+    def make_node(name: str, llink: Any = None, clink: Any = None, rlink: Any = None) -> Dict[str, Any]:
         return {
             "class": "A_NODE",
-            "name": token.value["name"],
-            "type": self.type_at(token.value["type_address"]),
-            "value": token.value["value"],
+            "name": name,
             "llink": llink,
             "clink": clink,
             "rlink": rlink,
@@ -306,7 +224,7 @@ class AstPrintParser:
 
     @staticmethod
     def make_type(
-        kind: Optional[str],
+        kind: str,
         element_type: Any = None,
         field: Any = None,
         expr: Any = None,
@@ -320,31 +238,19 @@ class AstPrintParser:
         }
 
     def parse(self) -> Dict[str, Any]:
-        root = self.take("NODE", depth=0)
-        if root.value["name"] != "N_PROGRAM":
-            raise VerificationError(f"expected N_PROGRAM, got {root.value['name']}")
-        program = self.make_node(root, clink=self.parse_id_list(1, register_scope=True))
+        self.take("NODE", "N_PROGRAM")
+        program = self.make_node("N_PROGRAM", clink=self.parse_id_list())
         if self.position != len(self.tokens):
             token = self.tokens[self.position]
             raise VerificationError(
                 f"tree line {token.line}: unexpected trailing value {token.value!r}"
             )
-        unresolved = [
-            address
-            for address, type_object in self.types_by_address.items()
-            if type_object.get("kind") is None
-        ]
-        if unresolved:
-            rendered = ", ".join(hex(address) for address in unresolved)
-            raise VerificationError(f"DONE referenced unresolved type address(es): {rendered}")
         return program
 
-    def parse_id_list(
-        self, depth: int, *, register_scope: bool
-    ) -> Optional[Dict[str, Any]]:
+    def parse_id_list(self) -> Optional[Dict[str, Any]]:
         items: List[Dict[str, Any]] = []
-        while self.peek("ID", depth=depth):
-            items.append(self.parse_declaration(depth, register_scope=register_scope))
+        while self.peek("ID"):
+            items.append(self.parse_declaration())
 
         head: Optional[Dict[str, Any]] = None
         for item in reversed(items):
@@ -352,286 +258,134 @@ class AstPrintParser:
             head = item
         return head
 
-    def parse_declaration(
-        self, depth: int, *, register_scope: bool
-    ) -> Dict[str, Any]:
-        printed = self.take("ID", depth=depth).value
-        declaration = {
+    def parse_declaration(self) -> Dict[str, Any]:
+        identity = self.take("ID").value
+        self.take("LABEL", "TYPE")
+        declared_type = self.parse_type()
+        return {
             "class": "A_ID",
-            "name": printed["name"],
-            "kind": printed["kind"],
-            "level": printed["level"],
-            "specifier": printed["specifier"],
-            "value": printed["value"],
-            "address": printed["address"],
-            "type": self.type_at(printed["type_address"]),
-            "init": None,
+            **identity,
+            "type": declared_type,
             "link": None,
         }
-        if register_scope:
-            self.scopes[-1].append(declaration)
 
-        if self.peek("LABEL", "TYPE", depth + 1):
-            self.take("LABEL", "TYPE", depth + 1)
-            declaration["type"] = self.parse_type(
-                depth + 2, printed["type_address"]
-            )
-        elif printed["type_address"] is not None:
-            raise VerificationError(
-                f"identifier {printed['name']!r} has a type address but no TYPE output"
-            )
+    def parse_reference(self) -> Dict[str, Any]:
+        identity = self.take("ID").value
+        return {"class": "A_ID_REF", **identity}
 
-        if self.peek("LABEL", "INIT", depth + 1):
-            self.take("LABEL", "INIT", depth + 1)
-            if declaration["kind"] == "ID_ENUM_LITERAL":
-                declaration["init"] = self.parse_expression(depth + 2)
-            else:
-                declaration["init"] = self.parse_initializer(depth + 2)
-        return declaration
-
-    def parse_reference(self, depth: int) -> Dict[str, Any]:
-        printed = self.take("ID", depth=depth).value
-        reference = {
-            "class": "A_ID_REF",
-            "name": printed["name"],
-            "kind": printed["kind"],
-            "level": printed["level"],
-            "specifier": printed["specifier"],
-            "value": printed["value"],
-            "address": printed["address"],
-            "type": self.type_at(printed["type_address"]),
-            "target": None,
-        }
-        reference["target"] = self.resolve_reference(reference)
-        return reference
-
-    def resolve_reference(self, reference: Dict[str, Any]) -> Optional[Dict[str, Any]]:
-        """Resolve an A_ID reference only when printed lexical evidence is unique.
-
-        print.c does not emit A_ID object addresses, so ambiguous matches must stay
-        unresolved instead of being guessed.
-        """
-        visible_fields = (
-            "name",
-            "kind",
-            "level",
-            "specifier",
-            "value",
-            "address",
-        )
-        for scope in reversed(self.scopes):
-            named = [item for item in scope if item["name"] == reference["name"]]
-            if not named:
-                continue
-            matches = [
-                item
-                for item in named
-                if all(item[field] == reference[field] for field in visible_fields)
-                and item["type"] is reference["type"]
-            ]
-            return matches[0] if len(matches) == 1 else None
-        return None
-
-    def parse_type(
-        self, depth: int, address_hint: Optional[int] = None
-    ) -> Dict[str, Any]:
-        if self.peek("TYPE_REF", depth=depth):
-            reference = self.take("TYPE_REF", depth=depth).value
-            if reference is None:
-                raise VerificationError("DONE contains a null type address")
-            if reference not in self.types_by_address:
-                if len(self.unaddressed_types) == 1:
-                    candidate = self.unaddressed_types.pop()
-                    self.types_by_address[reference] = candidate
-                else:
-                    self.type_at(reference)
-            return self.type_at(reference)
-
-        kind = self.take("TYPE_KIND", depth=depth).value
+    def parse_type(self) -> Dict[str, Any]:
+        kind = self.take("TYPE_KIND").value
         if kind in {"T_INT", "T_FLOAT", "T_CHAR", "T_VOID", "T_NULL"}:
-            type_object = self.builtin_types.get(kind)
-            if type_object is None:
-                type_object = self.type_at(address_hint) or self.make_type(kind)
-                type_object["kind"] = kind
-                self.builtin_types[kind] = type_object
-            bound = self.bind_type_address(type_object, address_hint)
-            if bound.get("kind") is None:
-                bound["kind"] = kind
-            self.builtin_types[kind] = bound
-            return bound
-
-        type_object = self.type_at(address_hint) or self.make_type(kind)
-        if address_hint is None:
-            self.unaddressed_types.append(type_object)
-        if type_object.get("kind") not in {None, kind}:
-            raise VerificationError("one type address was printed with conflicting kinds")
-        type_object["kind"] = kind
+            return self.make_type(kind)
 
         if kind == "T_FUNC":
-            self.take("LABEL", "PARAMETER", depth + 1)
-            self.scopes.append([])
-            try:
-                type_object["field"] = self.parse_id_list(
-                    depth + 2, register_scope=True
-                )
-                self.take("LABEL", "TYPE", depth + 1)
-                type_object["element_type"] = self.parse_type(depth + 2)
-                if self.peek("LABEL", "BODY", depth + 1):
-                    self.take("LABEL", "BODY", depth + 1)
-                    type_object["expr"] = self.parse_statement(
-                        depth + 2, function_body=True
-                    )
-            finally:
-                self.scopes.pop()
-            return type_object
+            self.take("LABEL", "PARAMETER")
+            parameters = self.parse_id_list()
+            self.take("LABEL", "TYPE")
+            return_type = self.parse_type()
+            body = None
+            if self.peek("LABEL", "BODY"):
+                self.take("LABEL", "BODY")
+                body = self.parse_statement()
+            return self.make_type(kind, return_type, parameters, body)
 
         if kind == "T_POINTER":
-            self.take("LABEL", "ELEMENT_TYPE", depth + 1)
-            type_object["element_type"] = self.parse_type(depth + 2)
-            return type_object
+            self.take("LABEL", "ELEMENT_TYPE")
+            return self.make_type(kind, element_type=self.parse_type())
 
         if kind == "T_ARRAY":
-            self.take("LABEL", "INDEX", depth + 1)
-            if self.peek("NONE", depth=depth + 2):
-                self.take("NONE", depth=depth + 2)
-                type_object["expr"] = None
+            self.take("LABEL", "INDEX")
+            if self.peek("NONE"):
+                self.take("NONE")
+                size = None
             else:
-                type_object["expr"] = self.parse_expression(depth + 2)
-            self.take("LABEL", "ELEMENT_TYPE", depth + 1)
-            type_object["element_type"] = self.parse_type(depth + 2)
-            return type_object
+                size = self.parse_expression()
+            self.take("LABEL", "ELEMENT_TYPE")
+            return self.make_type(kind, self.parse_type(), expr=size)
 
         if kind in {"T_STRUCT", "T_UNION", "T_ENUM"}:
             label = "ENUMERATORS" if kind == "T_ENUM" else "FIELD"
-            self.take("LABEL", label, depth + 1)
-            type_object["field"] = self.parse_id_list(
-                depth + 2, register_scope=kind == "T_ENUM"
-            )
-            return type_object
+            self.take("LABEL", label)
+            return self.make_type(kind, field=self.parse_id_list())
 
         raise VerificationError(f"unsupported type in AST_PRINT output: {kind}")
 
-    def parse_statement_list(self, depth: int) -> Dict[str, Any]:
-        token = self.take("NODE", depth=depth)
-        name = token.value["name"]
+    def parse_statement_list(self) -> Dict[str, Any]:
+        name = self.take("NODE").value
         if name == "N_STMT_LIST_NIL":
-            return self.make_node(token)
+            return self.make_node(name)
         if name != "N_STMT_LIST":
             raise VerificationError(f"expected statement list, got {name}")
-        statement = self.parse_statement(depth + 1)
-        remainder = self.parse_statement_list(depth + 1)
-        return self.make_node(token, llink=statement, rlink=remainder)
+        statement = self.parse_statement()
+        remainder = self.parse_statement_list()
+        return self.make_node(name, llink=statement, rlink=remainder)
 
-    def parse_statement(
-        self, depth: int, *, function_body: bool = False
-    ) -> Dict[str, Any]:
-        token = self.take("NODE", depth=depth)
-        name = token.value["name"]
+    def parse_statement(self) -> Dict[str, Any]:
+        name = self.take("NODE").value
         if name == "N_STMT_COMPOUND":
-            if not function_body:
-                self.scopes.append([])
-            try:
-                declarations = self.parse_id_list(depth + 1, register_scope=True)
-                statements = self.parse_statement_list(depth + 1)
-            finally:
-                if not function_body:
-                    self.scopes.pop()
-            return self.make_node(token, llink=declarations, rlink=statements)
+            declarations = self.parse_id_list()
+            statements = self.parse_statement_list()
+            return self.make_node(name, llink=declarations, rlink=statements)
         if name == "N_STMT_EMPTY" or name in {"N_STMT_CONTINUE", "N_STMT_BREAK"}:
-            return self.make_node(token)
+            return self.make_node(name)
         if name == "N_STMT_EXPRESSION":
-            return self.make_node(token, clink=self.parse_expression(depth + 1))
+            return self.make_node(name, clink=self.parse_expression())
         if name == "N_STMT_RETURN":
-            expression = (
-                self.parse_expression(depth + 1)
-                if self.peek_expression(depth + 1)
-                else None
-            )
-            return self.make_node(token, clink=expression)
+            expression = self.parse_expression() if self.peek_expression() else None
+            return self.make_node(name, clink=expression)
         if name == "N_STMT_IF":
             return self.make_node(
-                token,
-                llink=self.parse_expression(depth + 1),
-                rlink=self.parse_statement(depth + 1),
+                name, llink=self.parse_expression(), rlink=self.parse_statement()
             )
         if name == "N_STMT_IF_ELSE":
             return self.make_node(
-                token,
-                llink=self.parse_expression(depth + 1),
-                clink=self.parse_statement(depth + 1),
-                rlink=self.parse_statement(depth + 1),
+                name,
+                llink=self.parse_expression(),
+                clink=self.parse_statement(),
+                rlink=self.parse_statement(),
             )
         raise VerificationError(f"unsupported statement in AST_PRINT output: {name}")
 
-    def peek_expression(self, depth: int) -> bool:
-        return (
-            self.peek("NODE", depth=depth)
-            and self.tokens[self.position].value["name"].startswith("N_EXP_")
-        )
+    def peek_expression(self) -> bool:
+        return self.peek("NODE") and self.tokens[self.position].value.startswith("N_EXP_")
 
-    def parse_expression(self, depth: int) -> Dict[str, Any]:
-        token = self.take("NODE", depth=depth)
-        name = token.value["name"]
+    def parse_expression(self) -> Dict[str, Any]:
+        name = self.take("NODE").value
         if name == "N_EXP_IDENT":
-            return self.make_node(token, clink=self.parse_reference(depth + 1))
+            return self.make_node(name, clink=self.parse_reference())
         if name in {"N_EXP_INT_CONST", "N_EXP_CHAR_CONST"}:
-            return self.make_node(
-                token, clink=self.take("INTEGER", depth=depth + 1).value
-            )
+            return self.make_node(name, clink=self.take("INTEGER").value)
         if name in self.BINARY_EXPRESSIONS:
             return self.make_node(
-                token,
-                llink=self.parse_expression(depth + 1),
-                rlink=self.parse_expression(depth + 1),
+                name, llink=self.parse_expression(), rlink=self.parse_expression()
             )
         if name in self.UNARY_EXPRESSIONS:
-            return self.make_node(token, clink=self.parse_expression(depth + 1))
+            return self.make_node(name, clink=self.parse_expression())
         if name == "N_EXP_FUNCTION_CALL":
             return self.make_node(
-                token,
-                llink=self.parse_expression(depth + 1),
-                rlink=self.parse_argument_list(depth + 1),
+                name, llink=self.parse_expression(), rlink=self.parse_argument_list()
             )
         raise VerificationError(f"unsupported expression in AST_PRINT output: {name}")
 
-    def parse_argument_list(self, depth: int) -> Dict[str, Any]:
-        token = self.take("NODE", depth=depth)
-        name = token.value["name"]
+    def parse_argument_list(self) -> Dict[str, Any]:
+        name = self.take("NODE").value
         if name == "N_ARG_LIST_NIL":
-            return self.make_node(token)
+            return self.make_node(name)
         if name != "N_ARG_LIST":
             raise VerificationError(f"expected argument list, got {name}")
         return self.make_node(
-            token,
-            llink=self.parse_expression(depth + 1),
-            rlink=self.parse_argument_list(depth + 1),
+            name,
+            llink=self.parse_expression(),
+            rlink=self.parse_argument_list(),
         )
-
-    def parse_initializer(self, depth: int) -> Dict[str, Any]:
-        token = self.take("NODE", depth=depth)
-        name = token.value["name"]
-        if name == "N_INIT_LIST_NIL":
-            return self.make_node(token)
-        if name == "N_INIT_LIST_ONE":
-            return self.make_node(token, clink=self.parse_expression(depth + 1))
-        if name == "N_INIT_LIST":
-            return self.make_node(
-                token,
-                llink=self.parse_initializer(depth + 1),
-                rlink=self.parse_initializer(depth + 1),
-            )
-        raise VerificationError(f"unsupported initializer in AST_PRINT output: {name}")
 
 
 def _path(parts: Sequence[str]) -> str:
     return " > ".join(parts)
 
 
-ID_FIELDS = ("name", "kind", "level", "specifier", "value", "address")
-
-
-def _identity(value: Dict[str, Any]) -> Tuple[Any, ...]:
-    return tuple(value.get(field) for field in ID_FIELDS)
+def _identity(value: Dict[str, Any]) -> Tuple[Any, Any, Any]:
+    return value.get("name"), value.get("kind"), value.get("level")
 
 
 def _node_path(value: Any, path: Sequence[str]) -> List[str]:
@@ -644,29 +398,11 @@ def _node_path(value: Any, path: Sequence[str]) -> List[str]:
 
 
 def compare(expected: Any, actual: Any) -> List[Difference]:
-    """Compare two object graphs, including aliases and recursive references."""
+    """Compare normalized structures while producing source-oriented paths."""
     differences: List[Difference] = []
-    expected_to_actual: Dict[int, int] = {}
-    actual_to_expected: Dict[int, int] = {}
 
     def different(path: Sequence[str], wanted: Any, found: Any) -> None:
         differences.append(Difference(_path(path), wanted, found))
-
-    def claim_object(wanted: Dict[str, Any], found: Dict[str, Any], path: Sequence[str]) -> bool:
-        wanted_id = id(wanted)
-        found_id = id(found)
-        previous_found = expected_to_actual.get(wanted_id)
-        previous_wanted = actual_to_expected.get(found_id)
-        if previous_found is not None:
-            if previous_found != found_id:
-                different([*path, "REFERENCE_IDENTITY"], wanted, found)
-            return False
-        if previous_wanted is not None and previous_wanted != wanted_id:
-            different([*path, "REFERENCE_IDENTITY"], wanted, found)
-            return False
-        expected_to_actual[wanted_id] = found_id
-        actual_to_expected[found_id] = wanted_id
-        return True
 
     def compare_value(wanted: Any, found: Any, path: Sequence[str]) -> None:
         if type(wanted) is not type(found):
@@ -680,15 +416,13 @@ def compare(expected: Any, actual: Any) -> List[Difference]:
         wanted_class = wanted.get("class")
         if wanted_class != found.get("class"):
             different(path, wanted, found)
-            return
-        if not claim_object(wanted, found, path):
-            return
-        if wanted_class == "A_NODE":
+        elif wanted_class == "A_NODE":
             compare_node(wanted, found, path)
         elif wanted_class == "A_ID":
             compare_id(wanted, found, path)
         elif wanted_class == "A_ID_REF":
-            compare_reference(wanted, found, path)
+            if _identity(wanted) != _identity(found):
+                different(path, wanted, found)
         elif wanted_class == "A_TYPE":
             compare_type(wanted, found, path)
         elif wanted != found:
@@ -712,25 +446,25 @@ def compare(expected: Any, actual: Any) -> List[Difference]:
             if wanted_current is None or found_current is None:
                 different(item_path, wanted_current, found_current)
                 return
-            compare_value(wanted_current, found_current, item_path)
+            compare_id(wanted_current, found_current, item_path)
             wanted_current = wanted_current.get("link")
             found_current = found_current.get("link")
 
     def compare_id(wanted: Dict[str, Any], found: Dict[str, Any], path: Sequence[str]) -> None:
+        if found.get("class") != "A_ID":
+            different(path, wanted, found)
+            return
         if _identity(wanted) != _identity(found):
             different(path, wanted, found)
-        compare_value(wanted.get("type"), found.get("type"), [*path, "TYPE"])
-        compare_value(wanted.get("init"), found.get("init"), [*path, "INIT"])
-
-    def compare_reference(
-        wanted: Dict[str, Any], found: Dict[str, Any], path: Sequence[str]
-    ) -> None:
-        if _identity(wanted) != _identity(found):
-            different(path, wanted, found)
-        compare_value(wanted.get("type"), found.get("type"), [*path, "TYPE"])
-        compare_value(wanted.get("target"), found.get("target"), [*path, "TARGET"])
+        compare_type(wanted.get("type"), found.get("type"), [*path, "TYPE"])
 
     def compare_type(wanted: Any, found: Any, path: Sequence[str]) -> None:
+        if not isinstance(wanted, dict) or not isinstance(found, dict):
+            compare_value(wanted, found, path)
+            return
+        if wanted.get("class") != "A_TYPE" or found.get("class") != "A_TYPE":
+            different(path, wanted, found)
+            return
         if wanted.get("kind") != found.get("kind"):
             different(path, wanted, found)
             return
@@ -750,9 +484,33 @@ def compare(expected: Any, actual: Any) -> List[Difference]:
         body_path = [*path[:-1], "BODY"] if kind == "T_FUNC" else [*path, "EXPR"]
         compare_value(wanted.get("expr"), found.get("expr"), body_path)
 
-    def statement_label(statement: Any) -> str:
+    def compare_statement_chain(wanted: Any, found: Any, path: Sequence[str]) -> None:
+        index = 1
+        while True:
+            if not isinstance(wanted, dict) or not isinstance(found, dict):
+                compare_value(wanted, found, [*path, f"STATEMENT[{index}]"])
+                return
+            wanted_name = wanted.get("name")
+            found_name = found.get("name")
+            if wanted_name == "N_STMT_LIST_NIL" or found_name == "N_STMT_LIST_NIL":
+                if wanted_name != found_name:
+                    different([*path, f"STATEMENT[{index}]"], wanted, found)
+                return
+            if wanted_name != "N_STMT_LIST" or found_name != "N_STMT_LIST":
+                different([*path, f"STATEMENT[{index}]"], wanted, found)
+                return
+
+            wanted_statement = wanted.get("llink")
+            found_statement = found.get("llink")
+            label = statement_label(wanted_statement, index)
+            compare_value(wanted_statement, found_statement, [*path, label])
+            wanted = wanted.get("rlink")
+            found = found.get("rlink")
+            index += 1
+
+    def statement_label(statement: Any, index: int) -> str:
         if not isinstance(statement, dict):
-            return "STATEMENT"
+            return f"STATEMENT[{index}]"
         names = {
             "N_STMT_RETURN": "RETURN",
             "N_STMT_EXPRESSION": "EXPRESSION",
@@ -760,7 +518,7 @@ def compare(expected: Any, actual: Any) -> List[Difference]:
             "N_STMT_IF": "IF",
             "N_STMT_IF_ELSE": "IF_ELSE",
         }
-        return names.get(statement.get("name"), "STATEMENT")
+        return names.get(statement.get("name"), f"STATEMENT[{index}]")
 
     def compare_node(
         wanted: Dict[str, Any], found: Dict[str, Any], path: Sequence[str]
@@ -770,10 +528,6 @@ def compare(expected: Any, actual: Any) -> List[Difference]:
             return
 
         name = wanted.get("name")
-        compare_value(wanted.get("type"), found.get("type"), [*path, "TYPE"])
-        if wanted.get("value") != found.get("value"):
-            different([*path, "VALUE"], wanted.get("value"), found.get("value"))
-
         if name == "N_PROGRAM":
             compare_value(wanted.get("llink"), found.get("llink"), [*path, "llink"])
             compare_id_chain(wanted.get("clink"), found.get("clink"), path)
@@ -784,14 +538,12 @@ def compare(expected: Any, actual: Any) -> List[Difference]:
                 wanted.get("llink"), found.get("llink"), [*path, "DECLARATIONS"]
             )
             compare_value(wanted.get("clink"), found.get("clink"), [*path, "clink"])
-            compare_value(wanted.get("rlink"), found.get("rlink"), path)
+            compare_statement_chain(wanted.get("rlink"), found.get("rlink"), path)
             return
         if name == "N_EXP_IDENT":
+            if _identity(wanted.get("clink", {})) != _identity(found.get("clink", {})):
+                different(path, wanted, found)
             compare_value(wanted.get("llink"), found.get("llink"), [*path, "llink"])
-            before = len(differences)
-            compare_value(wanted.get("clink"), found.get("clink"), path)
-            if len(differences) > before and differences[-1].path == _path(path):
-                differences[-1] = Difference(_path(path), wanted, found)
             compare_value(wanted.get("rlink"), found.get("rlink"), [*path, "rlink"])
             return
         if name in {"N_EXP_INT_CONST", "N_EXP_CHAR_CONST"}:
@@ -800,16 +552,8 @@ def compare(expected: Any, actual: Any) -> List[Difference]:
             compare_value(wanted.get("llink"), found.get("llink"), [*path, "llink"])
             compare_value(wanted.get("rlink"), found.get("rlink"), [*path, "rlink"])
             return
-        if name == "N_STMT_LIST":
-            wanted_statement = wanted.get("llink")
-            found_statement = found.get("llink")
-            compare_value(
-                wanted_statement,
-                found_statement,
-                [*path, statement_label(wanted_statement)],
-            )
-            compare_value(wanted.get("clink"), found.get("clink"), [*path, "clink"])
-            compare_value(wanted.get("rlink"), found.get("rlink"), path)
+        if name in {"N_STMT_LIST", "N_STMT_LIST_NIL"}:
+            compare_statement_chain(wanted, found, path)
             return
 
         for link in ("llink", "clink", "rlink"):
@@ -838,11 +582,11 @@ def describe(value: Any) -> str:
                 return f"{name}({value.get('clink')})"
             return name
         if class_name == "A_TYPE":
-            return value.get("kind") or "A_TYPE(unresolved)"
+            return value.get("kind", "A_TYPE")
         if class_name in {"A_ID", "A_ID_REF"}:
             return (
                 f'A_ID({value.get("name")!r}, {value.get("kind")}, '
-                f'scope={value.get("level")}, spec={value.get("specifier")})'
+                f'scope={value.get("level")})'
             )
     return repr(value)
 
@@ -852,8 +596,6 @@ def format_tree(root: Optional[Dict[str, Any]]) -> str:
         return "<unavailable>"
 
     lines: List[str] = []
-    labels: Dict[int, int] = {}
-    expanded: set[int] = set()
 
     def emit(value: Any, indent: int, label: Optional[str] = None) -> None:
         prefix = "  " * indent
@@ -862,31 +604,14 @@ def format_tree(root: Optional[Dict[str, Any]]) -> str:
             lines.append(f"{prefix}{label_prefix}{describe(value)}")
             return
 
-        object_id = id(value)
-        if object_id not in labels:
-            labels[object_id] = len(labels) + 1
-        object_label = labels[object_id]
-        if object_id in expanded:
-            lines.append(
-                f"{prefix}{label_prefix}<ref #{object_label} {describe(value)}>"
-            )
-            return
-        expanded.add(object_id)
-
         class_name = value.get("class")
-        lines.append(f"{prefix}{label_prefix}#{object_label} {describe(value)}")
+        lines.append(f"{prefix}{label_prefix}{describe(value)}")
         if class_name == "A_NODE":
-            emit(value.get("type"), indent + 1, "type")
-            lines.append(f"{'  ' * (indent + 1)}value: {value.get('value')}")
             for link in ("llink", "clink", "rlink"):
                 emit(value.get(link), indent + 1, link)
         elif class_name == "A_ID":
             emit(value.get("type"), indent + 1, "type")
-            emit(value.get("init"), indent + 1, "init")
             emit(value.get("link"), indent + 1, "link")
-        elif class_name == "A_ID_REF":
-            emit(value.get("type"), indent + 1, "type")
-            emit(value.get("target"), indent + 1, "target")
         elif class_name == "A_TYPE":
             emit(value.get("element_type"), indent + 1, "element_type")
             emit(value.get("field"), indent + 1, "field")
