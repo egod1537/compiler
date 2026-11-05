@@ -1,0 +1,49 @@
+AST 44 — scope_shadowing
+Source: tests/ast/44_scope_shadowing.c
+
+int x;
+int main(void) {
+    int x;
+    x = 1;
+    { int x; x = 2; }
+    return x;
+}
+
+MANUALLY DERIVED EXPECTED STRUCTURE (not captured program output)
+
+N_PROGRAM
+└─ clink / global A_ID list
+   ├─ A_ID "x" [ID_VAR, level=0, specifier=S_AUTO, type=int]  [X_GLOBAL]
+   └─ next → A_ID "main" [ID_FUNC, level=0, specifier=S_NULL]
+      └─ type: T_FUNC
+         ├─ field: A_ID "" [ID_PARM, level=1, type=void]
+         ├─ element_type: int
+         └─ expr: N_STMT_COMPOUND  [outer function block]
+            ├─ llink → A_ID "x" [ID_VAR, level=1, type=int] [X_OUTER]
+            └─ rlink: N_STMT_LIST
+               ├─ llink: N_STMT_EXPRESSION
+               │  └─ clink: N_EXP_ASSIGN
+               │     ├─ llink: N_EXP_IDENT → X_OUTER
+               │     └─ rlink: N_EXP_INT_CONST(1)
+               └─ rlink: N_STMT_LIST
+                  ├─ llink: N_STMT_COMPOUND  [inner nested block]
+                  │  ├─ llink → A_ID "x" [ID_VAR, level=2, type=int] [X_INNER]
+                  │  └─ rlink: N_STMT_LIST
+                  │     ├─ llink: N_STMT_EXPRESSION
+                  │     │  └─ clink: N_EXP_ASSIGN
+                  │     │     ├─ llink: N_EXP_IDENT → X_INNER
+                  │     │     └─ rlink: N_EXP_INT_CONST(2)
+                  │     └─ rlink: N_STMT_LIST_NIL
+                  └─ rlink: N_STMT_LIST
+                     ├─ llink: N_STMT_RETURN
+                     │  └─ clink: N_EXP_IDENT → X_OUTER
+                     └─ rlink: N_STMT_LIST_NIL
+
+MANUAL VALIDATION
+- There are THREE distinct declarations named x: levels 0, 1 and 2.
+- Assignment x=1 uses X_OUTER (level 1).
+- Assignment x=2 uses X_INNER (level 2).
+- return x uses X_OUTER again after leaving the inner block.
+- X_GLOBAL is shadowed inside main and must not be referenced by these statements.
+- Level numbers describe this project's enterScope()/leaveScope() behavior.
+- Pointer addresses printed by print.c are runtime-dependent.
