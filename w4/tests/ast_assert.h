@@ -22,5 +22,6 @@ void AST_checkFunctionParameters(void);
 void AST_checkReturn(A_NODE *root);
 void AST_checkCompoundReturn(A_NODE *root);
 void AST_checkFunctionScope(void);
+void AST_checkBlockShadowing(void);
 
 #endif // !AST_ASSERT_H

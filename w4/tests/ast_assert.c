@@ -514,3 +514,65 @@ void AST_checkFunctionScope(void) {
 
   logMsg(LOG_INFO, "AST function scope test passed");
 }
+void AST_checkBlockShadowing(void) {
+  A_ID *global = searchIdentifier("x");
+  A_ID *func = searchIdentifier("main");
+
+  if (global == NULL || func == NULL)
+    semanticError("Missing global identifiers");
+
+  if (current_level != 0)
+    semanticError("Scope was not restored");
+
+  if (global->level != 0 || global->type != int_type)
+    semanticError("Invalid global x");
+
+  A_NODE *body = func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing function body");
+
+  A_ID *outer = PTR(A_ID, body->llink);
+
+  if (outer == NULL || strcmp(outer->name, "x") != 0 || outer->level != 1)
+    semanticError("Invalid outer x");
+
+  A_NODE *inner = NULL;
+
+  for (A_NODE *list = body->rlink; list != NULL && list->name == N_STMT_LIST;
+       list = list->rlink) {
+
+    if (list->llink != NULL && list->llink->name == N_STMT_COMPOUND) {
+      inner = list->llink;
+      break;
+    }
+  }
+
+  if (inner == NULL)
+    semanticError("Missing inner compound");
+
+  A_ID *local = PTR(A_ID, inner->llink);
+
+  if (local == NULL || strcmp(local->name, "x") != 0 || local->level != 2)
+    semanticError("Invalid inner x");
+
+  if (global == outer || outer == local || global == local)
+    semanticError("Identifiers must be distinct");
+
+  A_NODE *ret = NULL;
+
+  for (A_NODE *list = body->rlink; list != NULL && list->name == N_STMT_LIST;
+       list = list->rlink) {
+
+    if (list->llink != NULL && list->llink->name == N_STMT_RETURN)
+      ret = list->llink;
+  }
+
+  if (ret == NULL || ret->clink == NULL || ret->clink->name != N_EXP_IDENT)
+    semanticError("Missing return identifier");
+
+  if (PTR(A_ID, ret->clink->clink) != outer)
+    semanticError("Incorrect identifier after shadowing");
+
+  logMsg(LOG_INFO, "AST block shadowing test passed");
+}

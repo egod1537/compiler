@@ -389,7 +389,9 @@ initializer_list
 
 statement
     : labeled_statement
-    | compound_statement
+    | scoped_compound_statement {
+  $$ = $1;
+}
     | expression_statement
     | selection_statement
     | iteration_statement
@@ -398,6 +400,18 @@ statement
       $$ = $1;
     }
     ;
+
+scoped_compound_statement
+  : 
+  {
+    enterScope();
+  }
+  compound_statement
+  {
+    $$ = $2;
+    leaveScope();
+  }
+  ;
 
 labeled_statement
     : CASE_SYM constant_expression COLON statement
@@ -409,12 +423,18 @@ compound_statement
     : LR declaration_list_opt statement_list_opt RR
     {
       $$ = YY(makeNode(N_STMT_COMPOUND, PTR(A_NODE, $2), NULL, PTR(A_NODE, $3)));
+    
+      compound_root = PTR(A_NODE, $$);
     }
     ;
 
 declaration_list
-    : declaration
-    | declaration_list declaration
+    : declaration {
+  $$ = $1;
+}
+    | declaration_list declaration{
+  $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $2)));
+}
     ;
 
 statement_list_opt
