@@ -213,6 +213,10 @@ init_declarator
       $$ = $1;
     }
     | declarator ASSIGN initializer
+    {
+      semanticError("Initializers are not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 type_specifier
@@ -334,6 +338,10 @@ enumerator
       $$ = YY(setDeclaratorKind(id, ID_ENUM_LITERAL));
     }
     | IDENTIFIER ASSIGN constant_expression
+    {
+      semanticError("Enumerator initializers are not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 declarator
@@ -419,6 +427,10 @@ parameter_type_list_opt
 parameter_type_list
     : parameter_list
     | parameter_list COMMA DOTDOTDOT
+    {
+      semanticError("Variadic parameters are not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 parameter_list
@@ -500,13 +512,33 @@ direct_abstract_declarator
 
 initializer
     : assignment_expression
+    {
+      semanticError("Initializers are not supported");
+      $$ = YY(NULL);
+    }
     | LR initializer_list RR
+    {
+      semanticError("Initializers are not supported");
+      $$ = YY(NULL);
+    }
     | LR initializer_list COMMA RR
+    {
+      semanticError("Initializers are not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 initializer_list
     : initializer
+    {
+      semanticError("Initializers are not supported");
+      $$ = YY(NULL);
+    }
     | initializer_list COMMA initializer
+    {
+      semanticError("Initializers are not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 statement
@@ -549,6 +581,10 @@ labeled_statement
       $$ = YY(makeNode(N_STMT_LABEL_DEFAULT, NULL, NULL, PTR(A_NODE, $3)));
     }
     | IDENTIFIER COLON statement
+    {
+      semanticError("User labels are not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 compound_statement
@@ -669,6 +705,10 @@ jump_statement
       $$ = YY(makeNode(N_STMT_BREAK, NULL, NULL, NULL));
     }
     | GOTO_SYM IDENTIFIER SEMICOLON
+    {
+      semanticError("goto is not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 primary_expression
@@ -788,6 +828,10 @@ unary_expression
       $$ = YY(makeNode(N_EXP_MINUS, NULL, PTR(A_NODE, $2), NULL));
     }
     | TILDE cast_expression
+    {
+      semanticError("Bitwise complement is not supported");
+      $$ = YY(NULL);
+    }
     | PLUS cast_expression
     {
       $$ = $2;
@@ -857,7 +901,15 @@ additive_expression
 shift_expression
     : additive_expression { $$ = $1; }
     | shift_expression LSHIFT additive_expression
+    {
+      semanticError("Left shift is not supported");
+      $$ = YY(NULL);
+    }
     | shift_expression RSHIFT additive_expression
+    {
+      semanticError("Right shift is not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 relational_expression
@@ -901,16 +953,28 @@ equality_expression
 AND_expression
     : equality_expression { $$ = $1; }
     | AND_expression AMP equality_expression
+    {
+      semanticError("Bitwise AND is not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 exclusive_OR_expression
     : AND_expression { $$ = $1; }
     | exclusive_OR_expression CARET AND_expression
+    {
+      semanticError("Bitwise XOR is not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 inclusive_OR_expression
     : exclusive_OR_expression { $$ = $1; }
     | inclusive_OR_expression BAR exclusive_OR_expression
+    {
+      semanticError("Bitwise OR is not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 logical_AND_expression
@@ -931,7 +995,14 @@ logical_OR_expression
 
 conditional_expression
     : logical_OR_expression
+    {
+      $$ = $1;
+    }
     | logical_OR_expression QUESTION expression COLON conditional_expression
+    {
+      semanticError("Conditional operator is not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 assignment_expression
@@ -947,7 +1018,14 @@ assignment_expression
 
 comma_expression
     : assignment_expression
+    {
+      $$ = $1;
+    }
     | comma_expression COMMA assignment_expression
+    {
+      semanticError("Comma expressions are not supported");
+      $$ = YY(NULL);
+    }
     ;
 
 expression
