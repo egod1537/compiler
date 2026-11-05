@@ -207,5 +207,11 @@ int main(int argc, char **argv) {
   if (getenv("AST_TEST_SWITCH") != NULL)
     AST_checkSwitch();
 
+  if (getenv("AST_TEST_CHAR_STRING") != NULL)
+    AST_checkCharString();
+
+  if (getenv("AST_TEST_PROGRAM") != NULL)
+    AST_checkProgram(program_root);
+
   return 0;
 }

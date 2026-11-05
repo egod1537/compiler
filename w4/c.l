@@ -120,8 +120,28 @@ volatile                    { return (VOLATILE_SYM); }
   return (INTEGER_CONSTANT);
 }
 
-\"([^"\n]|\\["\n])*\"        { return (STRING_LITERAL); }
-\'([^'\n]|\\.)\'             { return(CHARACTER_CONSTANT); }
+\"([^"\n]|\\["\n])*\"        {
+  char *value = malloc(strlen(yytext) + 1);
+  if (value == NULL) {
+    fprintf(stderr, "Out of memory\n");
+    exit(EXIT_FAILURE);
+  }
+
+  strcpy(value, yytext);
+  yylval = YY(value);
+  return (STRING_LITERAL);
+}
+\'([^'\n]|\\.)\'             { 
+  char *value = malloc(strlen(yytext) + 1);
+  if(value == NULL){
+    fprintf(stderr, "Out of memory\n");
+    exit(EXIT_FAILURE);
+  }
+
+  strcpy(value, yytext);
+  yylval = YY(value);
+  return(CHARACTER_CONSTANT);
+}
 
 {letter}({letter}|{digit})* {
   int token = checkIdentifier(yytext);

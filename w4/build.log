@@ -1,6 +1,6 @@
-lex.yy.c:1605:16: warning: 'input' defined but not used [-Wunused-function]
- 1605 | #else
+lex.yy.c:1625:16: warning: 'input' defined but not used [-Wunused-function]
+ 1625 | #else
       |                ^    
-lex.yy.c:1562:17: warning: 'yyunput' defined but not used [-Wunused-function]
- 1562 | 
+lex.yy.c:1582:17: warning: 'yyunput' defined but not used [-Wunused-function]
+ 1582 | 
       |                 ^      

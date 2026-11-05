@@ -5,6 +5,7 @@
 A_NODE *expression_root = NULL;
 A_NODE *statement_root = NULL;
 A_NODE *compound_root = NULL;
+A_NODE *program_root = NULL;
 
 A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right) {
   A_NODE *node = calloc(1, sizeof(A_NODE));

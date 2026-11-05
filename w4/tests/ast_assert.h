@@ -35,5 +35,7 @@ void AST_checkSizeofExpression(void);
 void AST_checkSizeofType(void);
 void AST_checkCastExpression(void);
 void AST_checkSwitch(void);
+void AST_checkCharString(void);
+void AST_checkProgram(A_NODE *root);
 
 #endif // !AST_ASSERT_H

@@ -1188,16 +1188,36 @@ case 66:
 /* rule 66 can match eol */
 YY_RULE_SETUP
 #line 123 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
-{ return (STRING_LITERAL); }
+{
+  char *value = malloc(strlen(yytext) + 1);
+  if (value == NULL) {
+    fprintf(stderr, "Out of memory\n");
+    exit(EXIT_FAILURE);
+  }
+
+  strcpy(value, yytext);
+  yylval = YY(value);
+  return (STRING_LITERAL);
+}
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 124 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
-{ return(CHARACTER_CONSTANT); }
+#line 134 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
+{ 
+  char *value = malloc(strlen(yytext) + 1);
+  if(value == NULL){
+    fprintf(stderr, "Out of memory\n");
+    exit(EXIT_FAILURE);
+  }
+
+  strcpy(value, yytext);
+  yylval = YY(value);
+  return(CHARACTER_CONSTANT);
+}
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 126 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
+#line 146 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 {
   int token = checkIdentifier(yytext);
 
@@ -1221,10 +1241,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 148 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
+#line 168 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 ECHO;
 	YY_BREAK
-#line 1227 "lex.yy.c"
+#line 1247 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2229,7 +2249,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 148 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
+#line 168 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.l"
 
 int checkIdentifier(char *s) {
   const char *types[] = {"int",   "float", "double", "char",    "void",

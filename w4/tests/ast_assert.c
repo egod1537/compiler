@@ -1162,3 +1162,91 @@ void AST_checkSwitch(void) {
 
   logMsg(LOG_INFO, "AST switch test passed");
 }
+
+void AST_checkCharString(void) {
+  A_ID *func = searchIdentifier("main");
+
+  if (func == NULL || func->type == NULL)
+    semanticError("Missing main function");
+
+  A_NODE *body = func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing function body");
+
+  A_NODE *list = body->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing expression statement");
+
+  A_NODE *stmt = list->llink;
+
+  if (stmt == NULL || stmt->name != N_STMT_EXPRESSION)
+    semanticError("Invalid expression statement");
+
+  A_NODE *call = stmt->clink;
+
+  if (call == NULL || call->name != N_EXP_FUNCTION_CALL)
+    semanticError("Missing function call");
+
+  A_NODE *args = call->rlink;
+
+  if (args == NULL || args->name != N_ARG_LIST)
+    semanticError("Missing argument list");
+
+  A_NODE *str = args->llink;
+
+  if (str == NULL || str->name != N_EXP_STRING_LITERAL)
+    semanticError("Expected string literal");
+
+  if (strcmp(PTR(char, str->clink), "\"hello\"") != 0)
+    semanticError("Incorrect string literal");
+
+  list = list->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing return statement");
+
+  A_NODE *ret = list->llink;
+
+  if (ret == NULL || ret->name != N_STMT_RETURN)
+    semanticError("Expected return statement");
+
+  A_NODE *ch = ret->clink;
+
+  if (ch == NULL || ch->name != N_EXP_CHAR_CONST)
+    semanticError("Expected character literal");
+
+  if (strcmp(PTR(char, ch->clink), "'A'") != 0)
+    semanticError("Incorrect character literal");
+
+  logMsg(LOG_INFO, "AST character/string test passed");
+}
+void AST_checkProgram(A_NODE *root) {
+  if (root == NULL || root->name != N_PROGRAM)
+    semanticError("Expected N_PROGRAM");
+
+  if (root->llink != NULL || root->rlink != NULL)
+    semanticError("Invalid program root");
+
+  A_ID *head = PTR(A_ID, root->clink);
+
+  if (head != current_id)
+    semanticError("Incorrect symbol table head");
+
+  const char *names[] = {"c", "b", "a"};
+
+  A_ID *id = head;
+
+  for (int i = 0; i < 3; i++) {
+    if (id == NULL || strcmp(id->name, names[i]) != 0)
+      semanticError("Incorrect global declaration order");
+
+    if (id->kind != ID_VAR || id->type != int_type || id->level != 0)
+      semanticError("Invalid global declaration");
+
+    id = id->prev;
+  }
+
+  logMsg(LOG_INFO, "AST program root test passed");
+}

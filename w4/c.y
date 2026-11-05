@@ -42,6 +42,11 @@ A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right);
 %%
 program
     : translation_unit
+    {
+      program_root = makeNode(N_PROGRAM, NULL, PTR(A_NODE, current_id), NULL);
+
+      $$ = YY(program_root);
+    }
     ;
 
 translation_unit
@@ -571,7 +576,13 @@ primary_expression
       $$ = YY(makeNode(N_EXP_FLOAT_CONST, NULL, PTR(A_NODE, $1), NULL));
     }
     | CHARACTER_CONSTANT
+    {
+      $$ = YY(makeNode(N_EXP_CHAR_CONST, NULL, PTR(A_NODE, $1), NULL));
+    }
     | STRING_LITERAL
+    {
+      $$ = YY(makeNode(N_EXP_STRING_LITERAL, NULL, PTR(A_NODE, $1), NULL));
+    }
     | LP expression RP
     {
       $$ = $2;
