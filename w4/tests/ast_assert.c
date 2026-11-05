@@ -1223,7 +1223,7 @@ void AST_checkCharString(void) {
   if (ch == NULL || ch->name != N_EXP_CHAR_CONST)
     semanticError("Expected character literal");
 
-  if (strcmp(PTR(char, ch->clink), "'A'") != 0)
+  if ((intptr_t)ch->clink != 65)
     semanticError("Incorrect character literal");
 
   logMsg(LOG_INFO, "AST character/string test passed");
