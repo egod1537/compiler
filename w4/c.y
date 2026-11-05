@@ -45,20 +45,23 @@ program
     {
       checkForwardReference();
 
-      program_root = makeNode(N_PROGRAM, NULL, PTR(A_NODE, current_id), NULL);
+      program_root = makeNode(N_PROGRAM, NULL, PTR(A_NODE, $1), NULL);
 
       $$ = YY(program_root);
     }
     ;
 
 translation_unit
-    : external_declaration
+    : external_declaration { $$ = $1; }
     | translation_unit external_declaration
+    {
+      $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $2)));
+    }
     ;
 
 external_declaration
-    : function_definition
-    | declaration
+    : function_definition { $$ = $1; }
+    | declaration { $$ = $1; }
     ;
 
 // 이전이랑 달라진 듯?

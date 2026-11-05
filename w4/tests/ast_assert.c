@@ -1237,9 +1237,6 @@ void AST_checkProgram(A_NODE *root) {
 
   A_ID *head = PTR(A_ID, root->clink);
 
-  if (head != current_id)
-    semanticError("Incorrect symbol table head");
-
   const char *names[] = {"c", "b", "a"};
 
   A_ID *id = head;
@@ -1253,6 +1250,9 @@ void AST_checkProgram(A_NODE *root) {
 
     id = id->prev;
   }
+
+  if (id != NULL)
+    semanticError("Unexpected extra declaration");
 
   logMsg(LOG_INFO, "AST program root test passed");
 }
