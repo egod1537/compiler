@@ -132,14 +132,27 @@ volatile                    { return (VOLATILE_SYM); }
   return (STRING_LITERAL);
 }
 \'([^'\n]|\\.)\'             { 
-  char *value = malloc(strlen(yytext) + 1);
-  if(value == NULL){
-    fprintf(stderr, "Out of memory\n");
-    exit(EXIT_FAILURE);
+  int value = (unsigned char)yytext[1];
+  if (yytext[1] == '\\') {
+    switch (yytext[2]) {
+    case '0': value = 0; break;
+    case 'a': value = '\a'; break;
+    case 'b': value = '\b'; break;
+    case 'f': value = '\f'; break;
+    case 'n': value = '\n'; break;
+    case 'r': value = '\r'; break;
+    case 't': value = '\t'; break;
+    case 'v': value = '\v'; break;
+    case '\\': value = '\\'; break;
+    case '\'': value = '\''; break;
+    case '"': value = '"'; break;
+    case '?': value = '?'; break;
+    default:
+      fprintf(stderr, "Unsupported character escape: %s\n", yytext);
+      exit(EXIT_FAILURE);
+    }
   }
-
-  strcpy(value, yytext);
-  yylval = YY(value);
+  yylval = value;
   return(CHARACTER_CONSTANT);
 }
 
