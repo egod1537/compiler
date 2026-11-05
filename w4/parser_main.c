@@ -111,5 +111,8 @@ int main(int argc, char **argv) {
   if (getenv("AST_TEST_FUNCTION_SCOPE") != NULL)
     AST_checkFunctionScope();
 
+  if (getenv("AST_TEST_FUNCTION_SCOPE") != NULL)
+    AST_checkFunctionScope();
+
   return 0;
 }

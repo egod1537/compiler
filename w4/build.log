@@ -1,12 +1,6 @@
-C:\\Users\\egod1\\proj\\compiler\\w4\\c.y:80.57-58: error: integer out of range: '$2'
-   80 |       A_ID *id = YY(setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NO...
-      |                                                         ^~
-C:\\Users\\egod1\\proj\\compiler\\w4\\c.y:80.74-75: error: integer out of range: '$3'
-   80 | ...(A_NODE, $3)));
-      |             ^~
-C:\\Users\\egod1\\proj\\compiler\\w4\\c.y:106.54-55: error: integer out of range: '$2'
-  106 |       A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE,...
-      |                                                      ^~
-C:\\Users\\egod1\\proj\\compiler\\w4\\c.y:106.71-72: error: integer out of range: '$3'
-  106 |       A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE,...
-      |                                                                       ^
+lex.yy.c:1593:16: warning: 'input' defined but not used [-Wunused-function]
+ 1593 | #else
+      |                ^    
+lex.yy.c:1550:17: warning: 'yyunput' defined but not used [-Wunused-function]
+ 1550 | 
+      |                 ^      

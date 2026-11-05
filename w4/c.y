@@ -55,16 +55,15 @@ external_declaration
     ;
 
 // 이전이랑 달라진 듯?
-
 function_definition
     : declaration_specifiers declarator
     {
-      A_ID *id = YY(setFunctionDeclaratorSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1)));
+      A_ID *id = setFunctionDeclaratorSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1));
     
       current_id = id;
       enterScope();
     
-      for (A_ID *p = id->type->field; p; p = p->link) {
+      for (A_ID *p = id->type->field; p != NULL; p = p->link) {
         if (p->name == NULL || p->name[0] == '\0')
           continue;
     
@@ -75,9 +74,9 @@ function_definition
     
       $$ = YY(id);
     }
-    | compound_statement
+    compound_statement
     {
-      A_ID *id = YY(setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE, $3)));
+      A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $3), PTR(A_NODE, $4));
     
       leaveScope();
       $$ = YY(id);
@@ -85,12 +84,12 @@ function_definition
     | declarator
     {
       A_ID *id =
-          setFunctionDeclaratorSpecifier(PTR(A_ID, $1), makeSpecifier(int_type, s_NULL));
+          setFunctionDeclaratorSpecifier(PTR(A_ID, $1), makeSpecifier(int_type, S_NULL));
     
       current_id = id;
       enterScope();
     
-      for (A_ID *p = id->type->field; p; p = p->link) {
+      for (A_ID *p = id->type->field; p != NULL; p = p->link) {
         if (p->name == NULL || p->name[0] == '\0')
           continue;
     
@@ -101,7 +100,7 @@ function_definition
     
       $$ = YY(id);
     }
-    | compound_statement
+    compound_statement
     {
       A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE, $3));
     
