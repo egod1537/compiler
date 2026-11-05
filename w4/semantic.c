@@ -202,6 +202,8 @@ void leaveScope(void) {
     semanticError("scope stack underflow");
   }
 
+  checkForwardReference();
+
   ScopreFrame *frame = scope_stack;
 
   current_id = frame->saved_id;
