@@ -454,7 +454,7 @@ A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
   A_ID *param = id->type->field;
 
   while (param != NULL) {
-    if ((param->name == NULL || param->name[0] != '\0') && param->type != NULL &&
+    if ((param->name == NULL || param->name[0] == '\0') && param->type != NULL &&
         param->type->kind != T_VOID) {
       semanticError("Empty parameter name");
     }
