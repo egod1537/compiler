@@ -27,8 +27,7 @@ void AST_checkPrecedence(A_NODE *node) {
       b->name != N_EXP_INT_CONST)
     semanticError("Invalid multiplication operands");
 
-  if ((intptr_t)left->clink != 1 || (intptr_t)a->clink != 2 ||
-      (intptr_t)b->clink != 3)
+  if ((intptr_t)left->clink != 1 || (intptr_t)a->clink != 2 || (intptr_t)b->clink != 3)
     semanticError("Unexpected integer values");
 
   logMsg(LOG_SUCCESS, "AST precedence test passed");
@@ -463,4 +462,55 @@ void AST_checkCompoundReturn(A_NODE *root) {
     semanticError("Expected list terminator");
 
   logMsg(LOG_INFO, "AST compound return test passed");
+}
+
+void AST_checkFunctionScope(void) {
+  A_ID *func = searchIdentifier("add");
+
+  if (func == NULL || func->kind != ID_FUNC)
+    semanticError("Missing function add");
+
+  if (current_level != 0)
+    semanticError("Function scope not closed");
+
+  if (searchIdentifier("a") != NULL || searchIdentifier("b") != NULL)
+    semanticError("Parameter scope leaked");
+
+  A_TYPE *type = func->type;
+  if (type == NULL || type->kind != T_FUNC)
+    semanticError("Expected T_FUNC");
+
+  A_ID *a = type->field;
+  A_ID *b = a ? a->link : NULL;
+
+  if (a == NULL || b == NULL || a->kind != ID_PARM || b->kind != ID_PARM)
+    semanticError("Invalid parameters");
+
+  A_NODE *body = type->expr;
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing function body");
+
+  A_NODE *list = body->rlink;
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing statement list");
+
+  A_NODE *ret = list->llink;
+  if (ret == NULL || ret->name != N_STMT_RETURN)
+    semanticError("Missing return statement");
+
+  A_NODE *add = ret->clink;
+  if (add == NULL || add->name != N_EXP_ADD)
+    semanticError("Expected N_EXP_ADD");
+
+  A_NODE *left = add->llink;
+  A_NODE *right = add->rlink;
+
+  if (left == NULL || right == NULL || left->name != N_EXP_IDENT ||
+      right->name != N_EXP_IDENT)
+    semanticError("Invalid parameter expressions");
+
+  if (PTR(A_ID, left->clink) != a || PTR(A_ID, right->clink) != b)
+    semanticError("Parameter references mismatch");
+
+  logMsg(LOG_INFO, "AST function scope test passed");
 }

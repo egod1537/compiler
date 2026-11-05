@@ -1,3 +1,6 @@
+If:
+  PathMatch: .*\.(c|h)$
+
 CompileFlags:
   Remove:
     - -x

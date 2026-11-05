@@ -8,11 +8,7 @@
 
 int yyparse(void);
 
-typedef enum {
-  AST_MODE_NONE,
-  AST_MODE_PRECEDENCE,
-  AST_MODE_PARENTHESES
-} AstTestMode;
+typedef enum { AST_MODE_NONE, AST_MODE_PRECEDENCE, AST_MODE_PARENTHESES } AstTestMode;
 
 static int parseAstTestMode(int argc, char **argv, AstTestMode *mode) {
   *mode = AST_MODE_NONE;
@@ -111,6 +107,9 @@ int main(int argc, char **argv) {
 
   if (getenv("AST_TEST_COMPOUND") != NULL)
     AST_checkCompoundReturn(compound_root);
+
+  if (getenv("AST_TEST_FUNCTION_SCOPE") != NULL)
+    AST_checkFunctionScope();
 
   return 0;
 }

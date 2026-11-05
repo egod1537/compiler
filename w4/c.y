@@ -40,7 +40,6 @@ A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right);
 %start program
 
 %%
-
 program
     : translation_unit
     ;
@@ -55,24 +54,71 @@ external_declaration
     | declaration
     ;
 
+// 이전이랑 달라진 듯?
+
 function_definition
-    : declaration_specifiers declarator declaration_list_opt compound_statement
+    : declaration_specifiers declarator
     {
-      A_ID *id = setFunctionDeclaratorSpecifier(
-          PTR(A_ID, $2), PTR(A_SPECIFIER, $1));
-      $$ = YY(setFunctionDeclaratorBody(id, PTR(A_NODE, $4)));
+      A_ID *id = YY(setFunctionDeclaratorSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1)));
+    
+      current_id = id;
+      enterScope();
+    
+      for (A_ID *p = id->type->field; p; p = p->link) {
+        if (p->name == NULL || p->name[0] == '\0')
+          continue;
+    
+        p->level = current_level;
+        p->prev = current_id;
+        current_id = p;
+      }
+    
+      $$ = YY(id);
     }
-    | declarator declaration_list_opt compound_statement
+    | compound_statement
     {
-      A_SPECIFIER *specifier = makeSpecifier(NULL, S_NULL);
-      A_ID *id = setFunctionDeclaratorSpecifier(PTR(A_ID, $1), specifier);
-      $$ = YY(setFunctionDeclaratorBody(id, PTR(A_NODE, $3)));
+      A_ID *id = YY(setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE, $3)));
+    
+      leaveScope();
+      $$ = YY(id);
+    }
+    | declarator
+    {
+      A_ID *id =
+          setFunctionDeclaratorSpecifier(PTR(A_ID, $1), makeSpecifier(int_type, s_NULL));
+    
+      current_id = id;
+      enterScope();
+    
+      for (A_ID *p = id->type->field; p; p = p->link) {
+        if (p->name == NULL || p->name[0] == '\0')
+          continue;
+    
+        p->level = current_level;
+        p->prev = current_id;
+        current_id = id;
+      }
+    
+      $$ = YY(id);
+    }
+    | compound_statement
+    {
+      A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE, $3));
+    
+      leaveScope();
+      $$ = YY(id);
     }
     ;
 
 declaration_list_opt
-    : { $$ = YY(NULL); }
-    | declaration_list{ $$ = $1; }
+    :
+    {
+      $$ = YY(NULL);
+    }
+    | declaration_list
+    {
+      $$ = $1;
+    }
     ;
 
 declaration
@@ -88,8 +134,9 @@ declaration_specifiers
       $$ = YY(makeSpecifier(PTR(A_TYPE, $1), S_NULL));
     }
     | storage_class_specifier
-    { $$ = YY(makeSpecifier(NULL, (S_KIND)$1)); }
-
+    {
+      $$ = YY(makeSpecifier(NULL, (S_KIND)$1));
+    }
     | type_qualifier
     | type_specifier declaration_specifiers
     {
@@ -116,7 +163,10 @@ type_qualifier
     ;
 
 init_declarator_list
-    : init_declarator { $$ = $1; }
+    : init_declarator
+    {
+      $$ = $1;
+    }
     | init_declarator_list COMMA init_declarator
     {
       $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $3)));
@@ -124,14 +174,20 @@ init_declarator_list
     ;
 
 init_declarator
-    : declarator { $$ = $1; }
+    : declarator
+    {
+      $$ = $1;
+    }
     | declarator ASSIGN initializer
     ;
 
 type_specifier
     : struct_specifier
     | enum_specifier
-    | TYPE_IDENTIFIER { $$ = $1; }
+    | TYPE_IDENTIFIER
+    {
+      $$ = $1;
+    }
     ;
 
 struct_specifier
@@ -193,13 +249,17 @@ declarator
     {
       $$ = YY(setDeclaratorElementType(PTR(A_ID, $2), PTR(A_TYPE, $1)));
     }
-    | direct_declarator { $$ = $1; }
+    | direct_declarator
+    {
+      $$ = $1;
+    }
     ;
 
 pointer
     : STAR type_qualifier_list_opt
-    { $$ = YY(makeType(T_POINTER)); }
-
+    {
+      $$ = YY(makeType(T_POINTER));
+    }
     | STAR type_qualifier_list_opt pointer
     {
       $$ = YY(setTypeElementType(PTR(A_TYPE, $3), makeType(T_POINTER)));
@@ -220,36 +280,45 @@ direct_declarator
     : IDENTIFIER
     {
       char *name = PTR(char, $1);
-
+    
       A_ID *id = makeIdentifier(name);
       free(name);
-
+    
       $$ = YY(id);
     }
     | LP declarator RP
     | direct_declarator LB constant_expression_opt RB
     {
-      $$ = YY(setDeclaratorElementType(
-          PTR(A_ID, $1), setTypeExpr(makeType(T_ARRAY), PTR(A_NODE, $3))));
+      $$ = YY(setDeclaratorElementType(PTR(A_ID, $1),
+                                       setTypeExpr(makeType(T_ARRAY), PTR(A_NODE, $3))));
     }
     | direct_declarator LP parameter_type_list_opt RP
     {
-      $$ = YY(setDeclaratorElementType(
-          PTR(A_ID, $1), setTypeField(makeType(T_FUNC), PTR(A_ID, $3))));
+      $$ = YY(setDeclaratorElementType(PTR(A_ID, $1),
+                                       setTypeField(makeType(T_FUNC), PTR(A_ID, $3))));
     }
     ;
 
 constant_expression_opt
-    : { $$ = YY(NULL); }
+    :
+    {
+      $$ = YY(NULL);
+    }
     | constant_expression
-    { $$ = $1; }
-
+    {
+      $$ = $1;
+    }
     ;
 
 parameter_type_list_opt
-    :{ $$ = YY(NULL); }
+    :
+    {
+      $$ = YY(NULL);
+    }
     | parameter_type_list
-    { $$ = $1; }
+    {
+      $$ = $1;
+    }
     ;
 
 parameter_type_list
@@ -258,7 +327,10 @@ parameter_type_list
     ;
 
 parameter_list
-    : parameter_declaration { $$ = $1; }
+    : parameter_declaration
+    {
+      $$ = $1;
+    }
     | parameter_list COMMA parameter_declaration
     {
       $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $3)));
@@ -273,18 +345,22 @@ parameter_declaration
     | declaration_specifiers abstract_declarator_opt
     {
       A_ID *id = makeDummyIdentifier();
-
+    
       setDeclaratorElementType(id, PTR(A_TYPE, $2));
-
+    
       $$ = YY(setParameterDeclaratorSpecifier(id, PTR(A_SPECIFIER, $1)));
     }
     ;
 
 abstract_declarator_opt
-    : { $$ = YY(NULL); }
+    :
+    {
+      $$ = YY(NULL);
+    }
     | abstract_declarator
-    { $$ = $1; }
-
+    {
+      $$ = $1;
+    }
     ;
 
 abstract_declarator
@@ -318,7 +394,10 @@ statement
     | expression_statement
     | selection_statement
     | iteration_statement
-    | jump_statement { $$ = $1; }
+    | jump_statement
+    {
+      $$ = $1;
+    }
     ;
 
 labeled_statement
@@ -331,8 +410,6 @@ compound_statement
     : LR declaration_list_opt statement_list_opt RR
     {
       $$ = YY(makeNode(N_STMT_COMPOUND, PTR(A_NODE, $2), NULL, PTR(A_NODE, $3)));
-
-      compound_root = PTR(A_NODE, $$);
     }
     ;
 
@@ -342,12 +419,14 @@ declaration_list
     ;
 
 statement_list_opt
-  :
+    :
     {
       $$ = YY(makeNode(N_STMT_LIST_NIL, NULL, NULL, NULL));
     }
     | statement_list
-    { $$ = $1; }
+    {
+      $$ = $1;
+    }
     ;
 
 statement_list
@@ -376,19 +455,26 @@ selection_statement
 iteration_statement
     : WHILE_SYM LP expression RP statement
     | DO_SYM statement WHILE_SYM LP expression RP SEMICOLON
-    | FOR_SYM LP expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP statement
+    | FOR_SYM LP expression_opt SEMICOLON expression_opt SEMICOLON expression_opt RP
+      statement
     ;
 
 expression_opt
-    : { $$ = YY(NULL); }
-    | expression{ $$ = $1; }
+    :
+    {
+      $$ = YY(NULL);
+    }
+    | expression
+    {
+      $$ = $1;
+    }
     ;
 
 jump_statement
     : RETURN_SYM expression_opt SEMICOLON
     {
       $$ = YY(makeNode(N_STMT_RETURN, NULL, PTR(A_NODE, $2), NULL));
-
+    
       statement_root = PTR(A_NODE, $$);
     }
     | CONTINUE_SYM SEMICOLON
@@ -402,13 +488,13 @@ primary_expression
       char *name = PTR(char, $1);
       A_ID *id = getIdentifierDeclared(name);
       free(name);
-
+    
       $$ = YY(makeNode(N_EXP_IDENT, NULL, PTR(A_NODE, id), NULL));
     }
     | INTEGER_CONSTANT
     {
       $$ = YY(makeNode(N_EXP_INT_CONST, NULL, PTR(A_NODE, $1), NULL));
-
+    
       A_NODE *node = PTR(A_NODE, $$);
       logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
     }
@@ -416,11 +502,16 @@ primary_expression
     | CHARACTER_CONSTANT
     | STRING_LITERAL
     | LP expression RP
-    { $$ = $2; }
+    {
+      $$ = $2;
+    }
     ;
 
 postfix_expression
-    : primary_expression { $$ = $1; }
+    : primary_expression
+    {
+      $$ = $1;
+    }
     | postfix_expression LB expression RB
     {
       $$ = YY(makeNode(N_EXP_ARRAY, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
@@ -449,7 +540,10 @@ arg_expression_list
     ;
 
 unary_expression
-    : postfix_expression { $$ = $1; }
+    : postfix_expression
+    {
+      $$ = $1;
+    }
     | PLUSPLUS unary_expression
     {
       $$ = YY(makeNode(N_EXP_PRE_INC, NULL, PTR(A_NODE, $2), NULL));
@@ -476,13 +570,18 @@ unary_expression
     }
     | TILDE cast_expression
     | PLUS cast_expression
-    { $$ = $2; }
+    {
+      $$ = $2;
+    }
     | SIZEOF_SYM unary_expression
     | SIZEOF_SYM LP type_name RP
     ;
 
 cast_expression
-    : unary_expression { $$ = $1; }
+    : unary_expression
+    {
+      $$ = $1;
+    }
     | LP type_name RP cast_expression
     ;
 
@@ -492,7 +591,10 @@ type_name
     ;
 
 multiplicative_expression
-    : cast_expression { $$ = $1; }
+    : cast_expression
+    {
+      $$ = $1;
+    }
     | multiplicative_expression STAR cast_expression
     {
       $$ = YY(makeNode(N_EXP_MUL, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
@@ -508,7 +610,10 @@ multiplicative_expression
     ;
 
 additive_expression
-    : multiplicative_expression { $$ = $1; }
+    : multiplicative_expression
+    {
+      $$ = $1;
+    }
     | additive_expression PLUS multiplicative_expression
     {
       $$ = YY(makeNode(N_EXP_ADD, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
@@ -590,7 +695,6 @@ expression
 constant_expression
     : conditional_expression
     ;
-
 %%
 int yyerror(const char *s) {
   logMsg(LOG_ERROR, "Syntax error at line %d: %s", line_no, s);
