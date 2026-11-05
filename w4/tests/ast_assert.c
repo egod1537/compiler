@@ -1160,7 +1160,7 @@ void AST_checkSwitch(void) {
   A_NODE *def = list->llink;
 
   if (def == NULL || def->name != N_STMT_LABEL_DEFAULT || def->llink != NULL ||
-      def->clink != NULL || def->rlink == NULL || def->rlink->name != N_STMT_BREAK)
+      def->clink == NULL || def->clink->name != N_STMT_BREAK || def->rlink != NULL)
     semanticError("Invalid default AST");
 
   if (list->rlink == NULL || list->rlink->name != N_STMT_LIST_NIL)

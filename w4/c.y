@@ -578,7 +578,7 @@ labeled_statement
     }
     | DEFAULT_SYM COLON statement
     {
-      $$ = YY(makeNode(N_STMT_LABEL_DEFAULT, NULL, NULL, PTR(A_NODE, $3)));
+      $$ = YY(makeNode(N_STMT_LABEL_DEFAULT, NULL, PTR(A_NODE, $3), NULL));
     }
     | IDENTIFIER COLON statement
     {

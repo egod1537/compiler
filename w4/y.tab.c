@@ -2525,7 +2525,7 @@ yyreduce:
   case 106: /* labeled_statement: DEFAULT_SYM COLON statement  */
 #line 580 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(makeNode(N_STMT_LABEL_DEFAULT, NULL, NULL, PTR(A_NODE, yyvsp[0])));
+      yyval = YY(makeNode(N_STMT_LABEL_DEFAULT, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
 #line 2531 "y.tab.c"
     break;

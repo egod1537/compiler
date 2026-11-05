@@ -47,7 +47,7 @@ if errorlevel 1 (
     goto :finish
 )
 
-call :run_logged gcc -Wall -Wextra -std=c11 -g -O0 "%ROOT%y.tab.c" "%ROOT%lex.yy.c" "%ROOT%semantic.c" "%ROOT%syntax_tree.c" "%ROOT%logger.c" "%ROOT%tests\ast_assert.c" "%ROOT%parser_main.c" -o "%ROOT%parser.exe"
+call :run_logged gcc -Wall -Wextra -std=c11 -g -O0 "%ROOT%y.tab.c" "%ROOT%lex.yy.c" "%ROOT%semantic.c" "%ROOT%syntax_tree.c" "%ROOT%logger.c" "%ROOT%print.c" "%ROOT%tests\ast_assert.c" "%ROOT%parser_main.c" -o "%ROOT%parser.exe"
 if errorlevel 1 (
     set "EXIT_CODE=%ERRORLEVEL%"
     echo [ERROR] gcc failed. See "%BUILD_LOG%". 1>&2

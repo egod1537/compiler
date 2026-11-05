@@ -7,6 +7,7 @@
 #include <string.h>
 
 int yyparse(void);
+void print_ast(A_NODE *node);
 
 typedef enum { AST_MODE_NONE, AST_MODE_PRECEDENCE, AST_MODE_PARENTHESES } AstTestMode;
 
@@ -227,6 +228,11 @@ int main(int argc, char **argv) {
         semanticError("Unknown struct test mode");
     }
   }
+
+  const char *ast_print = getenv("AST_PRINT");
+
+  if (ast_print != NULL && strcmp(ast_print, "1") == 0)
+    print_ast(program_root);
 
   return 0;
 }
