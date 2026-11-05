@@ -288,8 +288,11 @@ enum_specifier
     ;
 
 enumerator_list
-    : enumerator
+    : enumerator { $$ = $1; }
     | enumerator_list COMMA enumerator
+    {
+      $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $3)));
+    }
     ;
 
 enumerator
@@ -425,16 +428,42 @@ abstract_declarator_opt
 
 abstract_declarator
     : pointer
+    {
+      $$ = $1;
+    }
     | direct_abstract_declarator
+    {
+      $$ = $1;
+    }
     | pointer direct_abstract_declarator
+    {
+      $$ = YY(setTypeElementType(PTR(A_TYPE, $2), PTR(A_TYPE, $1)));
+    }
     ;
 
 direct_abstract_declarator
     : LP abstract_declarator RP
+    {
+      $$ = $2;
+    }
     | LB constant_expression_opt RB
+    {
+      $$ = YY(setTypeExpr(makeType(T_ARRAY), PTR(A_NODE, $2)));
+    }
     | LP parameter_type_list_opt RP
+    {
+      $$ = YY(setTypeField(makeType(T_FUNC), PTR(A_ID, $2)));
+    }
     | direct_abstract_declarator LB constant_expression_opt RB
+    {
+      $$ = YY(setTypeElementType(PTR(A_TYPE, $1),
+                                 setTypeExpr(makeType(T_ARRAY), PTR(A_NODE, $3))));
+    }
     | direct_abstract_declarator LP parameter_type_list_opt RP
+    {
+      $$ = YY(setTypeElementType(PTR(A_TYPE, $1),
+                                 setTypeField(makeType(T_FUNC), PTR(A_ID, $3))));
+    }
     ;
 
 initializer
