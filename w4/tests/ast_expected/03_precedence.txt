@@ -1,0 +1,27 @@
+AST 03 — precedence
+Source: tests/ast/03_precedence.c
+
+int main(void) { return 1 + 2 * 3; }
+
+MANUALLY DERIVED EXPECTED STRUCTURE
+N_PROGRAM
+└─ clink → A_ID "main" [ID_FUNC, level=0, specifier=S_NULL]
+   └─ type → T_FUNC
+      ├─ field → A_ID "" [ID_PARM, level=1, type=void]
+      ├─ element_type → int
+      └─ expr → N_STMT_COMPOUND
+         ├─ llink → NULL
+         └─ rlink → N_STMT_LIST
+            ├─ llink → N_STMT_RETURN
+            │  └─ clink → N_EXP_ADD
+            │     ├─ llink → N_EXP_INT_CONST(1)
+            │     └─ rlink → N_EXP_MUL
+            │        ├─ llink → N_EXP_INT_CONST(2)
+            │        └─ rlink → N_EXP_INT_CONST(3)
+            └─ rlink → N_STMT_LIST_NIL
+
+MANUAL VALIDATION
+- Multiplication binds more tightly than addition: ADD(1, MUL(2,3)).
+- Parentheses are absent; no extra AST grouping node is created.
+- A_ID main.link is NULL. Function body has no local declarations.
+- The node's (type pointer,value) metadata is expected (NULL,0) before semantic analysis in this compiler.

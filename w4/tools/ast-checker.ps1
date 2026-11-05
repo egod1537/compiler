@@ -281,6 +281,30 @@ function Read-StatementList {
     return New-NodeFromToken $State $token (Read-Statement $State ($Depth+1)) $null (Read-StatementList $State ($Depth+1))
 }
 
+function Read-ForExpression {
+    param([hashtable]$State, [int]$Depth)
+    $token = Read-Token $State "NODE" $null -Depth $Depth
+    if ($token.Value.Name -ne "N_FOR_EXP") {
+        throw "expected N_FOR_EXP, got $($token.Value.Name)"
+    }
+
+    $expressions = New-Object System.Collections.ArrayList
+    while (Test-Token $State "NODE" $null -Depth ($Depth+1)) {
+        $nextName = $State.Tokens[$State.Position].Value.Name
+        if (-not $nextName.StartsWith("N_EXP_")) { break }
+        [void]$expressions.Add((Read-Expression $State ($Depth+1)))
+        if ($expressions.Count -gt 3) { throw "N_FOR_EXP has more than three expressions" }
+    }
+
+    if ($expressions.Count -eq 0) {
+        return New-NodeFromToken $State $token $null $null $null
+    }
+    if ($expressions.Count -ne 3) {
+        throw "N_FOR_EXP contains $($expressions.Count) printed expression(s); print.c does not identify which slot was omitted"
+    }
+    return New-NodeFromToken $State $token $expressions[0] $expressions[1] $expressions[2]
+}
+
 function Read-Statement {
     param([hashtable]$State, [int]$Depth, [bool]$FunctionBody=$false)
     $token = Read-Token $State "NODE" $null -Depth $Depth
@@ -305,6 +329,11 @@ function Read-Statement {
     }
     if ($name -eq "N_STMT_IF") { return New-NodeFromToken $State $token (Read-Expression $State ($Depth+1)) $null (Read-Statement $State ($Depth+1)) }
     if ($name -eq "N_STMT_IF_ELSE") { return New-NodeFromToken $State $token (Read-Expression $State ($Depth+1)) (Read-Statement $State ($Depth+1)) (Read-Statement $State ($Depth+1)) }
+    if ($name -eq "N_STMT_FOR") {
+        $forExpression = Read-ForExpression $State ($Depth+1)
+        $body = Read-Statement $State ($Depth+1)
+        return New-NodeFromToken $State $token $forExpression $null $body
+    }
     throw "unsupported statement $name"
 }
 
@@ -445,8 +474,10 @@ function Compare-AstValue {
         $leftPath = $Path + "llink"; $centerPath = $Path + "clink"; $rightPath = $Path + "rlink"
         if ($Expected.Name -eq "N_PROGRAM" -and $null -ne $Expected.Clink) { $centerPath = $Path + $Expected.Clink.Name }
         elseif ($Expected.Name -eq "N_STMT_COMPOUND") { $leftPath = $Path + "DECLARATIONS"; $rightPath = $Path }
+        elseif ($Expected.Name -eq "N_STMT_FOR") { $leftPath = $Path + "N_FOR_EXP"; $rightPath = $Path + "BODY" }
+        elseif ($Expected.Name -eq "N_FOR_EXP") { $leftPath = $Path + "INIT"; $centerPath = $Path + "CONDITION"; $rightPath = $Path + "INCREMENT" }
         elseif ($Expected.Name -eq "N_STMT_LIST" -and $null -ne $Expected.Llink) {
-            $labels = @{N_STMT_RETURN="RETURN";N_STMT_EXPRESSION="EXPRESSION";N_STMT_COMPOUND="BLOCK";N_STMT_IF="IF";N_STMT_IF_ELSE="IF_ELSE"}
+            $labels = @{N_STMT_RETURN="RETURN";N_STMT_EXPRESSION="EXPRESSION";N_STMT_COMPOUND="BLOCK";N_STMT_IF="IF";N_STMT_IF_ELSE="IF_ELSE";N_STMT_FOR="FOR"}
             $label = if ($labels.ContainsKey($Expected.Llink.Name)) { $labels[$Expected.Llink.Name] } else { "STATEMENT" }
             $leftPath = $Path + $label; $rightPath = $Path
         }
