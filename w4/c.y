@@ -1,3 +1,6 @@
+/* ============================================================
+ * 1. Declarations & Parser Configuration
+ * ============================================================ */
 %{
 #include "parse_value.h"
 #include <stdio.h>
@@ -40,6 +43,13 @@ A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right);
 %start program
 
 %%
+
+/* ============================================================
+ * 2. Program & Function Definitions
+ * ============================================================ */
+
+/* 2.1 Program root and translation units */
+
 program
     : translation_unit
     {
@@ -64,7 +74,7 @@ external_declaration
     | declaration { $$ = $1; }
     ;
 
-// 이전이랑 달라진 듯?
+/* 2.2 Function definitions and function-scope setup */
 
 function_definition
     : declaration_specifiers declarator
@@ -119,6 +129,12 @@ function_definition
       $$ = YY(id);
     }
     ;
+
+/* ============================================================
+ * 3. Declarations & Type Specifiers
+ * ============================================================ */
+
+/* 3.1 General declarations, specifiers, and declarator lists */
 
 declaration_list_opt
     :
@@ -231,6 +247,8 @@ type_specifier
     }
     ;
 
+/* 3.2 Structure and union specifiers */
+
 struct_specifier
     : struct_or_union IDENTIFIER
     {
@@ -300,6 +318,8 @@ struct_declarator
     }
     ;
 
+/* 3.3 Enumeration specifiers and enumerators */
+
 enum_specifier
     : ENUM_SYM IDENTIFIER
     {
@@ -347,6 +367,12 @@ enumerator
     }
     ;
 
+/* ============================================================
+ * 4. Declarators & Parameters
+ * ============================================================ */
+
+/* 4.1 Declarators, pointers, and qualifiers */
+
 declarator
     : pointer direct_declarator
     {
@@ -378,6 +404,8 @@ type_qualifier_list
     : type_qualifier
     | type_qualifier_list type_qualifier
     ;
+
+/* 4.2 Direct declarators and array bounds */
 
 direct_declarator
     : IDENTIFIER
@@ -423,6 +451,8 @@ constant_expression_opt
       $$ = $1;
     }
     ;
+
+/* 4.3 Formal parameters and abstract declarators */
 
 parameter_type_list_opt
     :
@@ -521,6 +551,8 @@ direct_abstract_declarator
     }
     ;
 
+/* 4.4 Initializers */
+
 initializer
     : assignment_expression
     {
@@ -551,6 +583,12 @@ initializer_list
       $$ = YY(NULL);
     }
     ;
+
+/* ============================================================
+ * 5. Statements
+ * ============================================================ */
+
+/* 5.1 Statement dispatch, scoped blocks, and labels */
 
 statement
     : labeled_statement { $$ = $1; }
@@ -598,6 +636,8 @@ labeled_statement
     }
     ;
 
+/* 5.2 Compound statements and statement lists */
+
 compound_statement
     : LR declaration_list_opt statement_list_opt RR
     {
@@ -641,6 +681,8 @@ statement_list
     }
     ;
 
+/* 5.3 Expression statements */
+
 expression_statement
     : SEMICOLON
     {
@@ -651,6 +693,8 @@ expression_statement
       $$ = YY(makeNode(N_STMT_EXPRESSION, NULL, PTR(A_NODE, $1), NULL));
     }
     ;
+
+/* 5.4 Selection statements: if, if-else, switch */
 
 selection_statement
     : IF_SYM LP expression RP statement %prec LOWER_THAN_ELSE
@@ -666,6 +710,8 @@ selection_statement
       $$ = YY(makeNode(N_STMT_SWITCH, PTR(A_NODE, $3), NULL, PTR(A_NODE, $5)));
     }
     ;
+
+/* 5.5 Iteration statements: while, do-while, for */
 
 iteration_statement
     : WHILE_SYM LP expression RP statement
@@ -700,6 +746,8 @@ for_expression
     }
     ;
 
+/* 5.6 Jump statements: return, continue, break, goto */
+
 jump_statement
     : RETURN_SYM expression_opt SEMICOLON
     {
@@ -721,6 +769,12 @@ jump_statement
       $$ = YY(NULL);
     }
     ;
+
+/* ============================================================
+ * 6. Expressions
+ * ============================================================ */
+
+/* 6.1 Primary, postfix, and argument-list expressions */
 
 primary_expression
     : IDENTIFIER
@@ -809,6 +863,8 @@ arg_expression_list
     }
     ;
 
+/* 6.2 Unary, cast, and type-name expressions */
+
 unary_expression
     : postfix_expression
     {
@@ -875,6 +931,8 @@ type_name
     }
     ;
 
+/* 6.3 Multiplicative, additive, and shift expressions */
+
 multiplicative_expression
     : cast_expression
     {
@@ -923,6 +981,8 @@ shift_expression
     }
     ;
 
+/* 6.4 Relational and equality expressions */
+
 relational_expression
     : shift_expression
     {
@@ -960,6 +1020,8 @@ equality_expression
       $$ = YY(makeNode(N_EXP_NEQ, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
     }
     ;
+
+/* 6.5 Bitwise and logical expressions */
 
 AND_expression
     : equality_expression { $$ = $1; }
@@ -1004,6 +1066,8 @@ logical_OR_expression
     }
     ;
 
+/* 6.6 Conditional, assignment, and comma expressions */
+
 conditional_expression
     : logical_OR_expression
     {
@@ -1039,6 +1103,8 @@ comma_expression
     }
     ;
 
+/* 6.7 Expression roots and constant expressions */
+
 expression
     : comma_expression
     {
@@ -1051,6 +1117,11 @@ constant_expression
     : conditional_expression
     ;
 %%
+
+/* ============================================================
+ * 7. Supporting C Functions
+ * ============================================================ */
+
 int yyerror(const char *s) {
   logMsg(LOG_ERROR, "Syntax error at line %d: %s", line_no, s);
   return 0;

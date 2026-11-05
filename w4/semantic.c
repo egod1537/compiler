@@ -1,7 +1,6 @@
 #include "semantic.h"
 #include "logger.h"
 #include "type.h"
-#include "syntax_tree.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
