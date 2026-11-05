@@ -102,7 +102,19 @@ volatile                    { return (VOLATILE_SYM); }
 "//"[^\n]*                  {}
 "/*"([^*]|\*+[^*/])*\*+"/"  {}
 
-{digit}+\.{digit}+          { return (FLOAT_CONSTANT); }
+{digit}+\.{digit}+          {
+  char *value = malloc(strlen(yytext) + 1);
+
+  if (value == NULL) {
+    fprintf(stderr, "Out of memory\n");
+    exit(EXIT_FAILURE);
+  }
+
+  strcpy(value, yytext);
+  yylval = YY(value);
+
+  return (FLOAT_CONSTANT);
+}
 {digit}+                    {
   yylval = atol(yytext);
   return (INTEGER_CONSTANT);
@@ -134,7 +146,6 @@ volatile                    { return (VOLATILE_SYM); }
 
 
 %%
-
 int checkIdentifier(char *s) {
   const char *types[] = {"int",   "float", "double", "char",    "void",
                          "short", "long",  "signed", "unsigned"};
@@ -149,4 +160,6 @@ int checkIdentifier(char *s) {
   return IDENTIFIER;
 }
 
-int yywrap(void) { return 1; }
+int yywrap(void) {
+  return 1;
+}

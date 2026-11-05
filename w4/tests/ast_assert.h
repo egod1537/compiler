@@ -33,5 +33,7 @@ void AST_checkVoidReturn(void);
 void AST_checkFunctionCall(void);
 void AST_checkSizeofExpression(void);
 void AST_checkSizeofType(void);
+void AST_checkCastExpression(void);
+void AST_checkSwitch(void);
 
 #endif // !AST_ASSERT_H

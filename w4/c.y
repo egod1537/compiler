@@ -389,7 +389,7 @@ initializer_list
     ;
 
 statement
-    : labeled_statement
+    : labeled_statement { $$ = $1; }
     | scoped_compound_statement
     {
       $$ = $1;
@@ -420,7 +420,13 @@ scoped_compound_statement
 
 labeled_statement
     : CASE_SYM constant_expression COLON statement
+    {
+      $$ = YY(makeNode(N_STMT_LABEL_CASE, PTR(A_NODE, $2), NULL, PTR(A_NODE, $4)));
+    }
     | DEFAULT_SYM COLON statement
+    {
+      $$ = YY(makeNode(N_STMT_LABEL_DEFAULT, NULL, NULL, PTR(A_NODE, $3)));
+    }
     | IDENTIFIER COLON statement
     ;
 
@@ -488,6 +494,9 @@ selection_statement
       $$ = YY(makeNode(N_STMT_IF_ELSE, PTR(A_NODE, $3), PTR(A_NODE, $5), PTR(A_NODE, $7)));
     }
     | SWITCH_SYM LP expression RP statement
+    {
+      $$ = YY(makeNode(N_STMT_SWITCH, PTR(A_NODE, $3), NULL, PTR(A_NODE, $5)));
+    }
     ;
 
 iteration_statement
@@ -558,6 +567,9 @@ primary_expression
       logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
     }
     | FLOAT_CONSTANT
+    {
+      $$ = YY(makeNode(N_EXP_FLOAT_CONST, NULL, PTR(A_NODE, $1), NULL));
+    }
     | CHARACTER_CONSTANT
     | STRING_LITERAL
     | LP expression RP
@@ -651,7 +663,7 @@ unary_expression
     }
     | SIZEOF_SYM LP type_name RP
     {
-      $$ = YY(makeNode(N_EXP_SIZE_EXP, NULL, PTR(A_NODE, $3), NULL));
+      $$ = YY(makeNode(N_EXP_SIZE_TYPE, NULL, PTR(A_NODE, $3), NULL));
     }
     ;
 
@@ -661,6 +673,9 @@ cast_expression
       $$ = $1;
     }
     | LP type_name RP cast_expression
+    {
+      $$ = YY(makeNode(N_EXP_CAST, PTR(A_NODE, $2), NULL, PTR(A_NODE, $4)));
+    }
     ;
 
 type_name

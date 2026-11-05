@@ -201,5 +201,11 @@ int main(int argc, char **argv) {
   if (getenv("AST_TEST_SIZEOF_TYPE") != NULL)
     AST_checkSizeofType();
 
+  if (getenv("AST_TEST_CAST") != NULL)
+    AST_checkCastExpression();
+
+  if (getenv("AST_TEST_SWITCH") != NULL)
+    AST_checkSwitch();
+
   return 0;
 }

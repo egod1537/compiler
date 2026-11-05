@@ -1047,3 +1047,118 @@ void AST_checkSizeofType(void) {
 
   logMsg(LOG_INFO, "AST sizeof type test passed");
 }
+void AST_checkCastExpression(void) {
+  A_ID *func = searchIdentifier("main");
+
+  if (func == NULL || func->type == NULL)
+    semanticError("Missing main function");
+
+  A_NODE *body = func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing function body");
+
+  A_NODE *list = body->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing statement list");
+
+  A_NODE *ret = list->llink;
+
+  if (ret == NULL || ret->name != N_STMT_RETURN)
+    semanticError("Expected return statement");
+
+  A_NODE *cast = ret->clink;
+
+  if (cast == NULL || cast->name != N_EXP_CAST || cast->clink != NULL)
+    semanticError("Invalid cast AST");
+
+  A_TYPE *type = PTR(A_TYPE, cast->llink);
+
+  if (type != int_type)
+    semanticError("Expected cast to int");
+
+  A_NODE *operand = cast->rlink;
+
+  if (operand == NULL || operand->name != N_EXP_FLOAT_CONST)
+    semanticError("Expected float operand");
+
+  const char *value = PTR(char, operand->clink);
+
+  if (value == NULL || strcmp(value, "3.5") != 0)
+    semanticError("Incorrect float literal");
+
+  if (list->rlink == NULL || list->rlink->name != N_STMT_LIST_NIL)
+    semanticError("Invalid statement list terminator");
+
+  logMsg(LOG_INFO, "AST cast expression test passed");
+}
+
+void AST_checkSwitch(void) {
+  A_ID *func = searchIdentifier("main");
+
+  if (func == NULL || func->type == NULL)
+    semanticError("Missing main function");
+
+  A_NODE *body = func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing function body");
+
+  A_NODE *sw = NULL;
+
+  // main 함수의 최상위 문장 목록에서 switch 검색
+  for (A_NODE *p = body->rlink; p != NULL && p->name == N_STMT_LIST; p = p->rlink) {
+
+    if (p->llink != NULL && p->llink->name == N_STMT_SWITCH) {
+      sw = p->llink;
+      break;
+    }
+  }
+
+  if (sw == NULL)
+    semanticError("Missing N_STMT_SWITCH");
+
+  if (sw->llink == NULL || sw->llink->name != N_EXP_IDENT || sw->clink != NULL)
+    semanticError("Invalid switch condition");
+
+  A_NODE *block = sw->rlink;
+
+  if (block == NULL || block->name != N_STMT_COMPOUND)
+    semanticError("Invalid switch body");
+
+  A_NODE *list = block->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing case statement");
+
+  A_NODE *case_stmt = list->llink;
+
+  if (case_stmt == NULL || case_stmt->name != N_STMT_LABEL_CASE ||
+      case_stmt->llink == NULL || case_stmt->llink->name != N_EXP_INT_CONST ||
+      (intptr_t)case_stmt->llink->clink != 0 || case_stmt->clink != NULL ||
+      case_stmt->rlink == NULL || case_stmt->rlink->name != N_STMT_EXPRESSION)
+    semanticError("Invalid case AST");
+
+  list = list->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST || list->llink == NULL ||
+      list->llink->name != N_STMT_BREAK)
+    semanticError("Missing case break");
+
+  list = list->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing default statement");
+
+  A_NODE *def = list->llink;
+
+  if (def == NULL || def->name != N_STMT_LABEL_DEFAULT || def->llink != NULL ||
+      def->clink != NULL || def->rlink == NULL || def->rlink->name != N_STMT_BREAK)
+    semanticError("Invalid default AST");
+
+  if (list->rlink == NULL || list->rlink->name != N_STMT_LIST_NIL)
+    semanticError("Invalid switch statement list");
+
+  logMsg(LOG_INFO, "AST switch test passed");
+}
