@@ -186,5 +186,20 @@ int main(int argc, char **argv) {
     }
   }
 
+  if (getenv("AST_TEST_BREAK_CONTINUE") != NULL)
+    AST_checkBreakContinue();
+
+  if (getenv("AST_TEST_VOID_RETURN") != NULL)
+    AST_checkVoidReturn();
+
+  if (getenv("AST_TEST_FUNCTION_CALL") != NULL)
+    AST_checkFunctionCall();
+
+  if (getenv("AST_TEST_SIZEOF_EXP") != NULL)
+    AST_checkSizeofExpression();
+
+  if (getenv("AST_TEST_SIZEOF_TYPE") != NULL)
+    AST_checkSizeofType();
+
   return 0;
 }

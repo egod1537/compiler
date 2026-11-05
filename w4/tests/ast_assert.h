@@ -28,5 +28,10 @@ void AST_checkComparison(A_NODE *root, NODE_NAME expected, int lhs, int rhs);
 void AST_checkLogical(A_NODE *root, int mode);
 void AST_checkSelection(int mode);
 void AST_checkIteration(int mode);
+void AST_checkBreakContinue(void);
+void AST_checkVoidReturn(void);
+void AST_checkFunctionCall(void);
+void AST_checkSizeofExpression(void);
+void AST_checkSizeofType(void);
 
 #endif // !AST_ASSERT_H

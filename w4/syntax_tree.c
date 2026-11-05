@@ -25,6 +25,21 @@ A_NODE *makeNodeList(NODE_NAME name, A_NODE *list, A_NODE *item) {
   if (list == NULL || item == NULL)
     semanticError("Invalid node list");
 
+  NODE_NAME nil;
+
+  switch (name) {
+  case N_STMT_LIST:
+    nil = N_STMT_LIST_NIL;
+    break;
+  case N_ARG_LIST:
+    nil = N_ARG_LIST_NIL;
+    break;
+
+  default:
+    semanticError("Unsupported list type");
+    return NULL;
+  }
+
   A_NODE *current = list;
 
   while (current->name == name) {
@@ -34,13 +49,13 @@ A_NODE *makeNodeList(NODE_NAME name, A_NODE *list, A_NODE *item) {
     current = current->rlink;
   }
 
-  if (current->name != N_STMT_LIST_NIL)
+  if (current->name != nil)
     semanticError("Invalid list terminator");
 
   current->name = name;
   current->llink = item;
   current->clink = NULL;
-  current->rlink = makeNode(N_STMT_LIST_NIL, NULL, NULL, NULL);
+  current->rlink = makeNode(nil, NULL, NULL, NULL);
 
   return list;
 }

@@ -53,4 +53,6 @@ A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier);
 
 A_ID *getIdentifierDeclared(const char *name);
 A_ID *makeDummyIdentifier(void);
+
+A_TYPE *setTypeNameSpecifier(A_TYPE *type, A_SPECIFIER *specifier);
 #endif // !SEMANTIC_H

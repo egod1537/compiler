@@ -293,8 +293,7 @@ A_SPECIFIER *makeSpecifier(A_TYPE *type, S_KIND stor) {
   return specifier;
 }
 
-A_SPECIFIER *updateSpecifier(A_SPECIFIER *specifier, A_TYPE *type,
-                             S_KIND stor) {
+A_SPECIFIER *updateSpecifier(A_SPECIFIER *specifier, A_TYPE *type, S_KIND stor) {
   if (specifier == NULL)
     semanticError("Null specifier in updateSpecifier");
 
@@ -471,4 +470,22 @@ A_ID *getIdentifierDeclared(const char *name) {
   return id;
 }
 
-A_ID *makeDummyIdentifier(void) { return makeIdentifier(""); }
+A_ID *makeDummyIdentifier(void) {
+  return makeIdentifier("");
+}
+
+A_TYPE *setTypeNameSpecifier(A_TYPE *type, A_SPECIFIER *specifier) {
+  if (specifier == NULL)
+    semanticError("Null type specifier");
+
+  if (specifier->stor != S_NULL)
+    semanticError("Illegal storage clss in type name");
+
+  if (specifier->type == NULL)
+    semanticError("Missing type in type name");
+
+  if (type == NULL)
+    return specifier->type;
+
+  return setTypeElementType(type, specifier->type);
+}

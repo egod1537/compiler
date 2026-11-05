@@ -827,3 +827,223 @@ void AST_checkIteration(int mode) {
 
   logMsg(LOG_INFO, "AST iteration test passed");
 }
+
+void AST_checkBreakContinue(void) {
+  A_ID *func = searchIdentifier("main");
+
+  if (func == NULL || func->type == NULL)
+    semanticError("Missing main function");
+
+  A_NODE *body = func->type->expr;
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing function body");
+
+  // main: i = 0; while (...) { ... } return i;
+  A_NODE *list = body->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST || list->rlink == NULL ||
+      list->rlink->name != N_STMT_LIST)
+    semanticError("Invalid main statement list");
+
+  A_NODE *loop = list->rlink->llink;
+
+  if (loop == NULL || loop->name != N_STMT_WHILE)
+    semanticError("Expected while statement");
+
+  A_NODE *block = loop->rlink;
+
+  if (block == NULL || block->name != N_STMT_COMPOUND)
+    semanticError("Expected while compound body");
+
+  // while body: i++; if (...) continue; if (...) break;
+  list = block->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST || list->rlink == NULL ||
+      list->rlink->name != N_STMT_LIST || list->rlink->rlink == NULL ||
+      list->rlink->rlink->name != N_STMT_LIST)
+    semanticError("Invalid while statement list");
+
+  A_NODE *if_continue = list->rlink->llink;
+  A_NODE *if_break = list->rlink->rlink->llink;
+
+  if (if_continue == NULL || if_continue->name != N_STMT_IF ||
+      if_continue->rlink == NULL || if_continue->rlink->name != N_STMT_CONTINUE)
+    semanticError("Invalid continue AST");
+
+  if (if_break == NULL || if_break->name != N_STMT_IF || if_break->rlink == NULL ||
+      if_break->rlink->name != N_STMT_BREAK)
+    semanticError("Invalid break AST");
+
+  A_NODE *cont = if_continue->rlink;
+  A_NODE *brk = if_break->rlink;
+
+  if (cont->llink != NULL || cont->clink != NULL || cont->rlink != NULL ||
+      brk->llink != NULL || brk->clink != NULL || brk->rlink != NULL)
+    semanticError("Jump nodes must be leaf nodes");
+
+  logMsg(LOG_INFO, "AST break/continue test passed");
+}
+void AST_checkVoidReturn(void) {
+  A_ID *func = searchIdentifier("done");
+
+  if (func == NULL || func->kind != ID_FUNC)
+    semanticError("Missing done function");
+
+  if (func->type == NULL || func->type->kind != T_FUNC ||
+      func->type->element_type != void_type)
+    semanticError("Invalid void function type");
+
+  A_NODE *body = func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing function body");
+
+  A_NODE *list = body->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing statement list");
+
+  A_NODE *ret = list->llink;
+
+  if (ret == NULL || ret->name != N_STMT_RETURN)
+    semanticError("Expected N_STMT_RETURN");
+
+  if (ret->llink != NULL || ret->clink != NULL || ret->rlink != NULL)
+    semanticError("Void return must have no expression");
+
+  if (list->rlink == NULL || list->rlink->name != N_STMT_LIST_NIL)
+    semanticError("Invalid statement list terminator");
+
+  logMsg(LOG_INFO, "AST void return test passed");
+}
+
+void AST_checkFunctionCall(void) {
+  A_ID *func = searchIdentifier("main");
+  A_ID *add = searchIdentifier("add");
+
+  if (func == NULL || add == NULL)
+    semanticError("Missing functions");
+
+  A_NODE *body = func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing main body");
+
+  A_NODE *list = body->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing statement list");
+
+  A_NODE *ret = list->llink;
+
+  if (ret == NULL || ret->name != N_STMT_RETURN)
+    semanticError("Expected return statement");
+
+  A_NODE *call = ret->clink;
+
+  if (call == NULL || call->name != N_EXP_FUNCTION_CALL || call->clink != NULL)
+    semanticError("Expected function call");
+
+  A_NODE *callee = call->llink;
+
+  if (callee == NULL || callee->name != N_EXP_IDENT || PTR(A_ID, callee->clink) != add)
+    semanticError("Incorrect called function");
+
+  A_NODE *args = call->rlink;
+
+  for (int expected = 1; expected <= 2; expected++) {
+    if (args == NULL || args->name != N_ARG_LIST)
+      semanticError("Invalid argument list");
+
+    A_NODE *value = args->llink;
+
+    if (value == NULL || value->name != N_EXP_INT_CONST ||
+        (intptr_t)value->clink != expected)
+      semanticError("Incorrect argument");
+
+    args = args->rlink;
+  }
+
+  if (args == NULL || args->name != N_ARG_LIST_NIL)
+    semanticError("Invalid argument list terminator");
+
+  logMsg(LOG_INFO, "AST function call test passed");
+}
+
+void AST_checkSizeofExpression(void) {
+  A_ID *func = searchIdentifier("main");
+
+  if (func == NULL || func->type == NULL)
+    semanticError("Missing main function");
+
+  A_NODE *body = func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing function body");
+
+  A_ID *x = PTR(A_ID, body->llink);
+
+  if (x == NULL || strcmp(x->name, "x") != 0 || x->type != int_type)
+    semanticError("Missing variable x");
+
+  A_NODE *list = body->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing statement list");
+
+  A_NODE *ret = list->llink;
+
+  if (ret == NULL || ret->name != N_STMT_RETURN)
+    semanticError("Expected return statement");
+
+  A_NODE *size = ret->clink;
+
+  if (size == NULL || size->name != N_EXP_SIZE_EXP || size->llink != NULL ||
+      size->rlink != NULL)
+    semanticError("Invalid sizeof expression");
+
+  A_NODE *operand = size->clink;
+
+  if (operand == NULL || operand->name != N_EXP_IDENT || PTR(A_ID, operand->clink) != x)
+    semanticError("Incorrect sizeof operand");
+
+  logMsg(LOG_INFO, "AST sizeof expression test passed");
+}
+
+void AST_checkSizeofType(void) {
+  A_ID *func = searchIdentifier("main");
+
+  if (func == NULL || func->type == NULL)
+    semanticError("Missing main function");
+
+  A_NODE *body = func->type->expr;
+
+  if (body == NULL || body->name != N_STMT_COMPOUND)
+    semanticError("Missing function body");
+
+  A_NODE *list = body->rlink;
+
+  if (list == NULL || list->name != N_STMT_LIST)
+    semanticError("Missing statement list");
+
+  A_NODE *ret = list->llink;
+
+  if (ret == NULL || ret->name != N_STMT_RETURN)
+    semanticError("Expected return statement");
+
+  A_NODE *size = ret->clink;
+
+  if (size == NULL || size->name != N_EXP_SIZE_TYPE || size->llink != NULL ||
+      size->rlink != NULL)
+    semanticError("Invalid sizeof type AST");
+
+  A_TYPE *type = PTR(A_TYPE, size->clink);
+
+  if (type != int_type)
+    semanticError("Expected int_type");
+
+  if (list->rlink == NULL || list->rlink->name != N_STMT_LIST_NIL)
+    semanticError("Invalid statement list terminator");
+
+  logMsg(LOG_INFO, "AST sizeof type test passed");
+}

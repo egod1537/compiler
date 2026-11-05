@@ -503,7 +503,6 @@ iteration_statement
     {
       $$ = YY(makeNode(N_STMT_FOR, PTR(A_NODE, $3), NULL, PTR(A_NODE, $5)));
     }
-      statement
     ;
 
 expression_opt
@@ -522,14 +521,23 @@ for_expression
     {
       $$ = YY(makeNode(N_FOR_EXP, PTR(A_NODE, $1), PTR(A_NODE, $3), PTR(A_NODE, $5)));
     }
-      jump_statement : RETURN_SYM expression_opt SEMICOLON
+    ;
+
+jump_statement
+    : RETURN_SYM expression_opt SEMICOLON
     {
       $$ = YY(makeNode(N_STMT_RETURN, NULL, PTR(A_NODE, $2), NULL));
 
       statement_root = PTR(A_NODE, $$);
     }
     | CONTINUE_SYM SEMICOLON
+    {
+      $$ = YY(makeNode(N_STMT_CONTINUE, NULL, NULL, NULL));
+    }
     | BREAK_SYM SEMICOLON
+    {
+      $$ = YY(makeNode(N_STMT_BREAK, NULL, NULL, NULL));
+    }
     | GOTO_SYM IDENTIFIER SEMICOLON
     ;
 
@@ -568,6 +576,9 @@ postfix_expression
       $$ = YY(makeNode(N_EXP_ARRAY, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
     }
     | postfix_expression LP arg_expression_list_opt RP
+    {
+      $$ = YY(makeNode(N_EXP_FUNCTION_CALL, PTR(A_NODE, $1), NULL, PTR(A_NODE, $3)));
+    }
     | postfix_expression PERIOD IDENTIFIER
     | postfix_expression ARROW IDENTIFIER
     | postfix_expression PLUSPLUS
@@ -582,12 +593,22 @@ postfix_expression
 
 arg_expression_list_opt
     :
-    | arg_expression_list
+    {
+      $$ = YY(makeNode(N_ARG_LIST_NIL, NULL, NULL, NULL));
+    }
+    | arg_expression_list { $$ = $1; }
     ;
 
 arg_expression_list
     : assignment_expression
+    {
+      $$ = YY(makeNode(N_ARG_LIST, PTR(A_NODE, $1), NULL,
+                       makeNode(N_ARG_LIST_NIL, NULL, NULL, NULL)));
+    }
     | arg_expression_list COMMA assignment_expression
+    {
+      $$ = YY(makeNodeList(N_ARG_LIST, PTR(A_NODE, $1), PTR(A_NODE, $3)));
+    }
     ;
 
 unary_expression
@@ -625,7 +646,13 @@ unary_expression
       $$ = $2;
     }
     | SIZEOF_SYM unary_expression
+    {
+      $$ = YY(makeNode(N_EXP_SIZE_EXP, NULL, PTR(A_NODE, $2), NULL));
+    }
     | SIZEOF_SYM LP type_name RP
+    {
+      $$ = YY(makeNode(N_EXP_SIZE_EXP, NULL, PTR(A_NODE, $3), NULL));
+    }
     ;
 
 cast_expression
@@ -637,8 +664,10 @@ cast_expression
     ;
 
 type_name
-    : declaration_specifiers
-    | declaration_specifiers abstract_declarator
+    : declaration_specifiers abstract_declarator_opt
+    {
+      $$ = YY(setTypeNameSpecifier(PTR(A_TYPE, $2), PTR(A_SPECIFIER, $1)));
+    }
     ;
 
 multiplicative_expression
