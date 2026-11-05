@@ -830,25 +830,25 @@ static const yytype_int8 yytranslate[] =
 static const yytype_int16 yyrline[] =
 {
        0,    44,    44,    53,    54,    58,    59,    66,    65,    91,
-      90,   120,   123,   130,   137,   141,   145,   146,   150,   154,
-     158,   159,   160,   161,   162,   166,   167,   171,   175,   182,
-     186,   190,   191,   192,   200,   199,   210,   209,   217,   226,
-     227,   231,   232,   239,   246,   247,   254,   255,   260,   269,
-     268,   277,   276,   284,   291,   292,   299,   307,   311,   315,
-     322,   326,   333,   334,   338,   339,   343,   352,   353,   358,
-     367,   370,   378,   381,   388,   389,   393,   397,   404,   408,
-     420,   423,   430,   434,   438,   445,   449,   453,   457,   462,
-     470,   471,   472,   476,   477,   481,   482,   486,   490,   491,
-     492,   500,   500,   511,   515,   519,   523,   532,   536,   544,
-     547,   554,   559,   566,   570,   577,   581,   585,   592,   596,
-     600,   608,   611,   618,   625,   631,   635,   639,   643,   651,
-     658,   662,   666,   670,   677,   681,   685,   689,   694,   699,
-     703,   711,   714,   718,   723,   730,   734,   738,   742,   746,
-     750,   754,   758,   759,   763,   767,   774,   778,   785,   792,
-     796,   800,   804,   811,   815,   819,   826,   827,   828,   832,
-     836,   840,   844,   848,   855,   859,   863,   870,   871,   875,
-     876,   880,   881,   885,   886,   893,   894,   901,   902,   906,
-     910,   917,   918,   922,   930
+      90,   120,   123,   130,   137,   141,   145,   150,   154,   158,
+     166,   167,   168,   169,   174,   182,   183,   187,   191,   198,
+     202,   206,   207,   208,   216,   215,   226,   225,   233,   242,
+     243,   247,   248,   255,   262,   263,   270,   271,   276,   285,
+     284,   293,   292,   300,   307,   308,   315,   323,   327,   331,
+     338,   342,   349,   350,   354,   355,   359,   368,   369,   374,
+     383,   386,   394,   397,   404,   405,   409,   413,   420,   424,
+     436,   439,   446,   450,   454,   461,   465,   469,   473,   478,
+     486,   487,   488,   492,   493,   497,   498,   502,   506,   507,
+     508,   516,   516,   527,   531,   535,   539,   548,   552,   560,
+     563,   570,   575,   582,   586,   593,   597,   601,   608,   612,
+     616,   624,   627,   634,   641,   647,   651,   655,   659,   667,
+     674,   678,   682,   686,   693,   697,   701,   705,   710,   715,
+     719,   727,   730,   734,   739,   746,   750,   754,   758,   762,
+     766,   770,   774,   775,   779,   783,   790,   794,   801,   808,
+     812,   816,   820,   827,   831,   835,   842,   843,   844,   848,
+     852,   856,   860,   864,   871,   875,   879,   886,   887,   891,
+     892,   896,   897,   901,   902,   909,   910,   917,   918,   922,
+     926,   933,   934,   938,   946
 };
 #endif
 
@@ -1858,226 +1858,280 @@ yyreduce:
 #line 1859 "y.tab.c"
     break;
 
-  case 17: /* declaration_specifiers: type_specifier declaration_specifiers  */
-#line 147 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 16: /* declaration_specifiers: type_qualifier  */
+#line 146 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(updateSpecifier(PTR(A_SPECIFIER, yyvsp[0]), PTR(A_TYPE, yyvsp[-1]), S_NULL));
+      semanticError("Type type_qualifier are not suuported");
+      yyval = YY(NULL);
     }
-#line 1867 "y.tab.c"
+#line 1868 "y.tab.c"
     break;
 
-  case 18: /* declaration_specifiers: storage_class_specifier declaration_specifiers  */
+  case 17: /* declaration_specifiers: type_specifier declaration_specifiers  */
 #line 151 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(updateSpecifier(PTR(A_SPECIFIER, yyvsp[0]), PTR(A_TYPE, yyvsp[-1]), S_NULL));
     }
-#line 1875 "y.tab.c"
+#line 1876 "y.tab.c"
     break;
 
-  case 27: /* init_declarator_list: init_declarator  */
-#line 172 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 18: /* declaration_specifiers: storage_class_specifier declaration_specifiers  */
+#line 155 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
+      yyval = YY(updateSpecifier(PTR(A_SPECIFIER, yyvsp[0]), NULL, (S_KIND)yyvsp[-1]));
+    }
+#line 1884 "y.tab.c"
+    break;
+
+  case 19: /* declaration_specifiers: type_qualifier declaration_specifiers  */
+#line 159 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      semanticError("Type type_qualifier are not suuported");
       yyval = yyvsp[0];
     }
-#line 1883 "y.tab.c"
+#line 1893 "y.tab.c"
     break;
 
-  case 28: /* init_declarator_list: init_declarator_list COMMA init_declarator  */
-#line 176 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-2]), PTR(A_ID, yyvsp[0])));
-    }
-#line 1891 "y.tab.c"
-    break;
-
-  case 29: /* init_declarator: declarator  */
-#line 183 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = yyvsp[0];
-    }
+  case 20: /* storage_class_specifier: AUTO_SYM  */
+#line 166 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+               { yyval = YY(S_AUTO); }
 #line 1899 "y.tab.c"
     break;
 
-  case 33: /* type_specifier: TYPE_IDENTIFIER  */
-#line 193 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 21: /* storage_class_specifier: STATIC_SYM  */
+#line 167 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                 { yyval = YY(S_STATIC); }
+#line 1905 "y.tab.c"
+    break;
+
+  case 22: /* storage_class_specifier: TYPEDEF_SYM  */
+#line 168 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                  { yyval = YY(S_TYPEDEF); }
+#line 1911 "y.tab.c"
+    break;
+
+  case 23: /* storage_class_specifier: REGISTER_SYM  */
+#line 170 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      semanticError("register is not supported");
+      yyval = YY(S_NULL);
+    }
+#line 1920 "y.tab.c"
+    break;
+
+  case 24: /* storage_class_specifier: EXTERN_SYM  */
+#line 175 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      semanticError("extern is not supported");
+      yyval = YY(S_NULL);
+    }
+#line 1929 "y.tab.c"
+    break;
+
+  case 27: /* init_declarator_list: init_declarator  */
+#line 188 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 1907 "y.tab.c"
+#line 1937 "y.tab.c"
+    break;
+
+  case 28: /* init_declarator_list: init_declarator_list COMMA init_declarator  */
+#line 192 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-2]), PTR(A_ID, yyvsp[0])));
+    }
+#line 1945 "y.tab.c"
+    break;
+
+  case 29: /* init_declarator: declarator  */
+#line 199 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = yyvsp[0];
+    }
+#line 1953 "y.tab.c"
+    break;
+
+  case 33: /* type_specifier: TYPE_IDENTIFIER  */
+#line 209 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = yyvsp[0];
+    }
+#line 1961 "y.tab.c"
     break;
 
   case 34: /* @3: %empty  */
-#line 200 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 216 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       char *name = PTR(char, yyvsp[0]);
       yyval = YY(setTypeStructOrEnumIdentifier((T_KIND)yyvsp[-1], name, ID_STRUCT));
       free(name);
     }
-#line 1917 "y.tab.c"
+#line 1971 "y.tab.c"
     break;
 
   case 35: /* struct_specifier: struct_or_union IDENTIFIER @3 LR struct_declaration_list RR  */
-#line 206 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 222 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setTypeField(PTR(A_TYPE, yyvsp[-3]), PTR(A_ID, yyvsp[-1])));
     }
-#line 1925 "y.tab.c"
+#line 1979 "y.tab.c"
     break;
 
   case 36: /* @4: %empty  */
-#line 210 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 226 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeType((T_KIND)yyvsp[0]));
     }
-#line 1933 "y.tab.c"
+#line 1987 "y.tab.c"
     break;
 
   case 37: /* struct_specifier: struct_or_union @4 LR struct_declaration_list RR  */
-#line 214 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 230 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setTypeField(PTR(A_TYPE, yyvsp[-3]), PTR(A_ID, yyvsp[-1])));
     }
-#line 1941 "y.tab.c"
+#line 1995 "y.tab.c"
     break;
 
   case 38: /* struct_specifier: struct_or_union IDENTIFIER  */
-#line 218 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 234 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       char *name = PTR(char, yyvsp[0]);
       yyval = YY(getTypeOfStructOrEnumIdentifier((T_KIND)yyvsp[-1], name, ID_STRUCT));
       free(name);
     }
-#line 1951 "y.tab.c"
-    break;
-
-  case 39: /* struct_or_union: STRUCT_SYM  */
-#line 226 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                 { yyval = YY(T_STRUCT); }
-#line 1957 "y.tab.c"
-    break;
-
-  case 40: /* struct_or_union: UNION_SYM  */
-#line 227 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                { yyval = YY(T_UNION); }
-#line 1963 "y.tab.c"
-    break;
-
-  case 41: /* struct_declaration_list: struct_declaration  */
-#line 231 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                         { yyval = yyvsp[0]; }
-#line 1969 "y.tab.c"
-    break;
-
-  case 42: /* struct_declaration_list: struct_declaration_list struct_declaration  */
-#line 233 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-1]), PTR(A_ID, yyvsp[0])));
-    }
-#line 1977 "y.tab.c"
-    break;
-
-  case 43: /* struct_declaration: type_specifier struct_declarator_list SEMICOLON  */
-#line 240 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(setStructDeclaratorListSpecifier(PTR(A_ID, yyvsp[-1]), PTR(A_TYPE, yyvsp[-2])));
-    }
-#line 1985 "y.tab.c"
-    break;
-
-  case 44: /* struct_declarator_list: struct_declarator  */
-#line 246 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                        { yyval = yyvsp[0]; }
-#line 1991 "y.tab.c"
-    break;
-
-  case 45: /* struct_declarator_list: struct_declarator_list COMMA struct_declarator  */
-#line 248 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-2]), PTR(A_ID, yyvsp[0])));
-    }
-#line 1999 "y.tab.c"
-    break;
-
-  case 46: /* struct_declarator: declarator  */
-#line 254 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                 { yyval = yyvsp[0]; }
 #line 2005 "y.tab.c"
     break;
 
-  case 47: /* struct_declarator: COLON constant_expression  */
-#line 256 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      semanticError("Bit-fields are not implemented");
-      yyval = YY(NULL);
-    }
-#line 2014 "y.tab.c"
+  case 39: /* struct_or_union: STRUCT_SYM  */
+#line 242 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                 { yyval = YY(T_STRUCT); }
+#line 2011 "y.tab.c"
     break;
 
-  case 48: /* struct_declarator: declarator COLON constant_expression  */
-#line 261 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      semanticError("Bit-fields are not implemented");
-      yyval = YY(NULL);
-    }
+  case 40: /* struct_or_union: UNION_SYM  */
+#line 243 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                { yyval = YY(T_UNION); }
+#line 2017 "y.tab.c"
+    break;
+
+  case 41: /* struct_declaration_list: struct_declaration  */
+#line 247 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                         { yyval = yyvsp[0]; }
 #line 2023 "y.tab.c"
     break;
 
-  case 49: /* @5: %empty  */
-#line 269 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 42: /* struct_declaration_list: struct_declaration_list struct_declaration  */
+#line 249 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(setTypeStructOrEnumIdentifier(T_ENUM, PTR(char, yyvsp[0]), ID_ENUM));
+      yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-1]), PTR(A_ID, yyvsp[0])));
     }
 #line 2031 "y.tab.c"
     break;
 
-  case 50: /* enum_specifier: ENUM_SYM IDENTIFIER @5 LR enumerator_list RR  */
-#line 273 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 43: /* struct_declaration: type_specifier struct_declarator_list SEMICOLON  */
+#line 256 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(setTypeField(PTR(A_TYPE, yyvsp[-3]), PTR(A_ID, yyvsp[-1])));
+      yyval = YY(setStructDeclaratorListSpecifier(PTR(A_ID, yyvsp[-1]), PTR(A_TYPE, yyvsp[-2])));
     }
 #line 2039 "y.tab.c"
     break;
 
-  case 51: /* @6: %empty  */
-#line 277 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(makeType(T_ENUM));
-    }
-#line 2047 "y.tab.c"
+  case 44: /* struct_declarator_list: struct_declarator  */
+#line 262 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                        { yyval = yyvsp[0]; }
+#line 2045 "y.tab.c"
     break;
 
-  case 52: /* enum_specifier: ENUM_SYM @6 LR enumerator_list RR  */
-#line 281 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(setTypeField(PTR(A_TYPE, yyvsp[-3]), PTR(A_ID, yyvsp[-1])));
-    }
-#line 2055 "y.tab.c"
-    break;
-
-  case 53: /* enum_specifier: ENUM_SYM IDENTIFIER  */
-#line 285 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(getTypeOfStructOrEnumIdentifier(T_ENUM, PTR(char, yyvsp[0]), ID_ENUM));
-    }
-#line 2063 "y.tab.c"
-    break;
-
-  case 54: /* enumerator_list: enumerator  */
-#line 291 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                 { yyval = yyvsp[0]; }
-#line 2069 "y.tab.c"
-    break;
-
-  case 55: /* enumerator_list: enumerator_list COMMA enumerator  */
-#line 293 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 45: /* struct_declarator_list: struct_declarator_list COMMA struct_declarator  */
+#line 264 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-2]), PTR(A_ID, yyvsp[0])));
+    }
+#line 2053 "y.tab.c"
+    break;
+
+  case 46: /* struct_declarator: declarator  */
+#line 270 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                 { yyval = yyvsp[0]; }
+#line 2059 "y.tab.c"
+    break;
+
+  case 47: /* struct_declarator: COLON constant_expression  */
+#line 272 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      semanticError("Bit-fields are not implemented");
+      yyval = YY(NULL);
+    }
+#line 2068 "y.tab.c"
+    break;
+
+  case 48: /* struct_declarator: declarator COLON constant_expression  */
+#line 277 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      semanticError("Bit-fields are not implemented");
+      yyval = YY(NULL);
     }
 #line 2077 "y.tab.c"
     break;
 
+  case 49: /* @5: %empty  */
+#line 285 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(setTypeStructOrEnumIdentifier(T_ENUM, PTR(char, yyvsp[0]), ID_ENUM));
+    }
+#line 2085 "y.tab.c"
+    break;
+
+  case 50: /* enum_specifier: ENUM_SYM IDENTIFIER @5 LR enumerator_list RR  */
+#line 289 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(setTypeField(PTR(A_TYPE, yyvsp[-3]), PTR(A_ID, yyvsp[-1])));
+    }
+#line 2093 "y.tab.c"
+    break;
+
+  case 51: /* @6: %empty  */
+#line 293 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeType(T_ENUM));
+    }
+#line 2101 "y.tab.c"
+    break;
+
+  case 52: /* enum_specifier: ENUM_SYM @6 LR enumerator_list RR  */
+#line 297 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(setTypeField(PTR(A_TYPE, yyvsp[-3]), PTR(A_ID, yyvsp[-1])));
+    }
+#line 2109 "y.tab.c"
+    break;
+
+  case 53: /* enum_specifier: ENUM_SYM IDENTIFIER  */
+#line 301 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(getTypeOfStructOrEnumIdentifier(T_ENUM, PTR(char, yyvsp[0]), ID_ENUM));
+    }
+#line 2117 "y.tab.c"
+    break;
+
+  case 54: /* enumerator_list: enumerator  */
+#line 307 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                 { yyval = yyvsp[0]; }
+#line 2123 "y.tab.c"
+    break;
+
+  case 55: /* enumerator_list: enumerator_list COMMA enumerator  */
+#line 309 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-2]), PTR(A_ID, yyvsp[0])));
+    }
+#line 2131 "y.tab.c"
+    break;
+
   case 56: /* enumerator: IDENTIFIER  */
-#line 300 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 316 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       char *name = PTR(char, yyvsp[0]);
       A_ID *id = makeIdentifier(name);
@@ -2085,43 +2139,43 @@ yyreduce:
 
       yyval = YY(setDeclaratorKind(id, ID_ENUM_LITERAL));
     }
-#line 2089 "y.tab.c"
+#line 2143 "y.tab.c"
     break;
 
   case 58: /* declarator: pointer direct_declarator  */
-#line 312 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 328 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setDeclaratorElementType(PTR(A_ID, yyvsp[0]), PTR(A_TYPE, yyvsp[-1])));
     }
-#line 2097 "y.tab.c"
+#line 2151 "y.tab.c"
     break;
 
   case 59: /* declarator: direct_declarator  */
-#line 316 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 332 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2105 "y.tab.c"
+#line 2159 "y.tab.c"
     break;
 
   case 60: /* pointer: STAR type_qualifier_list_opt  */
-#line 323 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 339 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeType(T_POINTER));
     }
-#line 2113 "y.tab.c"
+#line 2167 "y.tab.c"
     break;
 
   case 61: /* pointer: STAR type_qualifier_list_opt pointer  */
-#line 327 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 343 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setTypeElementType(PTR(A_TYPE, yyvsp[0]), makeType(T_POINTER)));
     }
-#line 2121 "y.tab.c"
+#line 2175 "y.tab.c"
     break;
 
   case 66: /* direct_declarator: IDENTIFIER  */
-#line 344 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 360 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       char *name = PTR(char, yyvsp[0]);
 
@@ -2130,85 +2184,85 @@ yyreduce:
 
       yyval = YY(id);
     }
-#line 2134 "y.tab.c"
+#line 2188 "y.tab.c"
     break;
 
   case 68: /* direct_declarator: direct_declarator LB constant_expression_opt RB  */
-#line 354 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 370 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setDeclaratorElementType(PTR(A_ID, yyvsp[-3]),
                                        setTypeExpr(makeType(T_ARRAY), PTR(A_NODE, yyvsp[-1]))));
     }
-#line 2143 "y.tab.c"
+#line 2197 "y.tab.c"
     break;
 
   case 69: /* direct_declarator: direct_declarator LP parameter_type_list_opt RP  */
-#line 359 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 375 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setDeclaratorElementType(PTR(A_ID, yyvsp[-3]),
                                        setTypeField(makeType(T_FUNC), PTR(A_ID, yyvsp[-1]))));
     }
-#line 2152 "y.tab.c"
+#line 2206 "y.tab.c"
     break;
 
   case 70: /* constant_expression_opt: %empty  */
-#line 367 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 383 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(NULL);
     }
-#line 2160 "y.tab.c"
+#line 2214 "y.tab.c"
     break;
 
   case 71: /* constant_expression_opt: constant_expression  */
-#line 371 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 387 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2168 "y.tab.c"
+#line 2222 "y.tab.c"
     break;
 
   case 72: /* parameter_type_list_opt: %empty  */
-#line 378 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 394 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(NULL);
     }
-#line 2176 "y.tab.c"
+#line 2230 "y.tab.c"
     break;
 
   case 73: /* parameter_type_list_opt: parameter_type_list  */
-#line 382 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 398 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2184 "y.tab.c"
+#line 2238 "y.tab.c"
     break;
 
   case 76: /* parameter_list: parameter_declaration  */
-#line 394 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 410 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2192 "y.tab.c"
+#line 2246 "y.tab.c"
     break;
 
   case 77: /* parameter_list: parameter_list COMMA parameter_declaration  */
-#line 398 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 414 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-2]), PTR(A_ID, yyvsp[0])));
     }
-#line 2200 "y.tab.c"
+#line 2254 "y.tab.c"
     break;
 
   case 78: /* parameter_declaration: declaration_specifiers declarator  */
-#line 405 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 421 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setParameterDeclaratorSpecifier(PTR(A_ID, yyvsp[0]), PTR(A_SPECIFIER, yyvsp[-1])));
     }
-#line 2208 "y.tab.c"
+#line 2262 "y.tab.c"
     break;
 
   case 79: /* parameter_declaration: declaration_specifiers abstract_declarator_opt  */
-#line 409 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 425 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       A_ID *id = makeDummyIdentifier();
 
@@ -2216,341 +2270,341 @@ yyreduce:
 
       yyval = YY(setParameterDeclaratorSpecifier(id, PTR(A_SPECIFIER, yyvsp[-1])));
     }
-#line 2220 "y.tab.c"
+#line 2274 "y.tab.c"
     break;
 
   case 80: /* abstract_declarator_opt: %empty  */
-#line 420 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 436 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(NULL);
     }
-#line 2228 "y.tab.c"
+#line 2282 "y.tab.c"
     break;
 
   case 81: /* abstract_declarator_opt: abstract_declarator  */
-#line 424 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 440 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2236 "y.tab.c"
+#line 2290 "y.tab.c"
     break;
 
   case 82: /* abstract_declarator: pointer  */
-#line 431 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 447 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2244 "y.tab.c"
+#line 2298 "y.tab.c"
     break;
 
   case 83: /* abstract_declarator: direct_abstract_declarator  */
-#line 435 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 451 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2252 "y.tab.c"
+#line 2306 "y.tab.c"
     break;
 
   case 84: /* abstract_declarator: pointer direct_abstract_declarator  */
-#line 439 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 455 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setTypeElementType(PTR(A_TYPE, yyvsp[0]), PTR(A_TYPE, yyvsp[-1])));
     }
-#line 2260 "y.tab.c"
+#line 2314 "y.tab.c"
     break;
 
   case 85: /* direct_abstract_declarator: LP abstract_declarator RP  */
-#line 446 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 462 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[-1];
     }
-#line 2268 "y.tab.c"
+#line 2322 "y.tab.c"
     break;
 
   case 86: /* direct_abstract_declarator: LB constant_expression_opt RB  */
-#line 450 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 466 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setTypeExpr(makeType(T_ARRAY), PTR(A_NODE, yyvsp[-1])));
     }
-#line 2276 "y.tab.c"
+#line 2330 "y.tab.c"
     break;
 
   case 87: /* direct_abstract_declarator: LP parameter_type_list_opt RP  */
-#line 454 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 470 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setTypeField(makeType(T_FUNC), PTR(A_ID, yyvsp[-1])));
     }
-#line 2284 "y.tab.c"
+#line 2338 "y.tab.c"
     break;
 
   case 88: /* direct_abstract_declarator: direct_abstract_declarator LB constant_expression_opt RB  */
-#line 458 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 474 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setTypeElementType(PTR(A_TYPE, yyvsp[-3]),
                                  setTypeExpr(makeType(T_ARRAY), PTR(A_NODE, yyvsp[-1]))));
     }
-#line 2293 "y.tab.c"
+#line 2347 "y.tab.c"
     break;
 
   case 89: /* direct_abstract_declarator: direct_abstract_declarator LP parameter_type_list_opt RP  */
-#line 463 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 479 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setTypeElementType(PTR(A_TYPE, yyvsp[-3]),
                                  setTypeField(makeType(T_FUNC), PTR(A_ID, yyvsp[-1]))));
     }
-#line 2302 "y.tab.c"
+#line 2356 "y.tab.c"
     break;
 
   case 95: /* statement: labeled_statement  */
-#line 481 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 497 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                         { yyval = yyvsp[0]; }
-#line 2308 "y.tab.c"
+#line 2362 "y.tab.c"
     break;
 
   case 96: /* statement: scoped_compound_statement  */
-#line 483 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 499 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2316 "y.tab.c"
+#line 2370 "y.tab.c"
     break;
 
   case 97: /* statement: expression_statement  */
-#line 487 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 503 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2324 "y.tab.c"
+#line 2378 "y.tab.c"
     break;
 
   case 98: /* statement: selection_statement  */
-#line 490 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 506 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                           { yyval = yyvsp[0]; }
-#line 2330 "y.tab.c"
+#line 2384 "y.tab.c"
     break;
 
   case 99: /* statement: iteration_statement  */
-#line 491 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 507 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                           { yyval = yyvsp[0]; }
-#line 2336 "y.tab.c"
+#line 2390 "y.tab.c"
     break;
 
   case 100: /* statement: jump_statement  */
-#line 493 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 509 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2344 "y.tab.c"
+#line 2398 "y.tab.c"
     break;
 
   case 101: /* $@7: %empty  */
-#line 500 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 516 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       enterScope();
     }
-#line 2352 "y.tab.c"
+#line 2406 "y.tab.c"
     break;
 
   case 102: /* scoped_compound_statement: $@7 compound_statement  */
-#line 504 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 520 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
       leaveScope();
     }
-#line 2361 "y.tab.c"
+#line 2415 "y.tab.c"
     break;
 
   case 103: /* labeled_statement: CASE_SYM constant_expression COLON statement  */
-#line 512 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 528 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_LABEL_CASE, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 2369 "y.tab.c"
+#line 2423 "y.tab.c"
     break;
 
   case 104: /* labeled_statement: DEFAULT_SYM COLON statement  */
-#line 516 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 532 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_LABEL_DEFAULT, NULL, NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 2377 "y.tab.c"
+#line 2431 "y.tab.c"
     break;
 
   case 106: /* compound_statement: LR declaration_list_opt statement_list_opt RR  */
-#line 524 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 540 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_COMPOUND, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[-1])));
 
       compound_root = PTR(A_NODE, yyval);
     }
-#line 2387 "y.tab.c"
+#line 2441 "y.tab.c"
     break;
 
   case 107: /* declaration_list: declaration  */
-#line 533 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 549 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2395 "y.tab.c"
+#line 2449 "y.tab.c"
     break;
 
   case 108: /* declaration_list: declaration_list declaration  */
-#line 537 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 553 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(linkDeclaratorList(PTR(A_ID, yyvsp[-1]), PTR(A_ID, yyvsp[0])));
     }
-#line 2403 "y.tab.c"
+#line 2457 "y.tab.c"
     break;
 
   case 109: /* statement_list_opt: %empty  */
-#line 544 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 560 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_LIST_NIL, NULL, NULL, NULL));
     }
-#line 2411 "y.tab.c"
+#line 2465 "y.tab.c"
     break;
 
   case 110: /* statement_list_opt: statement_list  */
-#line 548 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 564 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2419 "y.tab.c"
+#line 2473 "y.tab.c"
     break;
 
   case 111: /* statement_list: statement  */
-#line 555 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 571 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_LIST, PTR(A_NODE, yyvsp[0]), NULL,
                        makeNode(N_STMT_LIST_NIL, NULL, NULL, NULL)));
     }
-#line 2428 "y.tab.c"
+#line 2482 "y.tab.c"
     break;
 
   case 112: /* statement_list: statement_list statement  */
-#line 560 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 576 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNodeList(N_STMT_LIST, PTR(A_NODE, yyvsp[-1]), PTR(A_NODE, yyvsp[0])));
     }
-#line 2436 "y.tab.c"
+#line 2490 "y.tab.c"
     break;
 
   case 113: /* expression_statement: SEMICOLON  */
-#line 567 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 583 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_EMPTY, NULL, NULL, NULL));
     }
-#line 2444 "y.tab.c"
+#line 2498 "y.tab.c"
     break;
 
   case 114: /* expression_statement: expression SEMICOLON  */
-#line 571 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 587 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_EXPRESSION, NULL, PTR(A_NODE, yyvsp[-1]), NULL));
     }
-#line 2452 "y.tab.c"
+#line 2506 "y.tab.c"
     break;
 
   case 115: /* selection_statement: IF_SYM LP expression RP statement  */
-#line 578 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 594 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_IF, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 2460 "y.tab.c"
+#line 2514 "y.tab.c"
     break;
 
   case 116: /* selection_statement: IF_SYM LP expression RP statement ELSE_SYM statement  */
-#line 582 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 598 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_IF_ELSE, PTR(A_NODE, yyvsp[-4]), PTR(A_NODE, yyvsp[-2]), PTR(A_NODE, yyvsp[0])));
     }
-#line 2468 "y.tab.c"
+#line 2522 "y.tab.c"
     break;
 
   case 117: /* selection_statement: SWITCH_SYM LP expression RP statement  */
-#line 586 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 602 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_SWITCH, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 2476 "y.tab.c"
+#line 2530 "y.tab.c"
     break;
 
   case 118: /* iteration_statement: WHILE_SYM LP expression RP statement  */
-#line 593 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 609 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_WHILE, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 2484 "y.tab.c"
+#line 2538 "y.tab.c"
     break;
 
   case 119: /* iteration_statement: DO_SYM statement WHILE_SYM LP expression RP SEMICOLON  */
-#line 597 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 613 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_DO, PTR(A_NODE, yyvsp[-5]), NULL, PTR(A_NODE, yyvsp[-2])));
     }
-#line 2492 "y.tab.c"
+#line 2546 "y.tab.c"
     break;
 
   case 120: /* iteration_statement: FOR_SYM LP for_expression RP statement  */
-#line 601 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 617 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_FOR, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 2500 "y.tab.c"
+#line 2554 "y.tab.c"
     break;
 
   case 121: /* expression_opt: %empty  */
-#line 608 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 624 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(NULL);
     }
-#line 2508 "y.tab.c"
+#line 2562 "y.tab.c"
     break;
 
   case 122: /* expression_opt: expression  */
-#line 612 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 628 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2516 "y.tab.c"
+#line 2570 "y.tab.c"
     break;
 
   case 123: /* for_expression: expression_opt SEMICOLON expression_opt SEMICOLON expression_opt  */
-#line 619 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 635 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_FOR_EXP, PTR(A_NODE, yyvsp[-4]), PTR(A_NODE, yyvsp[-2]), PTR(A_NODE, yyvsp[0])));
     }
-#line 2524 "y.tab.c"
+#line 2578 "y.tab.c"
     break;
 
   case 124: /* jump_statement: RETURN_SYM expression_opt SEMICOLON  */
-#line 626 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 642 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_RETURN, NULL, PTR(A_NODE, yyvsp[-1]), NULL));
 
       statement_root = PTR(A_NODE, yyval);
     }
-#line 2534 "y.tab.c"
+#line 2588 "y.tab.c"
     break;
 
   case 125: /* jump_statement: CONTINUE_SYM SEMICOLON  */
-#line 632 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 648 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_CONTINUE, NULL, NULL, NULL));
     }
-#line 2542 "y.tab.c"
+#line 2596 "y.tab.c"
     break;
 
   case 126: /* jump_statement: BREAK_SYM SEMICOLON  */
-#line 636 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 652 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_STMT_BREAK, NULL, NULL, NULL));
     }
-#line 2550 "y.tab.c"
+#line 2604 "y.tab.c"
     break;
 
   case 128: /* primary_expression: IDENTIFIER  */
-#line 644 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 660 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       char *name = PTR(char, yyvsp[0]);
       A_ID *id = getIdentifierDeclared(name);
@@ -2558,444 +2612,444 @@ yyreduce:
 
       yyval = YY(makeNode(N_EXP_IDENT, NULL, PTR(A_NODE, id), NULL));
     }
-#line 2562 "y.tab.c"
+#line 2616 "y.tab.c"
     break;
 
   case 129: /* primary_expression: INTEGER_CONSTANT  */
-#line 652 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 668 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_INT_CONST, NULL, PTR(A_NODE, yyvsp[0]), NULL));
 
       A_NODE *node = PTR(A_NODE, yyval);
       logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
     }
-#line 2573 "y.tab.c"
+#line 2627 "y.tab.c"
     break;
 
   case 130: /* primary_expression: FLOAT_CONSTANT  */
-#line 659 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 675 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_FLOAT_CONST, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2581 "y.tab.c"
+#line 2635 "y.tab.c"
     break;
 
   case 131: /* primary_expression: CHARACTER_CONSTANT  */
-#line 663 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 679 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_CHAR_CONST, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2589 "y.tab.c"
+#line 2643 "y.tab.c"
     break;
 
   case 132: /* primary_expression: STRING_LITERAL  */
-#line 667 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 683 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_STRING_LITERAL, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2597 "y.tab.c"
+#line 2651 "y.tab.c"
     break;
 
   case 133: /* primary_expression: LP expression RP  */
-#line 671 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 687 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[-1];
     }
-#line 2605 "y.tab.c"
+#line 2659 "y.tab.c"
     break;
 
   case 134: /* postfix_expression: primary_expression  */
-#line 678 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 694 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2613 "y.tab.c"
+#line 2667 "y.tab.c"
     break;
 
   case 135: /* postfix_expression: postfix_expression LB expression RB  */
-#line 682 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 698 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_ARRAY, PTR(A_NODE, yyvsp[-3]), NULL, PTR(A_NODE, yyvsp[-1])));
     }
-#line 2621 "y.tab.c"
+#line 2675 "y.tab.c"
     break;
 
   case 136: /* postfix_expression: postfix_expression LP arg_expression_list_opt RP  */
-#line 686 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 702 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_FUNCTION_CALL, PTR(A_NODE, yyvsp[-3]), NULL, PTR(A_NODE, yyvsp[-1])));
     }
-#line 2629 "y.tab.c"
+#line 2683 "y.tab.c"
     break;
 
   case 137: /* postfix_expression: postfix_expression PERIOD IDENTIFIER  */
-#line 690 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 706 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       char *name = PTR(char, yyvsp[0]);
       yyval = YY(makeNode(N_EXP_STRUCT, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, name)));
     }
-#line 2638 "y.tab.c"
+#line 2692 "y.tab.c"
     break;
 
   case 138: /* postfix_expression: postfix_expression ARROW IDENTIFIER  */
-#line 695 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 711 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       char *name = PTR(char, yyvsp[0]);
       yyval = YY(makeNode(N_EXP_ARROW, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, name)));
     }
-#line 2647 "y.tab.c"
+#line 2701 "y.tab.c"
     break;
 
   case 139: /* postfix_expression: postfix_expression PLUSPLUS  */
-#line 700 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 716 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_POST_INC, NULL, PTR(A_NODE, yyvsp[-1]), NULL));
     }
-#line 2655 "y.tab.c"
+#line 2709 "y.tab.c"
     break;
 
   case 140: /* postfix_expression: postfix_expression MINUSMINUS  */
-#line 704 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 720 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_POST_DEC, NULL, PTR(A_NODE, yyvsp[-1]), NULL));
     }
-#line 2663 "y.tab.c"
+#line 2717 "y.tab.c"
     break;
 
   case 141: /* arg_expression_list_opt: %empty  */
-#line 711 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 727 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_ARG_LIST_NIL, NULL, NULL, NULL));
     }
-#line 2671 "y.tab.c"
+#line 2725 "y.tab.c"
     break;
 
   case 142: /* arg_expression_list_opt: arg_expression_list  */
-#line 714 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 730 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                           { yyval = yyvsp[0]; }
-#line 2677 "y.tab.c"
+#line 2731 "y.tab.c"
     break;
 
   case 143: /* arg_expression_list: assignment_expression  */
-#line 719 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 735 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_ARG_LIST, PTR(A_NODE, yyvsp[0]), NULL,
                        makeNode(N_ARG_LIST_NIL, NULL, NULL, NULL)));
     }
-#line 2686 "y.tab.c"
+#line 2740 "y.tab.c"
     break;
 
   case 144: /* arg_expression_list: arg_expression_list COMMA assignment_expression  */
-#line 724 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 740 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNodeList(N_ARG_LIST, PTR(A_NODE, yyvsp[-2]), PTR(A_NODE, yyvsp[0])));
     }
-#line 2694 "y.tab.c"
+#line 2748 "y.tab.c"
     break;
 
   case 145: /* unary_expression: postfix_expression  */
-#line 731 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 747 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2702 "y.tab.c"
+#line 2756 "y.tab.c"
     break;
 
   case 146: /* unary_expression: PLUSPLUS unary_expression  */
-#line 735 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 751 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_PRE_INC, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2710 "y.tab.c"
+#line 2764 "y.tab.c"
     break;
 
   case 147: /* unary_expression: MINUSMINUS unary_expression  */
-#line 739 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 755 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_PRE_DEC, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2718 "y.tab.c"
+#line 2772 "y.tab.c"
     break;
 
   case 148: /* unary_expression: AMP cast_expression  */
-#line 743 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 759 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_AMP, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2726 "y.tab.c"
+#line 2780 "y.tab.c"
     break;
 
   case 149: /* unary_expression: STAR cast_expression  */
-#line 747 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 763 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_STAR, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2734 "y.tab.c"
+#line 2788 "y.tab.c"
     break;
 
   case 150: /* unary_expression: EXCL cast_expression  */
-#line 751 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 767 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_NOT, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2742 "y.tab.c"
+#line 2796 "y.tab.c"
     break;
 
   case 151: /* unary_expression: MINUS cast_expression  */
-#line 755 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 771 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_MINUS, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2750 "y.tab.c"
+#line 2804 "y.tab.c"
     break;
 
   case 153: /* unary_expression: PLUS cast_expression  */
-#line 760 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 776 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2758 "y.tab.c"
+#line 2812 "y.tab.c"
     break;
 
   case 154: /* unary_expression: SIZEOF_SYM unary_expression  */
-#line 764 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 780 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_SIZE_EXP, NULL, PTR(A_NODE, yyvsp[0]), NULL));
     }
-#line 2766 "y.tab.c"
+#line 2820 "y.tab.c"
     break;
 
   case 155: /* unary_expression: SIZEOF_SYM LP type_name RP  */
-#line 768 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 784 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_SIZE_TYPE, NULL, PTR(A_NODE, yyvsp[-1]), NULL));
     }
-#line 2774 "y.tab.c"
+#line 2828 "y.tab.c"
     break;
 
   case 156: /* cast_expression: unary_expression  */
-#line 775 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 791 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2782 "y.tab.c"
+#line 2836 "y.tab.c"
     break;
 
   case 157: /* cast_expression: LP type_name RP cast_expression  */
-#line 779 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 795 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_CAST, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 2790 "y.tab.c"
+#line 2844 "y.tab.c"
     break;
 
   case 158: /* type_name: declaration_specifiers abstract_declarator_opt  */
-#line 786 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 802 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(setTypeNameSpecifier(PTR(A_TYPE, yyvsp[0]), PTR(A_SPECIFIER, yyvsp[-1])));
     }
-#line 2798 "y.tab.c"
+#line 2852 "y.tab.c"
     break;
 
   case 159: /* multiplicative_expression: cast_expression  */
-#line 793 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 809 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
     }
-#line 2806 "y.tab.c"
-    break;
-
-  case 160: /* multiplicative_expression: multiplicative_expression STAR cast_expression  */
-#line 797 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(makeNode(N_EXP_MUL, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
-    }
-#line 2814 "y.tab.c"
-    break;
-
-  case 161: /* multiplicative_expression: multiplicative_expression SLASH cast_expression  */
-#line 801 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(makeNode(N_EXP_DIV, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
-    }
-#line 2822 "y.tab.c"
-    break;
-
-  case 162: /* multiplicative_expression: multiplicative_expression PERCENT cast_expression  */
-#line 805 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(makeNode(N_EXP_MOD, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
-    }
-#line 2830 "y.tab.c"
-    break;
-
-  case 163: /* additive_expression: multiplicative_expression  */
-#line 812 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = yyvsp[0];
-    }
-#line 2838 "y.tab.c"
-    break;
-
-  case 164: /* additive_expression: additive_expression PLUS multiplicative_expression  */
-#line 816 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(makeNode(N_EXP_ADD, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
-    }
-#line 2846 "y.tab.c"
-    break;
-
-  case 165: /* additive_expression: additive_expression MINUS multiplicative_expression  */
-#line 820 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(makeNode(N_EXP_SUB, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
-    }
-#line 2854 "y.tab.c"
-    break;
-
-  case 166: /* shift_expression: additive_expression  */
-#line 826 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                          { yyval = yyvsp[0]; }
 #line 2860 "y.tab.c"
     break;
 
-  case 169: /* relational_expression: shift_expression  */
-#line 833 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 160: /* multiplicative_expression: multiplicative_expression STAR cast_expression  */
+#line 813 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = yyvsp[0];
+      yyval = YY(makeNode(N_EXP_MUL, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
 #line 2868 "y.tab.c"
     break;
 
-  case 170: /* relational_expression: relational_expression LSS shift_expression  */
-#line 837 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 161: /* multiplicative_expression: multiplicative_expression SLASH cast_expression  */
+#line 817 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(makeNode(N_EXP_LSS, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+      yyval = YY(makeNode(N_EXP_DIV, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
 #line 2876 "y.tab.c"
     break;
 
-  case 171: /* relational_expression: relational_expression GTR shift_expression  */
-#line 841 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 162: /* multiplicative_expression: multiplicative_expression PERCENT cast_expression  */
+#line 821 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(makeNode(N_EXP_GTR, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+      yyval = YY(makeNode(N_EXP_MOD, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
 #line 2884 "y.tab.c"
     break;
 
-  case 172: /* relational_expression: relational_expression LEQ shift_expression  */
-#line 845 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 163: /* additive_expression: multiplicative_expression  */
+#line 828 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(makeNode(N_EXP_LEQ, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+      yyval = yyvsp[0];
     }
 #line 2892 "y.tab.c"
     break;
 
-  case 173: /* relational_expression: relational_expression GEQ shift_expression  */
-#line 849 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 164: /* additive_expression: additive_expression PLUS multiplicative_expression  */
+#line 832 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(makeNode(N_EXP_GEQ, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+      yyval = YY(makeNode(N_EXP_ADD, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
 #line 2900 "y.tab.c"
     break;
 
-  case 174: /* equality_expression: relational_expression  */
-#line 856 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 165: /* additive_expression: additive_expression MINUS multiplicative_expression  */
+#line 836 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = yyvsp[0];
+      yyval = YY(makeNode(N_EXP_SUB, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
 #line 2908 "y.tab.c"
     break;
 
-  case 175: /* equality_expression: equality_expression EQL relational_expression  */
-#line 860 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(makeNode(N_EXP_EQL, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
-    }
-#line 2916 "y.tab.c"
-    break;
-
-  case 176: /* equality_expression: equality_expression NEQ relational_expression  */
-#line 864 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-    {
-      yyval = YY(makeNode(N_EXP_NEQ, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
-    }
-#line 2924 "y.tab.c"
-    break;
-
-  case 177: /* AND_expression: equality_expression  */
-#line 870 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 166: /* shift_expression: additive_expression  */
+#line 842 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
                           { yyval = yyvsp[0]; }
+#line 2914 "y.tab.c"
+    break;
+
+  case 169: /* relational_expression: shift_expression  */
+#line 849 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = yyvsp[0];
+    }
+#line 2922 "y.tab.c"
+    break;
+
+  case 170: /* relational_expression: relational_expression LSS shift_expression  */
+#line 853 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_LSS, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+    }
 #line 2930 "y.tab.c"
     break;
 
-  case 179: /* exclusive_OR_expression: AND_expression  */
-#line 875 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                     { yyval = yyvsp[0]; }
-#line 2936 "y.tab.c"
-    break;
-
-  case 181: /* inclusive_OR_expression: exclusive_OR_expression  */
-#line 880 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                              { yyval = yyvsp[0]; }
-#line 2942 "y.tab.c"
-    break;
-
-  case 183: /* logical_AND_expression: inclusive_OR_expression  */
-#line 885 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                              { yyval = yyvsp[0]; }
-#line 2948 "y.tab.c"
-    break;
-
-  case 184: /* logical_AND_expression: logical_AND_expression AMPAMP inclusive_OR_expression  */
-#line 887 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 171: /* relational_expression: relational_expression GTR shift_expression  */
+#line 857 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(makeNode(N_EXP_AND, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+      yyval = YY(makeNode(N_EXP_GTR, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 2956 "y.tab.c"
+#line 2938 "y.tab.c"
     break;
 
-  case 185: /* logical_OR_expression: logical_AND_expression  */
-#line 893 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
-                             { yyval = yyvsp[0]; }
+  case 172: /* relational_expression: relational_expression LEQ shift_expression  */
+#line 861 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_LEQ, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+    }
+#line 2946 "y.tab.c"
+    break;
+
+  case 173: /* relational_expression: relational_expression GEQ shift_expression  */
+#line 865 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_GEQ, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+    }
+#line 2954 "y.tab.c"
+    break;
+
+  case 174: /* equality_expression: relational_expression  */
+#line 872 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = yyvsp[0];
+    }
 #line 2962 "y.tab.c"
     break;
 
-  case 186: /* logical_OR_expression: logical_OR_expression BARBAR logical_AND_expression  */
-#line 895 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 175: /* equality_expression: equality_expression EQL relational_expression  */
+#line 876 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = YY(makeNode(N_EXP_OR, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+      yyval = YY(makeNode(N_EXP_EQL, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
 #line 2970 "y.tab.c"
     break;
 
-  case 189: /* assignment_expression: conditional_expression  */
-#line 907 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+  case 176: /* equality_expression: equality_expression NEQ relational_expression  */
+#line 880 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
-      yyval = yyvsp[0];
+      yyval = YY(makeNode(N_EXP_NEQ, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
 #line 2978 "y.tab.c"
     break;
 
-  case 190: /* assignment_expression: unary_expression ASSIGN assignment_expression  */
+  case 177: /* AND_expression: equality_expression  */
+#line 886 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                          { yyval = yyvsp[0]; }
+#line 2984 "y.tab.c"
+    break;
+
+  case 179: /* exclusive_OR_expression: AND_expression  */
+#line 891 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                     { yyval = yyvsp[0]; }
+#line 2990 "y.tab.c"
+    break;
+
+  case 181: /* inclusive_OR_expression: exclusive_OR_expression  */
+#line 896 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                              { yyval = yyvsp[0]; }
+#line 2996 "y.tab.c"
+    break;
+
+  case 183: /* logical_AND_expression: inclusive_OR_expression  */
+#line 901 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                              { yyval = yyvsp[0]; }
+#line 3002 "y.tab.c"
+    break;
+
+  case 184: /* logical_AND_expression: logical_AND_expression AMPAMP inclusive_OR_expression  */
+#line 903 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_AND, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+    }
+#line 3010 "y.tab.c"
+    break;
+
+  case 185: /* logical_OR_expression: logical_AND_expression  */
+#line 909 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+                             { yyval = yyvsp[0]; }
+#line 3016 "y.tab.c"
+    break;
+
+  case 186: /* logical_OR_expression: logical_OR_expression BARBAR logical_AND_expression  */
 #line 911 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = YY(makeNode(N_EXP_OR, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
+    }
+#line 3024 "y.tab.c"
+    break;
+
+  case 189: /* assignment_expression: conditional_expression  */
+#line 923 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+    {
+      yyval = yyvsp[0];
+    }
+#line 3032 "y.tab.c"
+    break;
+
+  case 190: /* assignment_expression: unary_expression ASSIGN assignment_expression  */
+#line 927 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = YY(makeNode(N_EXP_ASSIGN, PTR(A_NODE, yyvsp[-2]), NULL, PTR(A_NODE, yyvsp[0])));
     }
-#line 2986 "y.tab.c"
+#line 3040 "y.tab.c"
     break;
 
   case 193: /* expression: comma_expression  */
-#line 923 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 939 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
     {
       yyval = yyvsp[0];
       expression_root = PTR(A_NODE, yyvsp[0]);
     }
-#line 2995 "y.tab.c"
+#line 3049 "y.tab.c"
     break;
 
 
-#line 2999 "y.tab.c"
+#line 3053 "y.tab.c"
 
       default: break;
     }
@@ -3188,7 +3242,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 932 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
+#line 948 "C:\\Users\\egod1\\proj\\compiler\\w4\\c.y"
 
 int yyerror(const char *s) {
   logMsg(LOG_ERROR, "Syntax error at line %d: %s", line_no, s);

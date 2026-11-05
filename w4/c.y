@@ -143,23 +143,39 @@ declaration_specifiers
       $$ = YY(makeSpecifier(NULL, (S_KIND)$1));
     }
     | type_qualifier
+    {
+      semanticError("Type type_qualifier are not suuported");
+      $$ = YY(NULL);
+    }
     | type_specifier declaration_specifiers
     {
       $$ = YY(updateSpecifier(PTR(A_SPECIFIER, $2), PTR(A_TYPE, $1), S_NULL));
     }
     | storage_class_specifier declaration_specifiers
     {
-      $$ = YY(updateSpecifier(PTR(A_SPECIFIER, $2), PTR(A_TYPE, $1), S_NULL));
+      $$ = YY(updateSpecifier(PTR(A_SPECIFIER, $2), NULL, (S_KIND)$1));
     }
     | type_qualifier declaration_specifiers
+    {
+      semanticError("Type type_qualifier are not suuported");
+      $$ = $2;
+    }
     ;
 
 storage_class_specifier
-    : AUTO_SYM
-    | STATIC_SYM
-    | TYPEDEF_SYM
+    : AUTO_SYM { $$ = YY(S_AUTO); }
+    | STATIC_SYM { $$ = YY(S_STATIC); }
+    | TYPEDEF_SYM { $$ = YY(S_TYPEDEF); }
     | REGISTER_SYM
+    {
+      semanticError("register is not supported");
+      $$ = YY(S_NULL);
+    }
     | EXTERN_SYM
+    {
+      semanticError("extern is not supported");
+      $$ = YY(S_NULL);
+    }
     ;
 
 type_qualifier

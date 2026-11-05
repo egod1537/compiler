@@ -2262,6 +2262,10 @@ int checkIdentifier(char *s) {
       return TYPE_IDENTIFIER;
   }
 
+  A_ID *id = searchIdentifier(s);
+  if (id != NULL && id->kind == ID_TYPE)
+    return TYPE_IDENTIFIER;
+
   return IDENTIFIER;
 }
 
