@@ -52,4 +52,5 @@ A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *body);
 A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier);
 
 A_ID *getIdentifierDeclared(const char *name);
+A_ID *makeDummyIdentifier(void);
 #endif // !SEMANTIC_H

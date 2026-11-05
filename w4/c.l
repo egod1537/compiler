@@ -6,6 +6,7 @@ ws          {delim}+
 
 %{
 #include "parse_value.h"
+#include "semantic.h"
 #include "y.tab.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -113,7 +114,10 @@ volatile                    { return (VOLATILE_SYM); }
 {letter}({letter}|{digit})* {
   int token = checkIdentifier(yytext);
 
-  if (token == IDENTIFIER) {
+  if (token == TYPE_IDENTIFIER) {
+    A_ID *id = searchIdentifier(yytext);
+    yylval = YY(id != NULL ? id->type : NULL);
+  } else {
     char *name = malloc(strlen(yytext) + 1);
 
     if (name == NULL) {

@@ -470,3 +470,5 @@ A_ID *getIdentifierDeclared(const char *name) {
 
   return id;
 }
+
+A_ID *makeDummyIdentifier(void) { return makeIdentifier(""); }
