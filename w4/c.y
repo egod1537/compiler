@@ -398,10 +398,18 @@ direct_declarator
       $$ = YY(setDeclaratorElementType(PTR(A_ID, $1),
                                        setTypeExpr(makeType(T_ARRAY), PTR(A_NODE, $3))));
     }
-    | direct_declarator LP parameter_type_list_opt RP
+    | direct_declarator LP
     {
-      $$ = YY(setDeclaratorElementType(PTR(A_ID, $1),
-                                       setTypeField(makeType(T_FUNC), PTR(A_ID, $3))));
+      enterScope();
+    }
+      parameter_type_list_opt RP
+    {
+      A_ID *params = PTR(A_ID, $4);
+
+      $$ = YY(
+          setDeclaratorElementType(PTR(A_ID, $1), setTypeField(makeType(T_FUNC), params)));
+
+      leaveScope();
     }
     ;
 
