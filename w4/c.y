@@ -1,5 +1,5 @@
 /* ============================================================
- * 1. Declarations & Parser Configuration
+ * 1. 선언 및 파서 설정
  * ============================================================ */
 %{
 #include "parse_value.h"
@@ -45,10 +45,10 @@ A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right);
 %%
 
 /* ============================================================
- * 2. Program & Function Definitions
+ * 2. 프로그램 및 함수 정의
  * ============================================================ */
 
-/* 2.1 Program root and translation units */
+/* 2.1 프로그램 루트 및 번역 단위 */
 
 program
     : translation_unit
@@ -74,7 +74,7 @@ external_declaration
     | declaration { $$ = $1; }
     ;
 
-/* 2.2 Function definitions and function-scope setup */
+/* 2.2 함수 정의 및 함수 스코프 설정 */
 
 function_definition
     : declaration_specifiers declarator
@@ -131,10 +131,10 @@ function_definition
     ;
 
 /* ============================================================
- * 3. Declarations & Type Specifiers
+ * 3. 선언 및 타입 지정자
  * ============================================================ */
 
-/* 3.1 General declarations, specifiers, and declarator lists */
+/* 3.1 일반 선언, 지정자 및 선언자 목록 */
 
 declaration_list_opt
     :
@@ -247,7 +247,7 @@ type_specifier
     }
     ;
 
-/* 3.2 Structure and union specifiers */
+/* 3.2 구조체 및 공용체 지정자 */
 
 struct_specifier
     : struct_or_union IDENTIFIER
@@ -318,7 +318,7 @@ struct_declarator
     }
     ;
 
-/* 3.3 Enumeration specifiers and enumerators */
+/* 3.3 열거형 지정자 및 열거자 */
 
 enum_specifier
     : ENUM_SYM IDENTIFIER
@@ -368,10 +368,10 @@ enumerator
     ;
 
 /* ============================================================
- * 4. Declarators & Parameters
+ * 4. 선언자 및 매개변수
  * ============================================================ */
 
-/* 4.1 Declarators, pointers, and qualifiers */
+/* 4.1 선언자, 포인터 및 한정자 */
 
 declarator
     : pointer direct_declarator
@@ -405,7 +405,7 @@ type_qualifier_list
     | type_qualifier_list type_qualifier
     ;
 
-/* 4.2 Direct declarators and array bounds */
+/* 4.2 직접 선언자 및 배열 크기 */
 
 direct_declarator
     : IDENTIFIER
@@ -452,7 +452,7 @@ constant_expression_opt
     }
     ;
 
-/* 4.3 Formal parameters and abstract declarators */
+/* 4.3 형식 매개변수 및 추상 선언자 */
 
 parameter_type_list_opt
     :
@@ -551,7 +551,7 @@ direct_abstract_declarator
     }
     ;
 
-/* 4.4 Initializers */
+/* 4.4 초기화 */
 
 initializer
     : assignment_expression
@@ -585,10 +585,10 @@ initializer_list
     ;
 
 /* ============================================================
- * 5. Statements
+ * 5. 문장
  * ============================================================ */
 
-/* 5.1 Statement dispatch, scoped blocks, and labels */
+/* 5.1 문장 분기, 스코프 블록 및 레이블 */
 
 statement
     : labeled_statement { $$ = $1; }
@@ -636,7 +636,7 @@ labeled_statement
     }
     ;
 
-/* 5.2 Compound statements and statement lists */
+/* 5.2 복합문 및 문장 목록 */
 
 compound_statement
     : LR declaration_list_opt statement_list_opt RR
@@ -681,7 +681,7 @@ statement_list
     }
     ;
 
-/* 5.3 Expression statements */
+/* 5.3 수식문 */
 
 expression_statement
     : SEMICOLON
@@ -694,7 +694,7 @@ expression_statement
     }
     ;
 
-/* 5.4 Selection statements: if, if-else, switch */
+/* 5.4 선택문: if, if-else, switch */
 
 selection_statement
     : IF_SYM LP expression RP statement %prec LOWER_THAN_ELSE
@@ -711,7 +711,7 @@ selection_statement
     }
     ;
 
-/* 5.5 Iteration statements: while, do-while, for */
+/* 5.5 반복문: while, do-while, for */
 
 iteration_statement
     : WHILE_SYM LP expression RP statement
@@ -746,7 +746,7 @@ for_expression
     }
     ;
 
-/* 5.6 Jump statements: return, continue, break, goto */
+/* 5.6 점프문: return, continue, break, goto */
 
 jump_statement
     : RETURN_SYM expression_opt SEMICOLON
@@ -771,10 +771,10 @@ jump_statement
     ;
 
 /* ============================================================
- * 6. Expressions
+ * 6. 수식
  * ============================================================ */
 
-/* 6.1 Primary, postfix, and argument-list expressions */
+/* 6.1 기본, 후위 및 인수 목록 수식 */
 
 primary_expression
     : IDENTIFIER
@@ -863,7 +863,7 @@ arg_expression_list
     }
     ;
 
-/* 6.2 Unary, cast, and type-name expressions */
+/* 6.2 단항, 캐스트 및 타입 이름 수식 */
 
 unary_expression
     : postfix_expression
@@ -931,7 +931,7 @@ type_name
     }
     ;
 
-/* 6.3 Multiplicative, additive, and shift expressions */
+/* 6.3 곱셈, 덧셈 및 시프트 수식 */
 
 multiplicative_expression
     : cast_expression
@@ -981,7 +981,7 @@ shift_expression
     }
     ;
 
-/* 6.4 Relational and equality expressions */
+/* 6.4 관계 및 동등 수식 */
 
 relational_expression
     : shift_expression
@@ -1021,7 +1021,7 @@ equality_expression
     }
     ;
 
-/* 6.5 Bitwise and logical expressions */
+/* 6.5 비트 및 논리 수식 */
 
 AND_expression
     : equality_expression { $$ = $1; }
@@ -1066,7 +1066,7 @@ logical_OR_expression
     }
     ;
 
-/* 6.6 Conditional, assignment, and comma expressions */
+/* 6.6 조건, 대입 및 콤마 수식 */
 
 conditional_expression
     : logical_OR_expression
@@ -1103,7 +1103,7 @@ comma_expression
     }
     ;
 
-/* 6.7 Expression roots and constant expressions */
+/* 6.7 수식 루트 및 상수 수식 */
 
 expression
     : comma_expression
@@ -1119,7 +1119,7 @@ constant_expression
 %%
 
 /* ============================================================
- * 7. Supporting C Functions
+ * 7. 보조 C 함수
  * ============================================================ */
 
 int yyerror(const char *s) {
