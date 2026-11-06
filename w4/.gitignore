@@ -12,4 +12,4 @@
 /y.tab.h
 
 # Test build output
-/tests/bin/
+/tests/sem/bin/

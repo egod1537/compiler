@@ -9,7 +9,7 @@
 #include "logger.h"
 #include "semantic.h"
 #include "syntax_tree.h"
-#include "tests/ast_assert.h"
+#include "tests/ast/ast_assert.h"
 #include "type.h"
 
 int yylex(void);

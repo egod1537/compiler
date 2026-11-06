@@ -1,6 +1,23 @@
 # AST parser cases
 
-이 디렉터리의 파일은 5장 지원 문법 안에서 각 문법 요소를 독립적으로 파싱하기 위한 입력이다.
+이 디렉터리는 AST/parser 테스트에 필요한 파일을 함께 관리한다.
+
+- `cases/`: 문법 요소별 AST 입력 TC
+- `expected/`: 수동 작성 기대 AST와 구조화된 JSON
+- `valid/`: 파싱에 성공해야 하는 통합 입력
+- `invalid/`: 문법 오류가 발생해야 하는 통합 입력
+- `ast.c`: AST 테스트 parser 실행 진입점
+- `ast_options.c`: CLI 테스트 모드 처리
+- `ast_expression.c`: 표현식 AST 테스트 실행
+- `ast_declaration.c`: 선언·타입 AST 테스트 실행
+- `ast_statement.c`: 문장·제어 흐름 AST 테스트 실행
+- `ast_runner.h`: AST 테스트 실행기 공통 선언
+- `ast_assert.c`, `ast_assert.h`: parser에 연결되는 AST assertion 코드
+- `run.sh`: `valid/`와 `invalid/`를 실행하는 Unix 테스트 러너
+- `check.cmd`, `check.ps1`, `checker.ps1`: 기대 AST 비교 도구
+- `checker_tests.ps1`: AST 비교기 자체의 회귀 테스트
+
+`cases/`의 파일은 5장 지원 문법 안에서 각 문법 요소를 독립적으로 파싱하기 위한 입력이다.
 `Parsing success`는 문법 인식 성공만 뜻하며, 기대 AST가 만들어졌다는 뜻은 아니다.
 
 현재 `c.y`에는 `INTEGER_CONSTANT`의 `N_EXP_INT_CONST` 생성 액션만 있다. 따라서 01번도
@@ -30,5 +47,18 @@
 각 파일은 다음처럼 개별 실행한다.
 
 ```powershell
-.\parser.cmd tests/ast/01_integer.c
+.\parser.cmd tests/ast/cases/01_integer.c
+```
+
+Unix에서 parser 통합 테스트를 실행한다.
+
+```sh
+make test-ast
+```
+
+Windows에서 기대 AST를 비교한다.
+
+```powershell
+.\tests\ast\check.cmd 24
+.\tests\ast\check.cmd --all
 ```
