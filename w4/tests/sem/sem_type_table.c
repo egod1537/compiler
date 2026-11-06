@@ -5,19 +5,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-void SEM_testMakeType(void) {
+void SEM_01_MakeType(void) {
   A_TYPE *t = makeType(T_POINTER);
 
   assert(t != NULL);
   assert(t->kind == T_POINTER);
   assert(t->element_type == NULL);
 
-  printf("makeType test passed\n");
 
   free(t);
 }
 
-void SEM_testSetTypeElementType(void) {
+void SEM_06_SetTypeElementType(void) {
   A_TYPE *int_type = makeType(T_ENUM);
   A_TYPE *pointer1 = makeType(T_POINTER);
   A_TYPE *pointer2 = makeType(T_POINTER);
@@ -53,10 +52,9 @@ void SEM_testSetTypeElementType(void) {
   free(pointer1);
   free(int_type);
 
-  printf("testSetTypeElementType passed\n");
 }
 
-void SEM_testSetTypeExpr(void) {
+void SEM_08_SetTypeExpr(void) {
   A_TYPE *array = makeType(T_ARRAY);
 
   A_NODE size_expr = {0};
@@ -91,10 +89,9 @@ void SEM_testSetTypeExpr(void) {
   free(int_type);
   free(array);
 
-  printf("testSetTypeExpr passed\n");
 }
 
-void SEM_testSetTypeField(void) {
+void SEM_09_SetTypeField(void) {
   assert(current_id == NULL);
   assert(current_level == 0);
 
@@ -151,6 +148,5 @@ void SEM_testSetTypeField(void) {
   current_id = NULL;
   current_level = 0;
 
-  printf("testSetTypeField passed\n");
 }
 

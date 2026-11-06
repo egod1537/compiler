@@ -3,11 +3,12 @@
 #include "../../logger.h"
 #include "../../parse_value.h"
 #include "../../semantic.h"
+#include "../../syntax_tree.h"
 
 #include <stdint.h>
 #include <string.h>
 
-void AST_checkPrecedence(A_NODE *node) {
+void AST_03_Precedence(A_NODE *node) {
   if (node == NULL || node->name != N_EXP_ADD)
     semanticError("Expected N_EXP_ADD");
 
@@ -33,7 +34,7 @@ void AST_checkPrecedence(A_NODE *node) {
   logMsg(LOG_SUCCESS, "AST precedence test passed");
 }
 
-void AST_checkParentheses(A_NODE *root) {
+void AST_04_Parentheses(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_MUL)
     semanticError("Expected N_EXP_MUL root");
 
@@ -60,7 +61,7 @@ void AST_checkParentheses(A_NODE *root) {
   logMsg(LOG_SUCCESS, "AST parentheses test passed");
 }
 
-void AST_checkIdentifierAST(A_NODE *root) {
+void AST_05_Identifier(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_IDENT)
     semanticError("Expected N_EXP_IDENT");
 
@@ -81,7 +82,7 @@ void AST_checkIdentifierAST(A_NODE *root) {
   logMsg(LOG_INFO, "AST identifier test passed");
 }
 
-void AST_checkPointerDeclaration(void) {
+void AST_14_PointerDeclaration(void) {
   A_ID *p = searchIdentifier("p");
   A_ID *pp = searchIdentifier("pp");
 
@@ -108,7 +109,7 @@ void AST_checkPointerDeclaration(void) {
   logMsg(LOG_INFO, "AST pointer declaration test passed");
 }
 
-void AST_checkPointerDereference(A_NODE *root) {
+void AST_12_PointerDereference(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_STAR)
     semanticError("Expected N_EXP_STAR");
 
@@ -135,7 +136,7 @@ void AST_checkPointerDereference(A_NODE *root) {
   logMsg(LOG_INFO, "AST pointer dereference test passed");
 }
 
-void AST_checkAddressOf(A_NODE *root) {
+void AST_15_AddressOf(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_AMP)
     semanticError("Expected N_EXP_AMP");
 
@@ -161,7 +162,7 @@ void AST_checkAddressOf(A_NODE *root) {
   logMsg(LOG_INFO, "AST address-of test passed");
 }
 
-void AST_checkUnaryMinus(A_NODE *root) {
+void AST_16_UnaryMinus(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_MINUS)
     semanticError("Expected N_EXP_MINUS");
 
@@ -179,7 +180,7 @@ void AST_checkUnaryMinus(A_NODE *root) {
   logMsg(LOG_INFO, "AST unary minus test passed");
 }
 
-void AST_checkLogicalNot(A_NODE *root) {
+void AST_17_LogicalNot(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_NOT)
     semanticError("Expected N_EXP_NOT");
 
@@ -197,7 +198,7 @@ void AST_checkLogicalNot(A_NODE *root) {
   logMsg(LOG_INFO, "AST logical NOT test passed");
 }
 
-void AST_checkPreIncrement(A_NODE *root) {
+void AST_18_PreIncrement(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_PRE_INC)
     semanticError("Expected N_EXP_PRE_INC");
 
@@ -223,7 +224,7 @@ void AST_checkPreIncrement(A_NODE *root) {
   logMsg(LOG_INFO, "AST pre-increment test passed");
 }
 
-void AST_checkPreDecrement(A_NODE *root) {
+void AST_19_PreDecrement(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_PRE_DEC)
     semanticError("Expected N_EXP_PRE_DEC");
 
@@ -249,7 +250,7 @@ void AST_checkPreDecrement(A_NODE *root) {
   logMsg(LOG_INFO, "AST pre-decrement test passed");
 }
 
-void AST_checkPostIncrement(A_NODE *root) {
+void AST_20_PostIncrement(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_POST_INC)
     semanticError("Expected N_EXP_POST_INC");
 
@@ -275,7 +276,7 @@ void AST_checkPostIncrement(A_NODE *root) {
   logMsg(LOG_INFO, "AST post-increment test passed");
 }
 
-void AST_checkPostDecrement(A_NODE *root) {
+void AST_21_PostDecrement(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_POST_DEC)
     semanticError("Expected N_EXP_POST_DEC");
 
@@ -301,7 +302,7 @@ void AST_checkPostDecrement(A_NODE *root) {
   logMsg(LOG_INFO, "AST post-decrement test passed");
 }
 
-void AST_checkArrayAccess(A_NODE *root) {
+void AST_22_ArrayAccess(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_ARRAY)
     semanticError("Expected N_EXP_ARRAY");
 
@@ -340,7 +341,7 @@ void AST_checkArrayAccess(A_NODE *root) {
 
   logMsg(LOG_INFO, "AST array access test passed");
 }
-void AST_checkArrayDeclaration(void) {
+void AST_23_ArrayDeclaration(void) {
   A_ID *id = searchIdentifier("a");
 
   if (id == NULL)
@@ -367,7 +368,7 @@ void AST_checkArrayDeclaration(void) {
 
   logMsg(LOG_INFO, "AST array declaration test passed");
 }
-void AST_checkFunctionDeclarator(void) {
+void AST_59_FunctionDeclarator(void) {
   A_ID *id = searchIdentifier("f");
 
   if (id == NULL)
@@ -390,7 +391,62 @@ void AST_checkFunctionDeclarator(void) {
   logMsg(LOG_INFO, "AST function declarator test passed");
 }
 
-void AST_checkFunctionParameters(void) {
+void AST_24_FunctionPrototype(void) {
+  if (program_root == NULL || program_root->name != N_PROGRAM)
+    semanticError("Expected N_PROGRAM");
+
+  A_ID *add = PTR(A_ID, program_root->clink);
+  A_ID *main_id = add != NULL ? add->link : NULL;
+
+  if (add == NULL || main_id == NULL || main_id->link != NULL)
+    semanticError("Invalid global function list");
+
+  if (strcmp(add->name, "add") != 0 || add->kind != ID_FUNC || add->level != 0)
+    semanticError("Invalid add prototype");
+
+  A_TYPE *add_type = add->type;
+  if (add_type == NULL || add_type->kind != T_FUNC ||
+      add_type->element_type != int_type || add_type->expr != NULL)
+    semanticError("Invalid add function type");
+
+  A_ID *a = add_type->field;
+  A_ID *b = a != NULL ? a->link : NULL;
+  if (a == NULL || b == NULL || b->link != NULL || strcmp(a->name, "a") != 0 ||
+      strcmp(b->name, "b") != 0 || a->kind != ID_PARM || b->kind != ID_PARM ||
+      a->level != 1 || b->level != 1 || a->type != int_type || b->type != int_type)
+    semanticError("Invalid add prototype parameters");
+
+  if (strcmp(main_id->name, "main") != 0 || main_id->kind != ID_FUNC ||
+      main_id->level != 0)
+    semanticError("Invalid main definition");
+
+  A_TYPE *main_type = main_id->type;
+  if (main_type == NULL || main_type->kind != T_FUNC ||
+      main_type->element_type != int_type || main_type->expr == NULL ||
+      main_type->expr->name != N_STMT_COMPOUND)
+    semanticError("Invalid main function type");
+
+  A_ID *void_parameter = main_type->field;
+  if (void_parameter == NULL || void_parameter->link != NULL ||
+      void_parameter->name == NULL || void_parameter->name[0] != '\0' ||
+      void_parameter->kind != ID_PARM || void_parameter->type != void_type)
+    semanticError("Invalid main void parameter");
+
+  A_NODE *statements = main_type->expr->rlink;
+  A_NODE *return_statement = statements != NULL ? statements->llink : NULL;
+  A_NODE *return_value = return_statement != NULL ? return_statement->clink : NULL;
+
+  if (statements == NULL || statements->name != N_STMT_LIST ||
+      statements->rlink == NULL || statements->rlink->name != N_STMT_LIST_NIL ||
+      return_statement == NULL || return_statement->name != N_STMT_RETURN ||
+      return_value == NULL || return_value->name != N_EXP_INT_CONST ||
+      (intptr_t)return_value->clink != 0)
+    semanticError("Invalid main function body");
+
+  logMsg(LOG_INFO, "AST function prototype test passed");
+}
+
+void AST_25_FunctionParameters(void) {
   A_ID *func = searchIdentifier("add");
 
   if (func == NULL || func->kind != ID_FUNC)
@@ -422,7 +478,7 @@ void AST_checkFunctionParameters(void) {
   logMsg(LOG_INFO, "AST function parameters test passed");
 }
 
-void AST_checkReturn(A_NODE *root) {
+void AST_01_Return(A_NODE *root) {
   if (root == NULL || root->name != N_STMT_RETURN)
     semanticError("Expected N_STMT_RETURN");
 
@@ -439,7 +495,7 @@ void AST_checkReturn(A_NODE *root) {
 
   logMsg(LOG_INFO, "AST return test passed");
 }
-void AST_checkCompoundReturn(A_NODE *root) {
+void AST_43_CompoundReturn(A_NODE *root) {
   if (root == NULL || root->name != N_STMT_COMPOUND)
     semanticError("Expected N_STMT_COMPOUND");
 
@@ -470,7 +526,7 @@ void AST_checkCompoundReturn(A_NODE *root) {
   logMsg(LOG_INFO, "AST compound return test passed");
 }
 
-void AST_checkFunctionScope(void) {
+void AST_25_FunctionScope(void) {
   A_ID *func = searchIdentifier("add");
 
   if (func == NULL || func->kind != ID_FUNC)
@@ -520,7 +576,7 @@ void AST_checkFunctionScope(void) {
 
   logMsg(LOG_INFO, "AST function scope test passed");
 }
-void AST_checkBlockShadowing(void) {
+void AST_44_BlockShadowing(void) {
   A_ID *global = searchIdentifier("x");
   A_ID *func = searchIdentifier("main");
 
@@ -583,7 +639,7 @@ void AST_checkBlockShadowing(void) {
   logMsg(LOG_INFO, "AST block shadowing test passed");
 }
 
-void AST_checkAssignment(void) {
+void AST_27_Assignment(void) {
   A_ID *func = searchIdentifier("main");
 
   if (func == NULL || func->type == NULL)
@@ -637,7 +693,7 @@ void AST_checkAssignment(void) {
 
   logMsg(LOG_INFO, "AST assignment test passed");
 }
-void AST_checkComparison(A_NODE *root, NODE_NAME expected, int lhs, int rhs) {
+void AST_29_Comparison(A_NODE *root, NODE_NAME expected, int lhs, int rhs) {
   if (root == NULL || root->name != expected)
     semanticError("Incorrect comparison node");
 
@@ -658,7 +714,7 @@ void AST_checkComparison(A_NODE *root, NODE_NAME expected, int lhs, int rhs) {
 
   logMsg(LOG_INFO, "AST comparison test passed");
 }
-static void AST_checkIntValue(A_NODE *node, int value) {
+static void assertIntValue(A_NODE *node, int value) {
   if (node == NULL || node->name != N_EXP_INT_CONST)
     semanticError("Expected N_EXP_INT_CONST");
 
@@ -666,7 +722,7 @@ static void AST_checkIntValue(A_NODE *node, int value) {
     semanticError("Incorrect integer value");
 }
 
-void AST_checkLogical(A_NODE *root, int mode) {
+void AST_33_Logical(A_NODE *root, int mode) {
   NODE_NAME expected = mode == 1 ? N_EXP_AND : N_EXP_OR;
 
   if (root == NULL || root->name != expected)
@@ -676,21 +732,21 @@ void AST_checkLogical(A_NODE *root, int mode) {
     semanticError("Invalid logical AST structure");
 
   if (mode == 1) {
-    AST_checkIntValue(root->llink, 1);
-    AST_checkIntValue(root->rlink, 0);
+    assertIntValue(root->llink, 1);
+    assertIntValue(root->rlink, 0);
   } else if (mode == 2) {
-    AST_checkIntValue(root->llink, 0);
-    AST_checkIntValue(root->rlink, 1);
+    assertIntValue(root->llink, 0);
+    assertIntValue(root->rlink, 1);
   } else if (mode == 3) {
-    AST_checkIntValue(root->llink, 1);
+    assertIntValue(root->llink, 1);
 
     A_NODE *and = root->rlink;
 
     if (and== NULL || and->name != N_EXP_AND || and->clink != NULL)
       semanticError("Incorrect logical precedence");
 
-    AST_checkIntValue(and->llink, 0);
-    AST_checkIntValue(and->rlink, 1);
+    assertIntValue(and->llink, 0);
+    assertIntValue(and->rlink, 1);
   } else {
     semanticError("Unknown logical test mode");
   }
@@ -717,7 +773,7 @@ static A_NODE *AST_nthStatement(A_NODE *body, int n) {
   return list->llink;
 }
 
-void AST_checkSelection(int mode) {
+void AST_36_Selection(int mode) {
   A_ID *func = searchIdentifier("main");
 
   if (func == NULL || func->type == NULL)
@@ -788,7 +844,7 @@ static A_NODE *AST_iterationStatement(A_NODE *body, int index) {
   return list->llink;
 }
 
-void AST_checkIteration(int mode) {
+void AST_38_Iteration(int mode) {
   A_ID *func = searchIdentifier("main");
 
   if (func == NULL || func->type == NULL)
@@ -834,7 +890,7 @@ void AST_checkIteration(int mode) {
   logMsg(LOG_INFO, "AST iteration test passed");
 }
 
-void AST_checkBreakContinue(void) {
+void AST_41_BreakContinue(void) {
   A_ID *func = searchIdentifier("main");
 
   if (func == NULL || func->type == NULL)
@@ -889,7 +945,7 @@ void AST_checkBreakContinue(void) {
 
   logMsg(LOG_INFO, "AST break/continue test passed");
 }
-void AST_checkVoidReturn(void) {
+void AST_42_VoidReturn(void) {
   A_ID *func = searchIdentifier("done");
 
   if (func == NULL || func->kind != ID_FUNC)
@@ -923,7 +979,7 @@ void AST_checkVoidReturn(void) {
   logMsg(LOG_INFO, "AST void return test passed");
 }
 
-void AST_checkFunctionCall(void) {
+void AST_26_FunctionCall(void) {
   A_ID *func = searchIdentifier("main");
   A_ID *add = searchIdentifier("add");
 
@@ -976,7 +1032,7 @@ void AST_checkFunctionCall(void) {
   logMsg(LOG_INFO, "AST function call test passed");
 }
 
-void AST_checkSizeofExpression(void) {
+void AST_50_SizeofExpression(void) {
   A_ID *func = searchIdentifier("main");
 
   if (func == NULL || func->type == NULL)
@@ -1016,7 +1072,7 @@ void AST_checkSizeofExpression(void) {
   logMsg(LOG_INFO, "AST sizeof expression test passed");
 }
 
-void AST_checkSizeofType(void) {
+void AST_51_SizeofType(void) {
   A_ID *func = searchIdentifier("main");
 
   if (func == NULL || func->type == NULL)
@@ -1053,7 +1109,7 @@ void AST_checkSizeofType(void) {
 
   logMsg(LOG_INFO, "AST sizeof type test passed");
 }
-void AST_checkCastExpression(void) {
+void AST_52_CastExpression(void) {
   A_ID *func = searchIdentifier("main");
 
   if (func == NULL || func->type == NULL)
@@ -1100,7 +1156,7 @@ void AST_checkCastExpression(void) {
   logMsg(LOG_INFO, "AST cast expression test passed");
 }
 
-void AST_checkSwitch(void) {
+void AST_63_Switch(void) {
   A_ID *func = searchIdentifier("main");
 
   if (func == NULL || func->type == NULL)
@@ -1169,7 +1225,7 @@ void AST_checkSwitch(void) {
   logMsg(LOG_INFO, "AST switch test passed");
 }
 
-void AST_checkCharString(void) {
+void AST_62_CharString(void) {
   A_ID *func = searchIdentifier("main");
 
   if (func == NULL || func->type == NULL)
@@ -1228,7 +1284,7 @@ void AST_checkCharString(void) {
 
   logMsg(LOG_INFO, "AST character/string test passed");
 }
-void AST_checkProgram(A_NODE *root) {
+void AST_58_Program(A_NODE *root) {
   if (root == NULL || root->name != N_PROGRAM)
     semanticError("Expected N_PROGRAM");
 
@@ -1256,7 +1312,7 @@ void AST_checkProgram(A_NODE *root) {
 
   logMsg(LOG_INFO, "AST program root test passed");
 }
-void AST_checkStruct(int mode) {
+void AST_46_Struct(int mode) {
   if (current_level != 0)
     semanticError("Struct declaration changed current scope level");
 

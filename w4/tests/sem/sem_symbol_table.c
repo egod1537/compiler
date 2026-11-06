@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void SEM_testMakeIdentifier(void) {
+void SEM_02_MakeIdentifier(void) {
   A_ID *a = makeIdentifier("a");
   A_ID *b = makeIdentifier("b");
 
@@ -16,13 +16,12 @@ void SEM_testMakeIdentifier(void) {
   assert(a->prev == NULL);
   assert(a->link == NULL);
 
-  printf("makeIdentifier test passed\n");
 
   free(a);
   free(b);
 }
 
-void SEM_testSearchIdentifier(void) {
+void SEM_03_SearchIdentifier(void) {
   current_id = NULL;
   current_level = 0;
 
@@ -41,7 +40,6 @@ void SEM_testSearchIdentifier(void) {
   A_ID *duplicate_x = makeIdentifier("x");
   assert(searchIdentifierAtCurrentLevel("x", duplicate_x->prev) == local_x);
 
-  printf("searchIdentifier test passed\n");
 
   A_ID *id = current_id;
   while (id != NULL) {
@@ -55,7 +53,7 @@ void SEM_testSearchIdentifier(void) {
   current_level = 0;
 }
 
-void SEM_testLinkDeclaratorList(void) {
+void SEM_05_LinkDeclaratorList(void) {
   assert(current_id == NULL);
   assert(current_level == 0);
 
@@ -93,10 +91,9 @@ void SEM_testLinkDeclaratorList(void) {
 
   current_id = NULL;
 
-  printf("testLinkDeclaratorList passed\n");
 }
 
-void SEM_testInitialize(void) {
+void SEM_13_Initialize(void) {
   assert(current_id == NULL);
   assert(current_level == 0);
   assert(int_type == NULL);
@@ -178,6 +175,5 @@ void SEM_testInitialize(void) {
   float_type = NULL;
   int_type = NULL;
 
-  printf("testInitialize passed\n");
 }
 

@@ -28,5 +28,5 @@ if errorlevel 1 (
     exit /b %errorlevel%
 )
 
-"%SEM_EXE%"
+"%SEM_EXE%" %*
 exit /b %errorlevel%

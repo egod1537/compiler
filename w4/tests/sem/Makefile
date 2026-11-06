@@ -1,4 +1,5 @@
 CC ?= cc
+TEST ?=
 
 ROOT := ../..
 TARGET := bin/sem_tests
@@ -26,11 +27,11 @@ CFLAGS ?= -Wall -Wextra -std=c11 -g3 -O0 -fno-omit-frame-pointer
 all: $(TARGET)
 
 $(TARGET): $(TEST_SOURCES) $(PROJECT_SOURCES) $(HEADERS)
-	mkdir -p $(@D)
-	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(TEST_SOURCES) $(PROJECT_SOURCES) -o $@ $(LDLIBS)
+	@mkdir -p $(@D)
+	@$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $(TEST_SOURCES) $(PROJECT_SOURCES) -o $@ $(LDLIBS)
 
 test: $(TARGET)
-	./$(TARGET)
+	@./$(TARGET) $(TEST)
 
 clean:
 	rm -f $(TARGET)

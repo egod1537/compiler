@@ -24,6 +24,9 @@ AST/parser cases, assertion code, expected graphs, and runners live under
 
 `ast/valid/` contains inputs that must parse successfully. `ast/invalid/`
 contains inputs that must produce a syntax error.
+`ast/unsupported/` contains extended-language inputs outside the parser's
+current textbook scope; they are kept as future implementation cases and are
+not counted as successful-parser tests.
 
 On Unix-like systems, install a C11 compiler, Bison, Flex, and Make. Then build
 the parser from the project root:
@@ -46,8 +49,30 @@ Run both the parser and semantic test suites with:
 make test
 ```
 
-The runner uses colored output when connected to a terminal. Set `NO_COLOR=1`
-to disable colors.
+All suites use the same optional numbered-test interface. Use `TEST=list` to
+show the stable numbers, `TEST=N` to run one test, or omit `TEST` to run all:
+
+```sh
+make test-sem TEST=list
+make test-sem TEST=4
+make test-ast TEST=4
+make test-ast-expected TEST=4
+```
+
+Selectable C test functions follow one naming rule: `GROUP_NN_Name`.
+
+- `GROUP` is a single uppercase group code: `SEM` for semantic tests, `AST`
+  for AST assertions, or `ASTEXP` for selectable expected-AST tests.
+- `NN` is the suite-local two-digit number used by `TEST=N`.
+- `Name` is a PascalCase description.
+- Examples: `SEM_04_Scope`, `ASTEXP_03_For`.
+
+Shared assertion helpers and test dispatch functions are not independently
+selectable tests, so they do not receive a test number.
+
+The runners use colored output when connected to a terminal. Set
+`NO_COLOR=1` to disable colors or `FORCE_COLOR=1` to force ANSI colors when
+output is redirected.
 
 Run one input directly when debugging:
 

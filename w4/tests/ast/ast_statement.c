@@ -13,11 +13,11 @@ static void AST_runSelectionTest(void) {
     return;
 
   if (strcmp(selection, "if") == 0)
-    AST_checkSelection(1);
+    AST_36_Selection(1);
   else if (strcmp(selection, "ifelse") == 0)
-    AST_checkSelection(2);
+    AST_36_Selection(2);
   else if (strcmp(selection, "nested") == 0)
-    AST_checkSelection(3);
+    AST_36_Selection(3);
   else
     semanticError("Unknown selection test");
 }
@@ -29,31 +29,31 @@ static void AST_runIterationTest(void) {
     return;
 
   if (strcmp(iteration, "while") == 0)
-    AST_checkIteration(1);
+    AST_38_Iteration(1);
   else if (strcmp(iteration, "do") == 0)
-    AST_checkIteration(2);
+    AST_38_Iteration(2);
   else if (strcmp(iteration, "for") == 0)
-    AST_checkIteration(3);
+    AST_38_Iteration(3);
   else
     semanticError("Unknown iteration test");
 }
 
 void AST_runStatementTests(void) {
   if (getenv("AST_TEST_RETURN") != NULL)
-    AST_checkReturn(statement_root);
+    AST_01_Return(statement_root);
 
   if (getenv("AST_TEST_COMPOUND") != NULL)
-    AST_checkCompoundReturn(compound_root);
+    AST_43_CompoundReturn(compound_root);
 
   AST_runSelectionTest();
   AST_runIterationTest();
 
   if (getenv("AST_TEST_BREAK_CONTINUE") != NULL)
-    AST_checkBreakContinue();
+    AST_41_BreakContinue();
 
   if (getenv("AST_TEST_VOID_RETURN") != NULL)
-    AST_checkVoidReturn();
+    AST_42_VoidReturn();
 
   if (getenv("AST_TEST_SWITCH") != NULL)
-    AST_checkSwitch();
+    AST_63_Switch();
 }

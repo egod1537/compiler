@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void SEM_testSetDeclaratorElementType(void) {
+void SEM_07_SetDeclaratorElementType(void) {
   assert(current_id == NULL);
   assert(current_level == 0);
 
@@ -47,10 +47,9 @@ void SEM_testSetDeclaratorElementType(void) {
 
   current_id = NULL;
 
-  printf("testSetDeclaratorElementType passed\n");
 }
 
-void SEM_testMakeSpecifier(void) {
+void SEM_10_MakeSpecifier(void) {
   A_TYPE *int_type = makeType(T_ENUM);
 
   // 1. 타입만 있는 선언: int a;
@@ -96,10 +95,9 @@ void SEM_testMakeSpecifier(void) {
   free(s4);
   free(int_type);
 
-  printf("testMakeSpecifier passed\n");
 }
 
-void SEM_testUpdateSpecifier(void) {
+void SEM_11_UpdateSpecifier(void) {
   A_TYPE *int_type = makeType(T_ENUM);
 
   // 1. 타입만 있는 명시자에 static 추가
@@ -147,10 +145,9 @@ void SEM_testUpdateSpecifier(void) {
   free(s4);
   free(int_type);
 
-  printf("testUpdateSpecifier passed\n");
 }
 
-void SEM_testSetDefaultSpecifier(void) {
+void SEM_12_SetDefaultSpecifier(void) {
   // 아직 initialize()를 구현하지 않았으므로
   // 테스트에서 기본 int 타입을 임시 생성
   int_type = makeType(T_ENUM);
@@ -189,10 +186,9 @@ void SEM_testSetDefaultSpecifier(void) {
 
   int_type = NULL;
 
-  printf("testSetDefaultSpecifier passed\n");
 }
 
-void SEM_testSetDeclaratorListSpecifier(void) {
+void SEM_14_SetDeclaratorListSpecifier(void) {
   assert(current_id == NULL);
   assert(current_level == 0);
   assert(int_type == NULL);
@@ -298,10 +294,9 @@ void SEM_testSetDeclaratorListSpecifier(void) {
   float_type = NULL;
   int_type = NULL;
 
-  printf("testSetDeclaratorListSpecifier passed\n");
 }
 
-void SEM_testSetFunctionDeclaratorSpecifier(void) {
+void SEM_15_SetFunctionDeclaratorSpecifier(void) {
   assert(current_id == NULL);
   assert(current_level == 0);
   assert(int_type == NULL);
@@ -377,10 +372,9 @@ void SEM_testSetFunctionDeclaratorSpecifier(void) {
   free(int_type);
   int_type = NULL;
 
-  printf("testSetFunctionDeclaratorSpecifier passed\n");
 }
 
-void SEM_testSetFunctionDeclaratorBody(void) {
+void SEM_16_SetFunctionDeclaratorBody(void) {
   assert(current_id == NULL);
   assert(current_level == 0);
 
@@ -420,10 +414,9 @@ void SEM_testSetFunctionDeclaratorBody(void) {
 
   current_id = NULL;
 
-  printf("testSetFunctionDeclaratorBody passed\n");
 }
 
-void SEM_testSetParameterDeclaratorSpecifier(void) {
+void SEM_17_SetParameterDeclaratorSpecifier(void) {
   assert(current_id == NULL);
   assert(current_level == 0);
   assert(int_type == NULL);
@@ -527,6 +520,5 @@ void SEM_testSetParameterDeclaratorSpecifier(void) {
   float_type = NULL;
   int_type = NULL;
 
-  printf("testSetParameterDeclaratorSpecifier passed\n");
 }
 

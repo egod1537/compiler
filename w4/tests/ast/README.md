@@ -6,6 +6,7 @@
 - `expected/`: 수동 작성 기대 AST와 구조화된 JSON
 - `valid/`: 파싱에 성공해야 하는 통합 입력
 - `invalid/`: 문법 오류가 발생해야 하는 통합 입력
+- `unsupported/`: 현재 교재 범위를 벗어나 파서가 지원하지 않는 확장 문법 입력
 - `ast.c`: AST 테스트 parser 실행 진입점
 - `ast_options.c`: CLI 테스트 모드 처리
 - `ast_expression.c`: 표현식 AST 테스트 실행
@@ -55,6 +56,28 @@ Unix에서 parser 통합 테스트를 실행한다.
 ```sh
 make test-ast
 ```
+
+`valid/`와 `invalid/`만 자동 테스트 대상이다. 초기화식, 비트 연산, 가변 인자,
+사용자 레이블, 콤마·조건 연산자처럼 현재 구현 범위 밖인 입력은 `unsupported/`에
+분리되어 있으며 성공 테스트로 계산하지 않는다.
+
+수동으로 작성한 기대 AST 검증은 Windows와 Unix 모두 다음 명령으로 실행한다.
+
+```sh
+make test-ast-expected
+```
+
+테스트 번호를 보거나 하나만 실행할 때는 모든 스위트에서 같은 `TEST` 옵션을 쓴다.
+
+```sh
+make test-ast TEST=list
+make test-ast TEST=3
+make test-ast-expected TEST=list
+make test-ast-expected TEST=3
+```
+
+기대 AST 테스트 번호는 코드의 함수명과 직접 대응한다. 예를 들어
+`TEST=3`은 `ASTEXP_03_For()`를 실행한다.
 
 Windows에서 기대 AST를 비교한다.
 

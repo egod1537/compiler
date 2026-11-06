@@ -26,6 +26,7 @@ int main(int argc, char **argv) {
   AST_runExpressionTests(mode);
   AST_runDeclarationTests();
   AST_runStatementTests();
+  AST_runExpectedTest();
 
   const char *ast_print = getenv("AST_PRINT");
 

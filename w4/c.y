@@ -54,9 +54,9 @@ program
     : translation_unit
     {
       checkForwardReference();
-
+    
       program_root = makeNode(N_PROGRAM, NULL, PTR(A_NODE, $1), NULL);
-
+    
       $$ = YY(program_root);
     }
     ;
@@ -80,25 +80,25 @@ function_definition
     : declaration_specifiers declarator
     {
       A_ID *id = setFunctionDeclaratorSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1));
-
+    
       current_id = id;
       enterScope();
-
+    
       for (A_ID *p = id->type->field; p != NULL; p = p->link) {
         if (p->name == NULL || p->name[0] == '\0')
           continue;
-
+    
         p->level = current_level;
         p->prev = current_id;
         current_id = p;
       }
-
+    
       $$ = YY(id);
     }
       compound_statement
     {
       A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $3), PTR(A_NODE, $4));
-
+    
       leaveScope();
       $$ = YY(id);
     }
@@ -106,25 +106,25 @@ function_definition
     {
       A_ID *id =
           setFunctionDeclaratorSpecifier(PTR(A_ID, $1), makeSpecifier(int_type, S_NULL));
-
+    
       current_id = id;
       enterScope();
-
+    
       for (A_ID *p = id->type->field; p != NULL; p = p->link) {
         if (p->name == NULL || p->name[0] == '\0')
           continue;
-
+    
         p->level = current_level;
         p->prev = current_id;
         current_id = p;
       }
-
+    
       $$ = YY(id);
     }
       compound_statement
     {
       A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE, $3));
-
+    
       leaveScope();
       $$ = YY(id);
     }
@@ -255,18 +255,26 @@ struct_specifier
       char *name = PTR(char, $2);
       $$ = YY(setTypeStructOrEnumIdentifier((T_KIND)$1, name, ID_STRUCT));
       free(name);
+    
+      enterScope();
     }
       LR struct_declaration_list RR
     {
+      checkForwardReference();
       $$ = YY(setTypeField(PTR(A_TYPE, $3), PTR(A_ID, $5)));
+      leaveScope();
     }
     | struct_or_union
     {
       $$ = YY(makeType((T_KIND)$1));
+    
+      enterScope();
     }
       LR struct_declaration_list RR
     {
+      checkForwardReference();
       $$ = YY(setTypeField(PTR(A_TYPE, $2), PTR(A_ID, $4)));
+      leaveScope();
     }
     | struct_or_union IDENTIFIER
     {
@@ -357,7 +365,7 @@ enumerator
       char *name = PTR(char, $1);
       A_ID *id = makeIdentifier(name);
       free(name);
-
+    
       $$ = YY(setDeclaratorKind(id, ID_ENUM_LITERAL));
     }
     | IDENTIFIER ASSIGN constant_expression
@@ -411,10 +419,10 @@ direct_declarator
     : IDENTIFIER
     {
       char *name = PTR(char, $1);
-
+    
       A_ID *id = makeIdentifier(name);
       free(name);
-
+    
       $$ = YY(id);
     }
     | LP declarator RP
@@ -433,10 +441,10 @@ direct_declarator
       parameter_type_list_opt RP
     {
       A_ID *params = PTR(A_ID, $4);
-
+    
       $$ = YY(
           setDeclaratorElementType(PTR(A_ID, $1), setTypeField(makeType(T_FUNC), params)));
-
+    
       leaveScope();
     }
     ;
@@ -493,9 +501,9 @@ parameter_declaration
     | declaration_specifiers abstract_declarator_opt
     {
       A_ID *id = makeDummyIdentifier();
-
+    
       setDeclaratorElementType(id, PTR(A_TYPE, $2));
-
+    
       $$ = YY(setParameterDeclaratorSpecifier(id, PTR(A_SPECIFIER, $1)));
     }
     ;
@@ -642,7 +650,7 @@ compound_statement
     : LR declaration_list_opt statement_list_opt RR
     {
       $$ = YY(makeNode(N_STMT_COMPOUND, PTR(A_NODE, $2), NULL, PTR(A_NODE, $3)));
-
+    
       compound_root = PTR(A_NODE, $$);
     }
     ;
@@ -752,7 +760,7 @@ jump_statement
     : RETURN_SYM expression_opt SEMICOLON
     {
       $$ = YY(makeNode(N_STMT_RETURN, NULL, PTR(A_NODE, $2), NULL));
-
+    
       statement_root = PTR(A_NODE, $$);
     }
     | CONTINUE_SYM SEMICOLON
@@ -782,13 +790,13 @@ primary_expression
       char *name = PTR(char, $1);
       A_ID *id = getIdentifierDeclared(name);
       free(name);
-
+    
       $$ = YY(makeNode(N_EXP_IDENT, NULL, PTR(A_NODE, id), NULL));
     }
     | INTEGER_CONSTANT
     {
       $$ = YY(makeNode(N_EXP_INT_CONST, NULL, PTR(A_NODE, $1), NULL));
-
+    
       A_NODE *node = PTR(A_NODE, $$);
       logMsg(LOG_DEBUG, "N_EXP_INT_CONST: %lld", (long long)(intptr_t)node->clink);
     }
@@ -1117,7 +1125,6 @@ constant_expression
     : conditional_expression
     ;
 %%
-
 /* ============================================================
  * 7. 보조 C 함수
  * ============================================================ */

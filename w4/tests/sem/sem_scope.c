@@ -5,16 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 
-void SEM_testScope(void) {
+void SEM_04_Scope(void) {
   assert(current_level == 0);
   assert(current_id == NULL);
 
-  A_ID *a = makeIdentifier("a");
+  A_ID *a = setDeclaratorKind(makeIdentifier("a"), ID_VAR);
 
   enterScope();
   assert(current_level == 1);
 
-  A_ID *b = makeIdentifier("b");
+  A_ID *b = setDeclaratorKind(makeIdentifier("b"), ID_VAR);
 
   assert(current_id == b);
   assert(searchIdentifier("a") == a);
@@ -23,7 +23,7 @@ void SEM_testScope(void) {
   enterScope();
   assert(current_level == 2);
 
-  A_ID *c = makeIdentifier("c");
+  A_ID *c = setDeclaratorKind(makeIdentifier("c"), ID_VAR);
 
   assert(searchIdentifier("c") == c);
 
@@ -50,6 +50,5 @@ void SEM_testScope(void) {
 
   current_id = NULL;
 
-  printf("testScope passed\n");
 }
 
