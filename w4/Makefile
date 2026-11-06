@@ -34,7 +34,7 @@ HEADERS := \
 	tests/ast/ast_expected.h \
 	tests/ast/ast_runner.h
 
-.PHONY: all clean test test-ast test-ast-expected test-ast_expected test-parser test-sem
+.PHONY: all clean print-ast test test-ast test-ast-exp test-parser test-sem
 
 all: $(TARGET)
 
@@ -55,22 +55,23 @@ $(OBJECTS): $(HEADERS)
 test: $(TARGET)
 	@status=0; \
 	$(MAKE) test-ast || status=1; \
-	$(MAKE) test-ast-expected || status=1; \
+	$(MAKE) test-ast-exp || status=1; \
 	$(MAKE) test-sem || status=1; \
 	exit $$status
 
 test-ast: $(TARGET)
 	@bash tests/ast/run.sh ./$(TARGET) $(TEST)
 
-test-ast-expected: $(TARGET)
+test-ast-exp: $(TARGET)
 	@bash tests/ast/run_expected.sh ./$(TARGET) $(TEST)
-
-test-ast_expected: test-ast-expected
 
 test-parser: test-ast
 
 test-sem:
 	@$(MAKE) -C tests/sem test TEST="$(TEST)"
+
+print-ast: $(TARGET)
+	@bash tests/ast/print.sh ./$(TARGET) "$(FILE)"
 
 clean:
 	rm -f $(TARGET) $(OBJECTS) $(GENERATED)

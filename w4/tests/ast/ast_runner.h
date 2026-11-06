@@ -4,7 +4,8 @@
 typedef enum {
   AST_MODE_NONE,
   AST_MODE_PRECEDENCE,
-  AST_MODE_PARENTHESES
+  AST_MODE_PARENTHESES,
+  AST_MODE_PRINT
 } AstTestMode;
 
 int AST_parseTestMode(int argc, char **argv, AstTestMode *mode);

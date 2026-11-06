@@ -9,8 +9,15 @@ int AST_parseTestMode(int argc, char **argv, AstTestMode *mode) {
   if (argc == 1)
     return 1;
 
+  if (argc == 2 && strcmp(argv[1], "--print-ast") == 0) {
+    *mode = AST_MODE_PRINT;
+    return 1;
+  }
+
   if (argc != 3 || strcmp(argv[1], "--ast-test") != 0) {
-    logMsg(LOG_ERROR, "Usage: %s [--ast-test precedence|parentheses]", argv[0]);
+    logMsg(LOG_ERROR,
+           "Usage: %s [--print-ast | --ast-test precedence|parentheses]",
+           argv[0]);
     return 0;
   }
 

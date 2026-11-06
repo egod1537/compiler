@@ -56,7 +56,7 @@ show the stable numbers, `TEST=N` to run one test, or omit `TEST` to run all:
 make test-sem TEST=list
 make test-sem TEST=4
 make test-ast TEST=4
-make test-ast-expected TEST=4
+make test-ast-exp TEST=4
 ```
 
 Selectable C test functions follow one naming rule: `GROUP_NN_Name`.

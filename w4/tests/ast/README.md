@@ -64,7 +64,7 @@ make test-ast
 수동으로 작성한 기대 AST 검증은 Windows와 Unix 모두 다음 명령으로 실행한다.
 
 ```sh
-make test-ast-expected
+make test-ast-exp
 ```
 
 테스트 번호를 보거나 하나만 실행할 때는 모든 스위트에서 같은 `TEST` 옵션을 쓴다.
@@ -72,12 +72,32 @@ make test-ast-expected
 ```sh
 make test-ast TEST=list
 make test-ast TEST=3
-make test-ast-expected TEST=list
-make test-ast-expected TEST=3
+make test-ast-exp TEST=list
+make test-ast-exp TEST=3
 ```
 
 기대 AST 테스트 번호는 코드의 함수명과 직접 대응한다. 예를 들어
 `TEST=3`은 `ASTEXP_03_For()`를 실행한다.
+
+`print.c`의 `print_ast()`로 특정 입력의 전체 트리를 출력하려면 먼저 번호 목록을
+확인한 뒤 번호만 지정할 수 있다.
+
+```sh
+make print-ast FILE=list
+make print-ast FILE=3
+```
+
+기존처럼 입력 파일 경로를 직접 지정하는 방식도 지원한다.
+
+```sh
+make print-ast FILE=tests/ast/cases/03_precedence.c
+```
+
+파서를 직접 실행할 때는 `--print-ast` 옵션을 사용할 수 있다.
+
+```sh
+./parser --print-ast < tests/ast/cases/03_precedence.c
+```
 
 Windows에서 기대 AST를 비교한다.
 

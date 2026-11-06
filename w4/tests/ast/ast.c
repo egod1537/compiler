@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
 
   const char *ast_print = getenv("AST_PRINT");
 
-  if (ast_print != NULL && strcmp(ast_print, "1") == 0)
+  if (mode == AST_MODE_PRINT || (ast_print != NULL && strcmp(ast_print, "1") == 0))
     print_ast(program_root);
 
   return EXIT_SUCCESS;
