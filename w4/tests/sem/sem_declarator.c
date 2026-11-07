@@ -1,4 +1,5 @@
 #include "semantic.h"
+#include "sem_test_support.h"
 #include "type.h"
 #include <assert.h>
 #include <stdio.h>
@@ -202,33 +203,7 @@ void SEM_14_SetDeclaratorListSpecifier(void) {
   // 기본 타입은 공유되므로 여기서 해제하지 않음
   free(p->type);
 
-  // 전역 심볼 체인 해제
-  A_ID *current = current_id;
-
-  while (current != NULL) {
-    A_ID *prev = current->prev;
-
-    if (current->kind == ID_FUNC)
-      free(current->type);
-
-    free(current->name);
-    free(current);
-    current = prev;
-  }
-
-  current_id = NULL;
-
-  free(string_type);
-  free(void_type);
-  free(char_type);
-  free(float_type);
-  free(int_type);
-
-  string_type = NULL;
-  void_type = NULL;
-  char_type = NULL;
-  float_type = NULL;
-  int_type = NULL;
+  semTestResetInitializedState();
 
 }
 
@@ -290,20 +265,7 @@ void SEM_15_SetFunctionDeclaratorSpecifier(void) {
   free(def_spec);
   free(bar_spec);
 
-  A_ID *id = current_id;
-
-  while (id != NULL) {
-    A_ID *prev = id->prev;
-
-    if (id->kind == ID_FUNC)
-      free(id->type);
-
-    free(id->name);
-    free(id);
-    id = prev;
-  }
-
-  current_id = NULL;
+  semTestFreeIdentifierChain();
 
   free(int_type);
   int_type = NULL;
@@ -430,34 +392,7 @@ void SEM_17_SetParameterDeclaratorSpecifier(void) {
   free(a->name);
   free(a);
 
-  // initialize()에서 생성한 전역 심볼 해제
-  A_ID *current = current_id;
-
-  while (current != NULL) {
-    A_ID *prev = current->prev;
-
-    if (current->kind == ID_FUNC)
-      free(current->type);
-
-    free(current->name);
-    free(current);
-    current = prev;
-  }
-
-  current_id = NULL;
-
-  free(string_type);
-  free(void_type);
-  free(char_type);
-  free(float_type);
-  free(int_type);
-
-  string_type = NULL;
-  void_type = NULL;
-  char_type = NULL;
-  float_type = NULL;
-  int_type = NULL;
-  syntax_err = 0;
+  semTestResetInitializedState();
 
 }
 

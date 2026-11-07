@@ -8,6 +8,36 @@
 #include <stdint.h>
 #include <string.h>
 
+static A_NODE *AST_unaryOperand(A_NODE *root, NODE_NAME operator,
+                                NODE_NAME operand) {
+  if (root == NULL || root->name != operator)
+    semanticError("Unexpected unary operator");
+
+  if (root->llink != NULL || root->rlink != NULL)
+    semanticError("Invalid unary AST structure");
+
+  if (root->clink == NULL || root->clink->name != operand)
+    semanticError("Unexpected unary operand");
+
+  return root->clink;
+}
+
+static A_ID *AST_intVariableUnaryOperand(A_NODE *root, NODE_NAME operator) {
+  A_NODE *operand = AST_unaryOperand(root, operator, N_EXP_IDENT);
+  A_ID *id = PTR(A_ID, operand->clink);
+
+  if (id == NULL || strcmp(id->name, "x") != 0)
+    semanticError("Expected identifier x");
+
+  if (id->kind != ID_VAR || id->type != int_type)
+    semanticError("Expected int variable");
+
+  if (searchIdentifier("x") != id)
+    semanticError("Identifier mismatch");
+
+  return id;
+}
+
 void AST_03_Precedence(A_NODE *node) {
   if (node == NULL || node->name != N_EXP_ADD)
     semanticError("Expected N_EXP_ADD");
@@ -110,17 +140,7 @@ void AST_14_PointerDeclaration(void) {
 }
 
 void AST_12_PointerDereference(A_NODE *root) {
-  if (root == NULL || root->name != N_EXP_STAR)
-    semanticError("Expected N_EXP_STAR");
-
-  if (root->llink != NULL || root->rlink != NULL)
-    semanticError("Invalid dereference AST structure");
-
-  A_NODE *operand = root->clink;
-
-  if (operand == NULL || operand->name != N_EXP_IDENT)
-    semanticError("Expected N_EXP_IDENT operand");
-
+  A_NODE *operand = AST_unaryOperand(root, N_EXP_STAR, N_EXP_IDENT);
   A_ID *id = PTR(A_ID, operand->clink);
 
   if (id == NULL || strcmp(id->name, "p") != 0)
@@ -137,42 +157,13 @@ void AST_12_PointerDereference(A_NODE *root) {
 }
 
 void AST_15_AddressOf(A_NODE *root) {
-  if (root == NULL || root->name != N_EXP_AMP)
-    semanticError("Expected N_EXP_AMP");
-
-  if (root->llink != NULL || root->rlink != NULL)
-    semanticError("Invalid address-of AST structure");
-
-  A_NODE *operand = root->clink;
-
-  if (operand == NULL || operand->name != N_EXP_IDENT)
-    semanticError("Expected N_EXP_IDENT operand");
-
-  A_ID *id = PTR(A_ID, operand->clink);
-
-  if (id == NULL || strcmp(id->name, "x") != 0)
-    semanticError("Expected identifier x");
-
-  if (id->kind != ID_VAR || id->type != int_type)
-    semanticError("Expected int variable");
-
-  if (searchIdentifier("x") != id)
-    semanticError("Identifier mismatch");
+  AST_intVariableUnaryOperand(root, N_EXP_AMP);
 
   logMsg(LOG_INFO, "AST address-of test passed");
 }
 
 void AST_16_UnaryMinus(A_NODE *root) {
-  if (root == NULL || root->name != N_EXP_MINUS)
-    semanticError("Expected N_EXP_MINUS");
-
-  if (root->llink != NULL || root->rlink != NULL)
-    semanticError("Invalid unary minus AST structure");
-
-  A_NODE *operand = root->clink;
-
-  if (operand == NULL || operand->name != N_EXP_INT_CONST)
-    semanticError("Expected N_EXP_INT_CONST");
+  A_NODE *operand = AST_unaryOperand(root, N_EXP_MINUS, N_EXP_INT_CONST);
 
   if ((intptr_t)operand->clink != 5)
     semanticError("Expected integer value 5");
@@ -181,16 +172,7 @@ void AST_16_UnaryMinus(A_NODE *root) {
 }
 
 void AST_17_LogicalNot(A_NODE *root) {
-  if (root == NULL || root->name != N_EXP_NOT)
-    semanticError("Expected N_EXP_NOT");
-
-  if (root->llink != NULL || root->rlink != NULL)
-    semanticError("Invalid NOT AST structure");
-
-  A_NODE *operand = root->clink;
-
-  if (operand == NULL || operand->name != N_EXP_INT_CONST)
-    semanticError("Expected N_EXP_INT_CONST");
+  A_NODE *operand = AST_unaryOperand(root, N_EXP_NOT, N_EXP_INT_CONST);
 
   if ((intptr_t)operand->clink != 0)
     semanticError("Expected integer value 0");
@@ -199,105 +181,25 @@ void AST_17_LogicalNot(A_NODE *root) {
 }
 
 void AST_18_PreIncrement(A_NODE *root) {
-  if (root == NULL || root->name != N_EXP_PRE_INC)
-    semanticError("Expected N_EXP_PRE_INC");
-
-  if (root->llink != NULL || root->rlink != NULL)
-    semanticError("Invalid pre-increment AST structure");
-
-  A_NODE *operand = root->clink;
-
-  if (operand == NULL || operand->name != N_EXP_IDENT)
-    semanticError("Expected N_EXP_IDENT");
-
-  A_ID *id = (A_ID *)operand->clink;
-
-  if (id == NULL || strcmp(id->name, "x") != 0)
-    semanticError("Expected identifier x");
-
-  if (id->kind != ID_VAR || id->type != int_type)
-    semanticError("Expected int variable");
-
-  if (searchIdentifier("x") != id)
-    semanticError("Identifier mismatch");
+  AST_intVariableUnaryOperand(root, N_EXP_PRE_INC);
 
   logMsg(LOG_INFO, "AST pre-increment test passed");
 }
 
 void AST_19_PreDecrement(A_NODE *root) {
-  if (root == NULL || root->name != N_EXP_PRE_DEC)
-    semanticError("Expected N_EXP_PRE_DEC");
-
-  if (root->llink != NULL || root->rlink != NULL)
-    semanticError("Invalid pre-decrement AST");
-
-  A_NODE *operand = root->clink;
-
-  if (operand == NULL || operand->name != N_EXP_IDENT)
-    semanticError("Expected N_EXP_IDENT");
-
-  A_ID *id = PTR(A_ID, operand->clink);
-
-  if (id == NULL || strcmp(id->name, "x") != 0)
-    semanticError("Expected identifier x");
-
-  if (id->kind != ID_VAR || id->type != int_type)
-    semanticError("Expected int variable");
-
-  if (searchIdentifier("x") != id)
-    semanticError("Identifier mismatch");
+  AST_intVariableUnaryOperand(root, N_EXP_PRE_DEC);
 
   logMsg(LOG_INFO, "AST pre-decrement test passed");
 }
 
 void AST_20_PostIncrement(A_NODE *root) {
-  if (root == NULL || root->name != N_EXP_POST_INC)
-    semanticError("Expected N_EXP_POST_INC");
-
-  if (root->llink != NULL || root->rlink != NULL)
-    semanticError("Invalid post-increment AST");
-
-  A_NODE *operand = root->clink;
-
-  if (operand == NULL || operand->name != N_EXP_IDENT)
-    semanticError("Expected N_EXP_IDENT");
-
-  A_ID *id = PTR(A_ID, operand->clink);
-
-  if (id == NULL || strcmp(id->name, "x") != 0)
-    semanticError("Expected identifier x");
-
-  if (id->kind != ID_VAR || id->type != int_type)
-    semanticError("Expected int variable");
-
-  if (searchIdentifier("x") != id)
-    semanticError("Identifier mismatch");
+  AST_intVariableUnaryOperand(root, N_EXP_POST_INC);
 
   logMsg(LOG_INFO, "AST post-increment test passed");
 }
 
 void AST_21_PostDecrement(A_NODE *root) {
-  if (root == NULL || root->name != N_EXP_POST_DEC)
-    semanticError("Expected N_EXP_POST_DEC");
-
-  if (root->llink != NULL || root->rlink != NULL)
-    semanticError("Invalid post-decrement AST");
-
-  A_NODE *operand = root->clink;
-
-  if (operand == NULL || operand->name != N_EXP_IDENT)
-    semanticError("Expected N_EXP_IDENT");
-
-  A_ID *id = PTR(A_ID, operand->clink);
-
-  if (id == NULL || strcmp(id->name, "x") != 0)
-    semanticError("Expected identifier x");
-
-  if (id->kind != ID_VAR || id->type != int_type)
-    semanticError("Expected int variable");
-
-  if (searchIdentifier("x") != id)
-    semanticError("Identifier mismatch");
+  AST_intVariableUnaryOperand(root, N_EXP_POST_DEC);
 
   logMsg(LOG_INFO, "AST post-decrement test passed");
 }
