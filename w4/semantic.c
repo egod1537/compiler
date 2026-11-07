@@ -95,20 +95,30 @@ static int isSameFormalParameters(const A_ID *a, const A_ID *b);
 static int isPointerOrArrayType(const A_TYPE *type);
 
 static int isSameType(const A_TYPE *a, const A_TYPE *b) {
-  if (isPointerOrArrayType(a) || isPointerOrArrayType(b)) {
-    return isSameType(a->element_type, b->element_type);
-  }
+  if (a == b)
+    return 1;
 
-  return a == b;
+  if (a == NULL || b == NULL)
+    return 0;
+
+  if (isPointerOrArrayType(a) && isPointerOrArrayType(b))
+    return isSameType(a->element_type, b->element_type);
+
+  if (a->kind == T_FUNC && b->kind == T_FUNC)
+    return isSameType(a->element_type, b->element_type) &&
+           isSameFormalParameters(a->field, b->field);
+
+  return 0;
 }
 
 static int isSameFormalParameters(const A_ID *a, const A_ID *b) {
   if (a == NULL)
     return 1;
 
-  while (a != NULL) {
-    if (b == NULL)
-      return 0;
+  while (a != NULL && b != NULL) {
+    if (a->type == NULL || b->type == NULL)
+      return a->type == NULL && b->type == NULL && a->link == NULL &&
+             b->link == NULL;
 
     if (!isSameType(a->type, b->type))
       return 0;
@@ -117,7 +127,7 @@ static int isSameFormalParameters(const A_ID *a, const A_ID *b) {
     b = b->link;
   }
 
-  return a == NULL && b == NULL;
+  return a == b;
 }
 
 static int isPointerOrArrayType(const A_TYPE *type) {
@@ -485,7 +495,7 @@ A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
 
   setDefaultSpecifier(specifier);
 
-  if (id->type->kind != T_FUNC) {
+  if (id->type == NULL || id->type->kind != T_FUNC) {
     syntax_error(21, id->name);
     return id;
   }
@@ -525,6 +535,11 @@ A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
 A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *body) {
   if (id == NULL)
     semanticError("Null identifier in setFunctionDeclaratorBody");
+
+  if (id->type == NULL || id->type->kind != T_FUNC) {
+    current_id = id->prev;
+    return id;
+  }
 
   id->type->expr = body;
   current_id = id;

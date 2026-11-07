@@ -116,8 +116,31 @@ while                       { return (WHILE_SYM); }
   yylval = YY(value);
   return (STRING_LITERAL);
 }
-\'([^'\n]|\\\')\'             {
-  yylval = (unsigned char)yytext[1];
+\'([^'\n]|\\.)\'             {
+  int value = (unsigned char)yytext[1];
+
+  if (yytext[1] == '\\') {
+    switch (yytext[2]) {
+    case '0': value = '\0'; break;
+    case 'a': value = '\a'; break;
+    case 'b': value = '\b'; break;
+    case 'f': value = '\f'; break;
+    case 'n': value = '\n'; break;
+    case 'r': value = '\r'; break;
+    case 't': value = '\t'; break;
+    case 'v': value = '\v'; break;
+    case '\\': value = '\\'; break;
+    case '\'': value = '\''; break;
+    case '"': value = '"'; break;
+    case '?': value = '?'; break;
+    default:
+      report_compiler_error(LEXICAL_ERROR, 0, line_no,
+                            "unsupported character escape '%s'", yytext);
+      exit(EXIT_FAILURE);
+    }
+  }
+
+  yylval = (YYSTYPE)value;
   return(CHARACTER_CONSTANT);
 }
 

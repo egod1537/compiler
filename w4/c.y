@@ -427,7 +427,7 @@ direct_abstract_declarator
     }
     | LP parameter_type_list_opt RP
     {
-      $$ = YY(setTypeExpr(makeType(T_FUNC), PTR(A_NODE, $2)));
+      $$ = YY(setTypeField(makeType(T_FUNC), PTR(A_ID, $2)));
     }
     | direct_abstract_declarator LB constant_expression_opt RB
     {
@@ -437,7 +437,7 @@ direct_abstract_declarator
     | direct_abstract_declarator LP parameter_type_list_opt RP
     {
       $$ = YY(setTypeElementType(PTR(A_TYPE, $1),
-                                 setTypeExpr(makeType(T_FUNC), PTR(A_NODE, $3))));
+                                 setTypeField(makeType(T_FUNC), PTR(A_ID, $3))));
     }
     ;
 
@@ -487,7 +487,6 @@ compound_statement
     {
       $$ = YY(makeNode(N_STMT_COMPOUND, PTR(A_NODE, $3), NULL, PTR(A_NODE, $4)));
     
-      compound_root = PTR(A_NODE, $$);
       checkForwardReference();
       leaveScope();
     }
@@ -599,7 +598,6 @@ jump_statement
     {
       $$ = YY(makeNode(N_STMT_RETURN, NULL, PTR(A_NODE, $2), NULL));
     
-      statement_root = PTR(A_NODE, $$);
     }
     | CONTINUE_SYM SEMICOLON
     {
@@ -907,7 +905,6 @@ expression
     : comma_expression
     {
       $$ = $1;
-      expression_root = PTR(A_NODE, $1);
     }
     ;
 
