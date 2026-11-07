@@ -5,6 +5,7 @@ ROOT := ../..
 TARGET := bin/sem_tests
 TEST_SOURCES := \
 	sem.c \
+	sem_test_support.c \
 	sem_symbol_table.c \
 	sem_type_table.c \
 	sem_scope.c \
@@ -19,7 +20,8 @@ HEADERS := \
 	$(ROOT)/logger.h \
 	$(ROOT)/semantic.h \
 	$(ROOT)/syntax_tree.h \
-	$(ROOT)/type.h
+	$(ROOT)/type.h \
+	sem_test_support.h
 
 CPPFLAGS += -D_POSIX_C_SOURCE=200809L -I$(ROOT)
 CFLAGS ?= -Wall -Wextra -std=c11 -g3 -O0 -fno-omit-frame-pointer

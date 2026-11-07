@@ -7,20 +7,11 @@ ws          {delim}+
 %option noinput nounput
 
 %{
-#ifndef YYSTYPE_IS_DECLARED
-#define YYSTYPE_IS_DECLARED 1
-#ifdef _WIN64
-typedef long long YYSTYPE;
-#else
-typedef long YYSTYPE;
-#endif
-#endif
-
 #include <stdlib.h>
 #include <string.h>
-#include "y.tab.h"
 #include "type.h"
 #include "parse_value.h"
+#include "y.tab.h"
 
 _Static_assert(sizeof(YYSTYPE)>=sizeof(void *),
                "YYSTYPE must be able to hold a pointer");

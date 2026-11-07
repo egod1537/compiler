@@ -851,7 +851,7 @@ void AST_38_Iteration(int mode) {
     semanticError("Missing main function");
 
   A_NODE *body = func->type->expr;
-  A_NODE *node = AST_iterationStatement(body, mode == 3 ? 0 : 1);
+  A_NODE *node = AST_iterationStatement(body, mode == 3 ? 2 : 1);
 
   if (node == NULL)
     semanticError("Null iteration statement");
@@ -871,7 +871,7 @@ void AST_38_Iteration(int mode) {
   } else if (mode == 3) {
     // for
     if (node->name != N_STMT_FOR || node->clink != NULL || node->rlink == NULL ||
-        node->rlink->name != N_STMT_EMPTY)
+        node->rlink->name != N_STMT_EXPRESSION)
       semanticError("Invalid for AST");
 
     A_NODE *exp = node->llink;

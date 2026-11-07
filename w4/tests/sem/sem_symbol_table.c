@@ -1,8 +1,7 @@
 #include "semantic.h"
+#include "sem_test_support.h"
 #include "type.h"
 #include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 void SEM_02_MakeIdentifier(void) {
@@ -17,8 +16,7 @@ void SEM_02_MakeIdentifier(void) {
   assert(a->link == NULL);
 
 
-  free(a);
-  free(b);
+  semTestFreeIdentifierChain();
 }
 
 void SEM_03_SearchIdentifier(void) {
@@ -41,15 +39,7 @@ void SEM_03_SearchIdentifier(void) {
   assert(searchIdentifierAtCurrentLevel("x", duplicate_x->prev) == local_x);
 
 
-  A_ID *id = current_id;
-  while (id != NULL) {
-    A_ID *prev = id->prev;
-    free(id->name);
-    free(id);
-    id = prev;
-  }
-
-  current_id = NULL;
+  semTestFreeIdentifierChain();
   current_level = 0;
 }
 
@@ -81,15 +71,7 @@ void SEM_05_LinkDeclaratorList(void) {
   assert(linkDeclaratorList(NULL, a) == a);
   assert(linkDeclaratorList(a, NULL) == a);
 
-  // 메모리 해제
-  free(c->name);
-  free(c);
-  free(b->name);
-  free(b);
-  free(a->name);
-  free(a);
-
-  current_id = NULL;
+  semTestFreeIdentifierChain();
 
 }
 
@@ -161,33 +143,7 @@ void SEM_13_Initialize(void) {
   // 모든 기본 명칭은 전역 레벨에 등록됨
   assert(id->level == 0);
 
-  // 테스트 전역 상태 정리
-  A_ID *current = current_id;
-
-  while (current != NULL) {
-    A_ID *prev = current->prev;
-
-    if (current->kind == ID_FUNC)
-      free(current->type);
-
-    free(current->name);
-    free(current);
-    current = prev;
-  }
-
-  current_id = NULL;
-
-  free(string_type);
-  free(void_type);
-  free(char_type);
-  free(float_type);
-  free(int_type);
-
-  string_type = NULL;
-  void_type = NULL;
-  char_type = NULL;
-  float_type = NULL;
-  int_type = NULL;
+  semTestResetInitializedState();
 
 }
 

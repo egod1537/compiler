@@ -7,15 +7,6 @@ ws          {delim}+
 %option noinput nounput
 
 %{
-#ifndef YYSTYPE_IS_DECLARED
-#define YYSTYPE_IS_DECLARED 1
-#ifdef _WIN64
-typedef long long YYSTYPE;
-#else
-typedef long YYSTYPE;
-#endif
-#endif
-
 #include "parse_value.h"
 #include "semantic.h"
 #include "error.h"

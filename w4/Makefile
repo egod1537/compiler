@@ -69,6 +69,8 @@ $(CORE_OBJECTS) main.o: $(CORE_HEADERS)
 
 $(AST_TEST_OBJECTS): $(CORE_HEADERS) $(AST_HEADERS)
 
+lex.yy.o: CFLAGS += -Wno-sign-compare
+
 test: $(TARGET)
 	@status=0; \
 	$(MAKE) test-ch5 || status=1; \

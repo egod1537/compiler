@@ -527,6 +527,7 @@ A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *body) {
     semanticError("Null identifier in setFunctionDeclaratorBody");
 
   id->type->expr = body;
+  current_id = id;
 
   return id;
 }

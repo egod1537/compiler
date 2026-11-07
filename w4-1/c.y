@@ -1,15 +1,3 @@
-%code requires {
-#include <stdint.h>
-#ifndef YYSTYPE_IS_DECLARED
-#define YYSTYPE_IS_DECLARED 1
-#ifdef _WIN64
-typedef long long YYSTYPE;
-#else
-typedef long YYSTYPE;
-#endif
-#endif
-}
-
 %{
 #include <stdio.h>
 #include "type.h"

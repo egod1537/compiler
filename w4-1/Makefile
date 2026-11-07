@@ -1,20 +1,38 @@
-CC ?= gcc
+CC ?= cc
+BISON ?= bison
+FLEX ?= flex
+
+CPPFLAGS += -D_POSIX_C_SOURCE=200809L -I.
 CFLAGS ?= -std=c11 -Wall -Wextra -pedantic -O0 -g
-LEX = flex
-YACC = bison
 
-.PHONY: all clean
+TARGET := parser
+GENERATED := y.tab.c y.tab.h lex.yy.c
+SOURCES := y.tab.c lex.yy.c support.c print.c main.c
+OBJECTS := $(SOURCES:.c=.o)
+HEADERS := type.h support.h parse_value.h
 
-all: parser
+.PHONY: all clean test
 
-y.tab.c y.tab.h: c.y
-	$(YACC) -d -o y.tab.c c.y
+all: $(TARGET)
+
+$(TARGET): $(OBJECTS)
+	@$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LDLIBS)
+
+y.tab.c: c.y
+	@$(BISON) -d -o $@ $<
+
+y.tab.h: y.tab.c
+	@test -f $@ || $(BISON) -d -o y.tab.c c.y
 
 lex.yy.c: c.l y.tab.h
-	$(LEX) c.l
+	@$(FLEX) -o $@ $<
 
-parser: y.tab.c lex.yy.c support.c print.c main.c type.h support.h parse_value.h
-	$(CC) $(CFLAGS) -o $@ y.tab.c lex.yy.c support.c print.c main.c
+$(OBJECTS): $(HEADERS)
+
+lex.yy.o: CFLAGS += -Wno-sign-compare
+
+test: $(TARGET)
+	@bash ../w4/tests/ch5/run.sh ./$(TARGET)
 
 clean:
-	rm -f parser parser.exe y.tab.c y.tab.h lex.yy.c *.o
+	rm -f $(TARGET) $(TARGET).exe $(OBJECTS) $(GENERATED)

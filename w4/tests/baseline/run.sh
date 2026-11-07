@@ -2,8 +2,8 @@
 
 set -u
 
-script_dir=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
-project_dir=$(CDPATH= cd -- "$script_dir/../.." && pwd)
+script_dir=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+project_dir=$(CDPATH='' cd -- "$script_dir/../.." && pwd)
 current=${1:-"$project_dir/parser"}
 baseline=${2:-"$project_dir/../w4-1/parser"}
 
@@ -29,7 +29,10 @@ normalize_ast() {
         -e 's/\(DONE:[^)]+\)/(DONE:ADDR)/g' "$1"
 }
 
-mapfile -t cases < <(
+cases=()
+while IFS= read -r source; do
+    cases+=("$source")
+done < <(
     cd "$project_dir" &&
     find tests/baseline/cases tests/ch5 tests/ast/valid tests/ast/invalid tests/ast/cases \
         tests/ast/unsupported tests/semerr/cases -type f -name '*.c' -print | sort -u
