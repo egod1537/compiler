@@ -65,6 +65,15 @@ SEMERR에서 확인한 강의자료 오류 코드는 11, 12, 13, 14, 21, 22, 23,
 
 ## Unix
 
-동일 Makefile과 POSIX Bash 러너를 사용하며 Unix에서는 `YYSTYPE`을 64비트
-`long`으로 구성한다. 로컬 WSL Ubuntu에는 GCC, Bison, Flex, Make가 설치되어
-있지 않아 이 환경에서 Linux 실빌드는 수행하지 못했다.
+macOS UNIX 환경에서 Apple Clang 17.0.0, 시스템 Bison 2.3, Flex 2.6.4,
+GNU Make 3.81로 다음 클린 회귀를 수행했다.
+
+```sh
+make clean && make BISON=/usr/bin/bison test
+```
+
+빌드 경고 없이 CH5 15개, AST 17개, ASTEXP 7개, SEM 17개, SEMERR 16개와
+BASELINE 125개가 모두 통과했다. 별도로 `w4-1`에서도 `make clean && make
+BISON=/usr/bin/bison test`를 실행해 15개가 모두 통과했다. Bash 3.2에서
+지원하지 않는 `mapfile` 의존성도 제거했으며 모든 Unix 셸 스크립트가
+ShellCheck 경고 없이 검증됐다.

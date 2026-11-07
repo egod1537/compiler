@@ -2,7 +2,7 @@
 
 set -u
 
-script_dir=$(CDPATH= cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+script_dir=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 parser=${1:-"$script_dir/../../parser"}
 selection=${2:-all}
 manifest="$script_dir/cases.tsv"

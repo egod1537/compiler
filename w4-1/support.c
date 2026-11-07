@@ -267,6 +267,7 @@ A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p)
 A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *n)
 {
     id->type->expr=n;
+    current_id=id;
     return id;
 }
 

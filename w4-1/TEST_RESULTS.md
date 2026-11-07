@@ -5,6 +5,8 @@ Tested on 2026-11-07 after removing assignment-excluded functionality.
 ## Build and platform checks
 
 - `make`: passed
+- macOS clean build with Apple Clang 17 and system Bison 2.3: passed without warnings
+- Unix `make test`: 15 passed, 0 failed
 - `parser.cmd`: passed
 - Windows CRLF input: passed
 - Unix LF input: passed

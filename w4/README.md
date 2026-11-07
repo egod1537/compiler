@@ -34,6 +34,10 @@ make
 make test
 ```
 
+The grammar also builds with the Bison 2.3 shipped by macOS. `YYSTYPE` is
+declared in `parse_value.h`, so generated parser and scanner sources use the
+same pointer-sized value type without relying on newer Bison directives.
+
 Run one suite or one numbered test:
 
 ```sh

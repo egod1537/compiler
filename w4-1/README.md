@@ -27,7 +27,12 @@ Unix/MSYS2:
 ```sh
 make
 ./parser < source.c
+make test
 ```
+
+The `test` target runs the shared Chapter 5 acceptance, rejection, and newline
+suite. The grammar is compatible with both the Bison 2.3 shipped by macOS and
+current Bison releases used on Linux.
 
 Windows `cmd.exe`:
 

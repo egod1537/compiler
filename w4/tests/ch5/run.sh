@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -u
 
-script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-project_dir=$(CDPATH= cd -- "$script_dir/../.." && pwd)
+script_dir=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+project_dir=$(CDPATH='' cd -- "$script_dir/../.." && pwd)
 parser=${1:-"$project_dir/parser"}
 if [ ! -f "$parser" ] && [ -f "${parser}.exe" ]; then
     parser="${parser}.exe"
