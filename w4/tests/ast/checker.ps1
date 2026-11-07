@@ -58,16 +58,16 @@ function ConvertFrom-AstPrintTokens {
                 Value = [int]$Matches[3]
             }
         }
-        elseif ($content -match '^\(ID="([^"]*)"\)\s+TYPE:(\S+)\s+KIND:([A-Z_]+)\s+(?:SPEC=([A-Z_]+)\s+)?LEV=(-?\d+)\s+VAL=(-?\d+)\s+ADDR=(-?\d+)') {
+        elseif ($content -match '^\(ID="([^"]*)"\)\s+TYPE:(\S+)\s+KIND:([A-Z_]+)\s+LEV=(-?\d+)\s+VAL=(-?\d+)\s+ADDR=(-?\d+)') {
             $kind = "ID"
             $value = @{
                 Name = $Matches[1]
                 TypeAddress = ConvertTo-AddressKey $Matches[2]
                 Kind = "ID_$($Matches[3])"
-                Specifier = if ([string]::IsNullOrEmpty($Matches[4])) { "S_NULL" } else { "S_$($Matches[4])" }
-                Level = [int]$Matches[5]
-                Value = [int]$Matches[6]
-                Address = [int]$Matches[7]
+                Specifier = $null
+                Level = [int]$Matches[4]
+                Value = [int]$Matches[5]
+                Address = [int]$Matches[6]
             }
         }
         elseif ($content -in @("PARAMETER", "TYPE", "BODY", "ELEMENT_TYPE", "INDEX", "FIELD", "ENUMERATORS", "INIT")) {
@@ -191,7 +191,7 @@ function Resolve-IdReference {
         if ($named.Count -eq 0) { continue }
         $matches = @($named | Where-Object {
             $_.Kind -eq $Reference.Kind -and $_.Level -eq $Reference.Level -and
-            $_.Specifier -eq $Reference.Specifier -and $_.Value -eq $Reference.Value -and
+            $_.Value -eq $Reference.Value -and
             $_.Address -eq $Reference.Address -and [object]::ReferenceEquals($_.Type, $Reference.Type)
         })
         if ($matches.Count -eq 1) { return $matches[0] }
@@ -488,7 +488,6 @@ function Compare-AstValue {
         Compare-AstValue $Expected.Rlink $Actual.Rlink $rightPath $State
     }
     elseif ($Expected.Class -eq "A_ID") {
-        # Storage classes are outside the Chapter 5 assignment grammar.
         foreach ($field in @("Name","Kind","Level","Value","Address")) {
             if ($Expected[$field] -ne $Actual[$field]) { Add-AstDifference $State $Path $Expected $Actual; break }
         }

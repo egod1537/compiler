@@ -7,7 +7,7 @@ void swap(int *left, int *right)
     return;
 }
 
-int main(void)
+int main()
 {
     int first;
     int second;

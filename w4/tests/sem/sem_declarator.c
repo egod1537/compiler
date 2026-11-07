@@ -53,98 +53,45 @@ void SEM_10_MakeSpecifier(void) {
   A_TYPE *int_type = makeType(T_ENUM);
 
   // 1. 타입만 있는 선언: int a;
-  A_SPECIFIER *s1 = makeSpecifier(int_type, S_NULL);
+  A_SPECIFIER *s1 = makeSpecifier(int_type);
 
   assert(s1 != NULL);
   assert(s1->type == int_type);
   assert(s1->stor == S_NULL);
-  assert(s1->line == 0);
+  assert(s1->line == line_no);
 
-  // 2. 타입과 저장 클래스: static int b;
-  A_SPECIFIER *s2 = makeSpecifier(int_type, S_STATIC);
+  // 2. 타입이 생략된 선언 지정자
+  A_SPECIFIER *s2 = makeSpecifier(NULL);
 
   assert(s2 != NULL);
-  assert(s2->type == int_type);
-  assert(s2->stor == S_STATIC);
+  assert(s2->type == NULL);
+  assert(s2->stor == S_NULL);
 
-  // 3. 저장 클래스만 있는 상태
-  A_SPECIFIER *s3 = makeSpecifier(NULL, S_TYPEDEF);
-
-  assert(s3 != NULL);
-  assert(s3->type == NULL);
-  assert(s3->stor == S_TYPEDEF);
-
-  // 4. 둘 다 지정되지 않은 상태
-  A_SPECIFIER *s4 = makeSpecifier(NULL, S_NULL);
-
-  assert(s4 != NULL);
-  assert(s4->type == NULL);
-  assert(s4->stor == S_NULL);
-
-  // 5. 서로 독립적인 객체인지 확인
+  // 3. 서로 독립적인 객체인지 확인
   assert(s1 != s2);
-  assert(s2 != s3);
-  assert(s3 != s4);
-
-  // 6. 타입 객체는 공유되는지 확인
-  assert(s1->type == s2->type);
 
   free(s1);
   free(s2);
-  free(s3);
-  free(s4);
   free(int_type);
 
 }
 
-void SEM_11_UpdateSpecifier(void) {
-  A_TYPE *int_type = makeType(T_ENUM);
+void SEM_11_SpecifierIndependence(void) {
+  A_TYPE *first_type = makeType(T_ENUM);
+  A_TYPE *second_type = makeType(T_POINTER);
+  A_SPECIFIER *first = makeSpecifier(first_type);
+  A_SPECIFIER *second = makeSpecifier(second_type);
 
-  // 1. 타입만 있는 명시자에 static 추가
-  A_SPECIFIER *s1 = makeSpecifier(int_type, S_NULL);
+  assert(first != second);
+  assert(first->type == first_type);
+  assert(second->type == second_type);
+  assert(first->stor == S_NULL);
+  assert(second->stor == S_NULL);
 
-  A_SPECIFIER *result = updateSpecifier(s1, NULL, S_STATIC);
-
-  assert(result == s1);
-  assert(s1->type == int_type);
-  assert(s1->stor == S_STATIC);
-
-  // 2. 저장 클래스만 있는 명시자에 타입 추가
-  A_SPECIFIER *s2 = makeSpecifier(NULL, S_TYPEDEF);
-
-  result = updateSpecifier(s2, int_type, S_NULL);
-
-  assert(result == s2);
-  assert(s2->type == int_type);
-  assert(s2->stor == S_TYPEDEF);
-
-  // 3. 아무 정보가 없는 명시자에 타입 추가
-  A_SPECIFIER *s3 = makeSpecifier(NULL, S_NULL);
-
-  updateSpecifier(s3, int_type, S_NULL);
-
-  assert(s3->type == int_type);
-  assert(s3->stor == S_NULL);
-
-  // 4. 아무 정보가 없는 명시자에 static 추가
-  A_SPECIFIER *s4 = makeSpecifier(NULL, S_NULL);
-
-  updateSpecifier(s4, NULL, S_STATIC);
-
-  assert(s4->type == NULL);
-  assert(s4->stor == S_STATIC);
-
-  // 5. 기존 명시자 객체를 재사용하는지 검증
-  assert(s1 != s2);
-  assert(s2 != s3);
-  assert(s3 != s4);
-
-  free(s1);
-  free(s2);
-  free(s3);
-  free(s4);
-  free(int_type);
-
+  free(first);
+  free(second);
+  free(first_type);
+  free(second_type);
 }
 
 void SEM_12_SetDefaultSpecifier(void) {
@@ -153,24 +100,24 @@ void SEM_12_SetDefaultSpecifier(void) {
   int_type = makeType(T_ENUM);
 
   // 1. 타입이 없는 경우 기본 int 적용
-  A_SPECIFIER *s1 = makeSpecifier(NULL, S_STATIC);
+  A_SPECIFIER *s1 = makeSpecifier(NULL);
 
   setDefaultSpecifier(s1);
 
   assert(s1->type == int_type);
-  assert(s1->stor == S_STATIC);
+  assert(s1->stor == S_NULL);
 
   // 2. 타입이 이미 지정된 경우 유지
   A_TYPE *char_type = makeType(T_ENUM);
-  A_SPECIFIER *s2 = makeSpecifier(char_type, S_NULL);
+  A_SPECIFIER *s2 = makeSpecifier(char_type);
 
   setDefaultSpecifier(s2);
 
   assert(s2->type == char_type);
   assert(s2->type != int_type);
 
-  // 3. 타입과 저장 클래스 모두 없는 경우
-  A_SPECIFIER *s3 = makeSpecifier(NULL, S_NULL);
+  // 3. 타입이 없는 다른 선언 지정자
+  A_SPECIFIER *s3 = makeSpecifier(NULL);
 
   setDefaultSpecifier(s3);
 
@@ -195,14 +142,14 @@ void SEM_14_SetDeclaratorListSpecifier(void) {
 
   initialize();
 
-  // 1. static int a, *p;
+  // 1. int a, *p;
   A_ID *a = makeIdentifier("a");
   A_ID *p = makeIdentifier("p");
 
   setDeclaratorElementType(p, makeType(T_POINTER));
 
   A_ID *list = linkDeclaratorList(a, p);
-  A_SPECIFIER *specifier = makeSpecifier(int_type, S_STATIC);
+  A_SPECIFIER *specifier = makeSpecifier(int_type);
 
   A_ID *result = setDeclaratorListSpecifier(list, specifier);
 
@@ -210,38 +157,28 @@ void SEM_14_SetDeclaratorListSpecifier(void) {
 
   assert(a->kind == ID_VAR);
   assert(a->type == int_type);
-  assert(a->specifier == S_STATIC);
+  assert(a->specifier == S_NULL);
 
   assert(p->kind == ID_VAR);
   assert(p->type->kind == T_POINTER);
   assert(p->type->element_type == int_type);
-  assert(p->specifier == S_STATIC);
+  assert(p->specifier == S_NULL);
 
-  // 2. typedef int NUMBER;
-  A_ID *number = makeIdentifier("NUMBER");
-  A_SPECIFIER *typedef_spec = makeSpecifier(int_type, S_TYPEDEF);
-
-  setDeclaratorListSpecifier(number, typedef_spec);
-
-  assert(number->kind == ID_TYPE);
-  assert(number->type == int_type);
-  assert(number->specifier == S_TYPEDEF);
-
-  // 3. int value; (저장 클래스 기본값)
+  // 2. int value;
   A_ID *value = makeIdentifier("value");
-  A_SPECIFIER *default_spec = makeSpecifier(int_type, S_NULL);
+  A_SPECIFIER *default_spec = makeSpecifier(int_type);
 
   setDeclaratorListSpecifier(value, default_spec);
 
   assert(value->kind == ID_VAR);
   assert(value->type == int_type);
-  assert(value->specifier == S_AUTO);
+  assert(value->specifier == S_NULL);
 
-  // 4. 다른 스코프에서 동일 명칭 선언
+  // 3. 다른 스코프에서 동일 명칭 선언
   enterScope();
 
   A_ID *local_a = makeIdentifier("a");
-  A_SPECIFIER *local_spec = makeSpecifier(int_type, S_NULL);
+  A_SPECIFIER *local_spec = makeSpecifier(int_type);
 
   setDeclaratorListSpecifier(local_a, local_spec);
 
@@ -254,9 +191,8 @@ void SEM_14_SetDeclaratorListSpecifier(void) {
 
   assert(searchIdentifier("a") == a);
 
-  // 5. 테스트에서 생성한 객체 해제
+  // 4. 테스트에서 생성한 객체 해제
   free(specifier);
-  free(typedef_spec);
   free(default_spec);
   free(local_spec);
 
@@ -308,7 +244,7 @@ void SEM_15_SetFunctionDeclaratorSpecifier(void) {
   A_ID *prototype = makeIdentifier("foo");
   setDeclaratorElementType(prototype, makeType(T_FUNC));
 
-  A_SPECIFIER *proto_spec = makeSpecifier(int_type, S_NULL);
+  A_SPECIFIER *proto_spec = makeSpecifier(int_type);
   setDeclaratorListSpecifier(prototype, proto_spec);
 
   assert(prototype->kind == ID_FUNC);
@@ -318,7 +254,7 @@ void SEM_15_SetFunctionDeclaratorSpecifier(void) {
   A_ID *definition = makeIdentifier("foo");
   setDeclaratorElementType(definition, makeType(T_FUNC));
 
-  A_SPECIFIER *def_spec = makeSpecifier(int_type, S_NULL);
+  A_SPECIFIER *def_spec = makeSpecifier(int_type);
 
   A_ID *result = setFunctionDeclaratorSpecifier(definition, def_spec);
 
@@ -339,7 +275,7 @@ void SEM_15_SetFunctionDeclaratorSpecifier(void) {
 
   setTypeField(bar_type, param);
 
-  A_SPECIFIER *bar_spec = makeSpecifier(int_type, S_NULL);
+  A_SPECIFIER *bar_spec = makeSpecifier(int_type);
 
   result = setFunctionDeclaratorSpecifier(bar, bar_spec);
 
@@ -427,7 +363,7 @@ void SEM_17_SetParameterDeclaratorSpecifier(void) {
 
   // 1. int a
   A_ID *a = makeIdentifier("a");
-  A_SPECIFIER *s1 = makeSpecifier(int_type, S_NULL);
+  A_SPECIFIER *s1 = makeSpecifier(int_type);
 
   A_ID *result = setParameterDeclaratorSpecifier(a, s1);
 
@@ -440,7 +376,7 @@ void SEM_17_SetParameterDeclaratorSpecifier(void) {
   A_ID *b = makeIdentifier("b");
   setDeclaratorElementType(b, makeType(T_POINTER));
 
-  A_SPECIFIER *s2 = makeSpecifier(int_type, S_NULL);
+  A_SPECIFIER *s2 = makeSpecifier(int_type);
 
   result = setParameterDeclaratorSpecifier(b, s2);
 
@@ -451,10 +387,12 @@ void SEM_17_SetParameterDeclaratorSpecifier(void) {
 
   // 3. 이름 없는 void 파라미터
   A_ID *anonymous = makeIdentifier("");
-  A_SPECIFIER *s3 = makeSpecifier(void_type, S_NULL);
+  A_SPECIFIER *s3 = makeSpecifier(void_type);
+  int previous_errors = syntax_err;
 
   result = setParameterDeclaratorSpecifier(anonymous, s3);
 
+  assert(syntax_err == previous_errors + 1);
   assert(result == anonymous);
   assert(anonymous->kind == ID_PARM);
   assert(anonymous->type == void_type);
@@ -519,6 +457,7 @@ void SEM_17_SetParameterDeclaratorSpecifier(void) {
   char_type = NULL;
   float_type = NULL;
   int_type = NULL;
+  syntax_err = 0;
 
 }
 

@@ -1,5 +1,5 @@
 typedef int MyInt;
 MyInt value;
-int main(void) {
+int main() {
     return 0;
 }

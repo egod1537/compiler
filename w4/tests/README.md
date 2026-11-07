@@ -16,6 +16,15 @@ make test-semerr TEST=1
 make test-semerr TEST=list
 ```
 
+Compare compiler behavior directly with the professor baseline:
+
+```sh
+make test-baseline
+```
+
+This builds `../w4-1`, compares exact exit status for 125 inputs, and compares
+normalized output, including diagnostics, for every input.
+
 On Windows:
 
 ```powershell
@@ -72,7 +81,7 @@ make test-semerr TEST=4
 
 Selectable C test functions follow one naming rule: `GROUP_NN_Name`.
 
-- `GROUP` is an uppercase group code: `SEM` for legacy semantic unit tests,
+- `GROUP` is an uppercase group code: `SEM` for active semantic unit tests,
   `SEMERR` for Chapter 5 parser error integration tests, `AST` for parser
   acceptance tests, or `ASTEXP` for selectable expected-AST tests.
 - `NN` is the suite-local two-digit number used by `TEST=N`.

@@ -1,6 +1,6 @@
 int values[10;
 
-int main(void)
+int main()
 {
     return 0;
 }

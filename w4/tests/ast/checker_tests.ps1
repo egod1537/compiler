@@ -45,7 +45,7 @@ function New-RecursiveProgram {
     $field.Value=0; $field.Address=0; $field.Type=$pointer; $field.Init=$null; $field.Link=$null
     $struct.Field = $field
     $rootId = New-AstObject $graph "A_ID"
-    $rootId.Name="root"; $rootId.Kind="ID_VAR"; $rootId.Level=0; $rootId.Specifier="S_AUTO"
+    $rootId.Name="root"; $rootId.Kind="ID_VAR"; $rootId.Level=0; $rootId.Specifier=$null
     $rootId.Value=0; $rootId.Address=0; $rootId.Type=$struct; $rootId.Init=$null; $rootId.Link=$null
     $program = New-AstObject $graph "A_NODE"
     $program.Name="N_PROGRAM"; $program.Type=$null; $program.Value=0
@@ -93,11 +93,11 @@ Invoke-Test "normal recursive DONE type" {
     $output = @'
 =======  syntax tree  ==========
 N_PROGRAM (00000000,0)
-|  (ID="root") TYPE:00000010 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=0
+|  (ID="root") TYPE:00000010 KIND:VAR LEV=0 VAL=0 ADDR=0
 |  |  TYPE
 |  |  |  STRUCT
 |  |  |  |  FIELD
-|  |  |  |  |  (ID="next") TYPE:00000020 KIND:FIELD SPEC=NULL LEV=0 VAL=0 ADDR=0
+|  |  |  |  |  (ID="next") TYPE:00000020 KIND:FIELD LEV=0 VAL=0 ADDR=0
 |  |  |  |  |  |  TYPE
 |  |  |  |  |  |  |  POINTER
 |  |  |  |  |  |  |  |  ELEMENT_TYPE

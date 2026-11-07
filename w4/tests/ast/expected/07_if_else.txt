@@ -1,7 +1,7 @@
 AST 07 — if_else
 Source: tests/ast/cases/07_if_else.c
 
-int main(void) {
+int main() {
     int x;
     x = 1;
     if (x > 0) return 1;
@@ -12,10 +12,10 @@ MANUALLY DERIVED EXPECTED STRUCTURE
 N_PROGRAM
 └─ clink → A_ID "main" [ID_FUNC, level=0, specifier=S_NULL]
    └─ type → T_FUNC
-      ├─ field → unnamed void parameter [ID_PARM, level=1]
+      ├─ field → NULL
       ├─ element_type → int
       └─ expr → N_STMT_COMPOUND
-         ├─ llink → A_ID "x" [ID_VAR, level=1, specifier=S_AUTO, type=int]  [X_LOCAL]
+         ├─ llink → A_ID "x" [ID_VAR, level=1, specifier=S_NULL, type=int]  [X_LOCAL]
          └─ rlink → N_STMT_LIST
             ├─ llink → N_STMT_EXPRESSION
             │  └─ clink → N_EXP_ASSIGN

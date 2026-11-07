@@ -18,7 +18,7 @@
       "Name": "sum",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -33,7 +33,7 @@
       "Name": "i",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -60,7 +60,7 @@
       "Name": "i",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -124,7 +124,7 @@
       "Name": "sum",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -178,7 +178,7 @@
       "Name": "i",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -230,7 +230,7 @@
       "Name": "i",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -282,7 +282,7 @@
       "Name": "i",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -338,7 +338,7 @@
       "Name": "sum",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -366,7 +366,7 @@
       "Name": "i",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -408,7 +408,7 @@
       "Name": "sum",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -476,7 +476,7 @@
       "Name": "sum",
       "Kind": "ID_VAR",
       "Level": 1,
-      "Specifier": "S_AUTO",
+      "Specifier": "S_NULL",
       "Value": 0,
       "Address": 0,
       "Type": {
@@ -620,9 +620,7 @@
       "ElementType": {
         "ref": "int"
       },
-      "Field": {
-        "ref": "void_param"
-      },
+      "Field": null,
       "Expr": {
         "ref": "body"
       }

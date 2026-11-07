@@ -8,6 +8,8 @@ selection=${2:-all}
 manifest="$script_dir/cases.tsv"
 output=$(mktemp "${TMPDIR:-/tmp}/w4-semerr.XXXXXX") || exit 1
 trap 'rm -f "$output"' EXIT HUP INT TERM
+export COMPILER_ERROR_TAGS=1
+export WSLENV="${WSLENV:+$WSLENV:}COMPILER_ERROR_TAGS"
 
 if [[ ! -x "$parser" && -x "$parser.exe" ]]; then
     parser="$parser.exe"

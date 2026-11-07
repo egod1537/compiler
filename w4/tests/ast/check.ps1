@@ -63,12 +63,20 @@ function Build-CurrentParser {
     $parserH = Join-Path $Directory "y.tab.h"
     $lexerC = Join-Path $Directory "lex.yy.c"
     $executable = Join-Path $Directory "ast_tests.exe"
-    Invoke-BuildStep "bison" @("-y","-d","--defines=$parserH","-o",$parserC,(Join-Path $Root "c.y")) "bison"
+    Invoke-BuildStep "bison" @("-d","--defines=$parserH","-o",$parserC,(Join-Path $Root "c.y")) "bison"
     Invoke-BuildStep "flex" @("-o",$lexerC,(Join-Path $Root "c.l")) "flex"
     $sources = @(
         $parserC, $lexerC,
-        (Join-Path $Root "support.c"), (Join-Path $Root "error.c"),
-        (Join-Path $Root "print.c"), (Join-Path $Root "main.c")
+        (Join-Path $Root "semantic.c"), (Join-Path $Root "syntax_tree.c"),
+        (Join-Path $Root "logger.c"), (Join-Path $Root "error.c"),
+        (Join-Path $Root "print.c"),
+        (Join-Path $PSScriptRoot "ast_assert.c"),
+        (Join-Path $PSScriptRoot "ast_options.c"),
+        (Join-Path $PSScriptRoot "ast_expression.c"),
+        (Join-Path $PSScriptRoot "ast_declaration.c"),
+        (Join-Path $PSScriptRoot "ast_statement.c"),
+        (Join-Path $PSScriptRoot "ast_expected.c"),
+        (Join-Path $PSScriptRoot "ast.c")
     )
     Invoke-BuildStep "gcc" (@("-Wall","-Wextra","-std=c11","-g","-O0","-I",$Directory,"-I",$Root) + $sources + @("-o",$executable)) "gcc"
     return $executable

@@ -9,7 +9,7 @@ int choose(int first, int second, int enabled)
         return 0;
 }
 
-int main(void)
+int main()
 {
     return choose(4, 7, 1);
 }

@@ -3,7 +3,7 @@ struct Point {
     int y;
 } origin;
 
-int main(void)
+int main()
 {
     struct Point point;
     point.x = 1;

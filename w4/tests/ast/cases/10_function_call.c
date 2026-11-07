@@ -3,7 +3,7 @@ int add(int left, int right)
     return left + right;
 }
 
-int main(void)
+int main()
 {
     return add(1, 2);
 }

@@ -2,7 +2,6 @@ CC ?= cc
 TEST ?=
 
 ROOT := ../..
-FIXTURE_ROOT := $(ROOT)/submission
 TARGET := bin/sem_tests
 TEST_SOURCES := \
 	sem.c \
@@ -11,16 +10,18 @@ TEST_SOURCES := \
 	sem_scope.c \
 	sem_declarator.c
 PROJECT_SOURCES := \
-	$(FIXTURE_ROOT)/syntax_tree.c \
-	$(FIXTURE_ROOT)/semantic.c \
-	$(FIXTURE_ROOT)/logger.c
+	$(ROOT)/syntax_tree.c \
+	$(ROOT)/semantic.c \
+	$(ROOT)/error.c \
+	$(ROOT)/logger.c
 HEADERS := \
-	$(FIXTURE_ROOT)/logger.h \
-	$(FIXTURE_ROOT)/semantic.h \
-	$(FIXTURE_ROOT)/syntax_tree.h \
-	$(FIXTURE_ROOT)/type.h
+	$(ROOT)/error.h \
+	$(ROOT)/logger.h \
+	$(ROOT)/semantic.h \
+	$(ROOT)/syntax_tree.h \
+	$(ROOT)/type.h
 
-CPPFLAGS += -D_POSIX_C_SOURCE=200809L -I$(FIXTURE_ROOT)
+CPPFLAGS += -D_POSIX_C_SOURCE=200809L -I$(ROOT)
 CFLAGS ?= -Wall -Wextra -std=c11 -g3 -O0 -fno-omit-frame-pointer
 
 .PHONY: all clean test
@@ -35,5 +36,5 @@ test: $(TARGET)
 	@./$(TARGET) $(TEST)
 
 clean:
-	rm -f $(TARGET) $(TARGET).exe bin/sem_compat_tests bin/sem_compat_tests.exe
+	rm -f $(TARGET)
 	@rmdir bin 2>/dev/null || true

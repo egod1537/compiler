@@ -9,7 +9,7 @@ enum Color {
     BLUE
 } current_color;
 
-int main(void)
+int main()
 {
     struct Point point;
     enum Color color;

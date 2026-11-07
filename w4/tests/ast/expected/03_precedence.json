@@ -148,9 +148,7 @@
       "ElementType": {
         "ref": "int"
       },
-      "Field": {
-        "ref": "void_param"
-      },
+      "Field": null,
       "Expr": {
         "ref": "body"
       }

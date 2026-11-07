@@ -133,16 +133,30 @@ void SEM_13_Initialize(void) {
   assert(id != NULL);
   assert(id->type == void_type);
 
+  assert(searchIdentifier("double") == NULL);
+
   // 기본 함수 검색
   id = searchIdentifier("printf");
   assert(id != NULL);
   assert(id->kind == ID_FUNC);
   assert(id->type->kind == T_FUNC);
-  assert(id->type->element_type == int_type);
+  assert(id->type->element_type == void_type);
+  assert(id->type->field != NULL);
+  assert(id->type->field->type == string_type);
+  assert(id->type->field->link != NULL);
+  assert(id->type->field->link->type == NULL);
 
   id = searchIdentifier("scanf");
   assert(id != NULL);
   assert(id->kind == ID_FUNC);
+  assert(id->type->element_type == void_type);
+
+  id = searchIdentifier("malloc");
+  assert(id != NULL);
+  assert(id->kind == ID_FUNC);
+  assert(id->type->element_type == string_type);
+  assert(id->type->field != NULL);
+  assert(id->type->field->type == int_type);
 
   // 모든 기본 명칭은 전역 레벨에 등록됨
   assert(id->level == 0);

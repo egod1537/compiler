@@ -2,6 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* SEM 단위 테스트는 lexer를 연결하지 않으므로 오류 위치용 심볼만 제공한다. */
+char *yytext = NULL;
+
 #ifdef _WIN32
 #include <io.h>
 #define ISATTY _isatty
@@ -30,15 +33,15 @@ void SEM_07_SetDeclaratorElementType(void);
 void SEM_08_SetTypeExpr(void);
 /* 구조체 필드와 함수 매개변수 목록의 타입 테이블 연결 검증 */
 void SEM_09_SetTypeField(void);
-/* 타입과 저장 클래스를 결합한 선언 지정자 생성 검증 */
+/* 타입을 담는 선언 지정자 생성 검증 */
 void SEM_10_MakeSpecifier(void);
-/* 기존 선언 지정자에 타입 또는 저장 클래스 정보 추가 검증 */
-void SEM_11_UpdateSpecifier(void);
+/* 선언 지정자 객체와 타입 정보가 서로 독립적인지 검증 */
+void SEM_11_SpecifierIndependence(void);
 /* 타입 생략 시 기본 int 타입 설정 및 기존 타입 유지 검증 */
 void SEM_12_SetDefaultSpecifier(void);
 /* 기본 타입, 내장 함수 및 전역 식별자 초기화 검증 */
 void SEM_13_Initialize(void);
-/* 일반 선언의 최종 타입, 종류, 저장 클래스 및 스코프 처리 검증 */
+/* 일반 선언의 최종 타입, 종류 및 스코프 처리 검증 */
 void SEM_14_SetDeclaratorListSpecifier(void);
 /* 함수 프로토타입, 함수 정의 및 매개변수 타입 연결 검증 */
 void SEM_15_SetFunctionDeclaratorSpecifier(void);
@@ -67,7 +70,8 @@ static const SemTest tests[] = {
     {"SEM_08_SetTypeExpr", "set type expression", SEM_08_SetTypeExpr},
     {"SEM_09_SetTypeField", "set type field", SEM_09_SetTypeField},
     {"SEM_10_MakeSpecifier", "make specifier", SEM_10_MakeSpecifier},
-    {"SEM_11_UpdateSpecifier", "update specifier", SEM_11_UpdateSpecifier},
+    {"SEM_11_SpecifierIndependence", "specifier independence",
+     SEM_11_SpecifierIndependence},
     {"SEM_12_SetDefaultSpecifier", "set default specifier",
      SEM_12_SetDefaultSpecifier},
     {"SEM_13_Initialize", "initialize", SEM_13_Initialize},

@@ -1,5 +1,7 @@
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "error.h"
 
@@ -19,6 +21,13 @@ const char *error_class_name(ERROR_CLASS error_class)
     }
 }
 
+int compiler_error_tags_enabled(void)
+{
+    const char *value = getenv("COMPILER_ERROR_TAGS");
+    return value != NULL && value[0] != '\0' && strcmp(value, "0") != 0;
+}
+
+/* 분류와 강의 오류 번호를 메시지 본문과 분리해 출력한다. */
 void report_compiler_error(ERROR_CLASS error_class, int code, int line,
                            const char *format, ...)
 {
@@ -35,4 +44,5 @@ void report_compiler_error(ERROR_CLASS error_class, int code, int line,
     vfprintf(stderr, format, arguments);
     va_end(arguments);
     fputc('\n', stderr);
+    fflush(stderr);
 }

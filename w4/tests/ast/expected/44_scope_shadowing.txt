@@ -2,7 +2,7 @@ AST 44 — scope_shadowing
 Source: tests/ast/cases/44_scope_shadowing.c
 
 int x;
-int main(void) {
+int main() {
     int x;
     x = 1;
     { int x; x = 2; }
@@ -13,10 +13,10 @@ MANUALLY DERIVED EXPECTED STRUCTURE (not captured program output)
 
 N_PROGRAM
 └─ clink / global A_ID list
-   ├─ A_ID "x" [ID_VAR, level=0, specifier=S_AUTO, type=int]  [X_GLOBAL]
+   ├─ A_ID "x" [ID_VAR, level=0, specifier=S_NULL, type=int]  [X_GLOBAL]
    └─ next → A_ID "main" [ID_FUNC, level=0, specifier=S_NULL]
       └─ type: T_FUNC
-         ├─ field: A_ID "" [ID_PARM, level=1, type=void]
+         ├─ field: NULL
          ├─ element_type: int
          └─ expr: N_STMT_COMPOUND  [outer function block]
             ├─ llink → A_ID "x" [ID_VAR, level=1, type=int] [X_OUTER]

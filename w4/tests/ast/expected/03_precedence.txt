@@ -1,13 +1,13 @@
 AST 03 — precedence
 Source: tests/ast/cases/03_precedence.c
 
-int main(void) { return 1 + 2 * 3; }
+int main() { return 1 + 2 * 3; }
 
 MANUALLY DERIVED EXPECTED STRUCTURE
 N_PROGRAM
 └─ clink → A_ID "main" [ID_FUNC, level=0, specifier=S_NULL]
    └─ type → T_FUNC
-      ├─ field → A_ID "" [ID_PARM, level=1, type=void]
+      ├─ field → NULL
       ├─ element_type → int
       └─ expr → N_STMT_COMPOUND
          ├─ llink → NULL

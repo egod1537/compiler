@@ -3,7 +3,7 @@ union Number {
     float float_value;
 } number;
 
-int main(void)
+int main()
 {
     union Number local;
     local.integer_value = 42;

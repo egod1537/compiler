@@ -1,5 +1,5 @@
 int global;
-int main(void) {
+int main() {
     int local;
     local = global;
     return local;

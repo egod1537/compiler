@@ -12,6 +12,6 @@
 11|legal scope shadowing|OK|11_scope_shadowing_ok.c
 12|resolved forward reference|OK|12_resolved_forward_reference_ok.c
 13|matching prototype and definition|OK|13_matching_prototype_ok.c
-14|void parameter list|OK|14_void_parameter_list_ok.c
+14|void parameter list rejected|DECLARATION_ERROR:14|14_void_parameter_list.c
 15|yacc syntax classification|SYNTAX_ERROR|15_syntax_error.c
 16|lexical classification|LEXICAL_ERROR|16_lexical_error.c

@@ -1,7 +1,7 @@
 static int counter = 0;
 extern int external_value;
 
-int main(void)
+int main()
 {
     register int index;
     volatile int flag;

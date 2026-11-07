@@ -426,11 +426,8 @@ void AST_24_FunctionPrototype(void) {
       main_type->expr->name != N_STMT_COMPOUND)
     semanticError("Invalid main function type");
 
-  A_ID *void_parameter = main_type->field;
-  if (void_parameter == NULL || void_parameter->link != NULL ||
-      void_parameter->name == NULL || void_parameter->name[0] != '\0' ||
-      void_parameter->kind != ID_PARM || void_parameter->type != void_type)
-    semanticError("Invalid main void parameter");
+  if (main_type->field != NULL)
+    semanticError("Expected empty main parameter list");
 
   A_NODE *statements = main_type->expr->rlink;
   A_NODE *return_statement = statements != NULL ? statements->llink : NULL;

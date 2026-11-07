@@ -7,7 +7,7 @@ MANUALLY DERIVED EXPECTED STRUCTURE (not captured program output)
 
 N_PROGRAM
 └─ clink / global A_ID list
-   └─ A_ID "f" [ID_FUNC, level=0, specifier=S_AUTO]
+   └─ A_ID "f" [ID_FUNC, level=0, specifier=S_NULL]
       ├─ type: T_FUNC
       │  ├─ field / parameters: NULL (empty parameter list)
       │  ├─ element_type: int
