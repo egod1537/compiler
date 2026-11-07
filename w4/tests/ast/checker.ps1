@@ -58,13 +58,13 @@ function ConvertFrom-AstPrintTokens {
                 Value = [int]$Matches[3]
             }
         }
-        elseif ($content -match '^\(ID="([^"]*)"\)\s+TYPE:(\S+)\s+KIND:([A-Z_]+)\s+SPEC=([A-Z_]+)\s+LEV=(-?\d+)\s+VAL=(-?\d+)\s+ADDR=(-?\d+)') {
+        elseif ($content -match '^\(ID="([^"]*)"\)\s+TYPE:(\S+)\s+KIND:([A-Z_]+)\s+(?:SPEC=([A-Z_]+)\s+)?LEV=(-?\d+)\s+VAL=(-?\d+)\s+ADDR=(-?\d+)') {
             $kind = "ID"
             $value = @{
                 Name = $Matches[1]
                 TypeAddress = ConvertTo-AddressKey $Matches[2]
                 Kind = "ID_$($Matches[3])"
-                Specifier = "S_$($Matches[4])"
+                Specifier = if ([string]::IsNullOrEmpty($Matches[4])) { "S_NULL" } else { "S_$($Matches[4])" }
                 Level = [int]$Matches[5]
                 Value = [int]$Matches[6]
                 Address = [int]$Matches[7]
@@ -488,7 +488,8 @@ function Compare-AstValue {
         Compare-AstValue $Expected.Rlink $Actual.Rlink $rightPath $State
     }
     elseif ($Expected.Class -eq "A_ID") {
-        foreach ($field in @("Name","Kind","Level","Specifier","Value","Address")) {
+        # Storage classes are outside the Chapter 5 assignment grammar.
+        foreach ($field in @("Name","Kind","Level","Value","Address")) {
             if ($Expected[$field] -ne $Actual[$field]) { Add-AstDifference $State $Path $Expected $Actual; break }
         }
         Compare-AstValue $Expected.Type $Actual.Type ($Path + "TYPE") $State
@@ -497,7 +498,7 @@ function Compare-AstValue {
         Compare-AstValue $Expected.Link $Actual.Link $linkPath $State
     }
     elseif ($Expected.Class -eq "A_ID_REF") {
-        foreach ($field in @("Name","Kind","Level","Specifier","Value","Address")) {
+        foreach ($field in @("Name","Kind","Level","Value","Address")) {
             if ($Expected[$field] -ne $Actual[$field]) { Add-AstDifference $State $Path $Expected $Actual; break }
         }
         Compare-AstValue $Expected.Type $Actual.Type ($Path + "TYPE") $State

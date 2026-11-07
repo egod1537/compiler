@@ -1,78 +1,56 @@
-CC ?= cc
-BISON ?= bison
-FLEX ?= flex
+CC ?= gcc
+CFLAGS ?= -std=c11 -Wall -Wextra -pedantic -O0 -g
+LEX = flex
+YACC = bison
 TEST ?=
 MAKEFLAGS += --no-print-directory
 
-CPPFLAGS += -D_POSIX_C_SOURCE=200809L -I.
-CFLAGS ?= -Wall -Wextra -std=c11 -O2
+.PHONY: all clean print-ast test test-ch5 test-ast test-astexp \
+	test-ast-exp test-parser test-sem test-semerr
 
-TARGET := parser
-GENERATED := y.tab.c y.tab.h lex.yy.c
-SOURCES := \
-	y.tab.c \
-	lex.yy.c \
-	semantic.c \
-	syntax_tree.c \
-	logger.c \
-	print.c \
-	tests/ast/ast_assert.c \
-	tests/ast/ast_options.c \
-	tests/ast/ast_expression.c \
-	tests/ast/ast_declaration.c \
-	tests/ast/ast_statement.c \
-	tests/ast/ast_expected.c \
-	tests/ast/ast.c
-OBJECTS := $(SOURCES:.c=.o)
-HEADERS := \
-	logger.h \
-	parse_value.h \
-	semantic.h \
-	syntax_tree.h \
-	type.h \
-	tests/ast/ast_assert.h \
-	tests/ast/ast_expected.h \
-	tests/ast/ast_runner.h
+all: parser
 
-.PHONY: all clean print-ast test test-ast test-ast-exp test-parser test-sem
-
-all: $(TARGET)
-
-$(TARGET): $(OBJECTS)
-	@$(CC) $(LDFLAGS) -o $@ $(OBJECTS) $(LDLIBS)
-
-y.tab.c: c.y
-	@$(BISON) -y -d c.y
-
-y.tab.h: y.tab.c
-	@test -f $@ || $(BISON) -y -d c.y
+y.tab.c y.tab.h: c.y
+	$(YACC) -d -o y.tab.c c.y
 
 lex.yy.c: c.l y.tab.h
-	@$(FLEX) c.l
+	$(LEX) c.l
 
-$(OBJECTS): $(HEADERS)
+parser: y.tab.c lex.yy.c support.c error.c print.c main.c type.h support.h error.h parse_value.h
+	$(CC) $(CFLAGS) -o $@ y.tab.c lex.yy.c support.c error.c print.c main.c
 
-test: $(TARGET)
+test: parser
 	@status=0; \
+	$(MAKE) test-ch5 || status=1; \
 	$(MAKE) test-ast || status=1; \
-	$(MAKE) test-ast-exp || status=1; \
+	$(MAKE) test-astexp || status=1; \
 	$(MAKE) test-sem || status=1; \
+	$(MAKE) test-semerr || status=1; \
 	exit $$status
 
-test-ast: $(TARGET)
-	@bash tests/ast/run.sh ./$(TARGET) $(TEST)
+test-ch5: parser
+	@bash tests/ch5/run.sh ./parser
 
-test-ast-exp: $(TARGET)
-	@bash tests/ast/run_expected.sh ./$(TARGET) $(TEST)
+test-ast: parser
+	@bash tests/ast/run.sh ./parser $(if $(TEST),$(TEST),all)
+
+test-astexp: parser
+	@bash tests/ast/run_expected.sh ./parser $(if $(TEST),$(TEST),all)
+
+test-ast-exp: test-astexp
 
 test-parser: test-ast
 
 test-sem:
 	@$(MAKE) -C tests/sem test TEST="$(TEST)"
 
-print-ast: $(TARGET)
-	@bash tests/ast/print.sh ./$(TARGET) "$(FILE)"
+test-semerr: parser
+	@bash tests/semerr/run.sh ./parser $(if $(TEST),$(TEST),all)
+
+print-ast: parser
+	@bash tests/ast/print.sh ./parser "$(FILE)"
 
 clean:
-	rm -f $(TARGET) $(OBJECTS) $(GENERATED)
-	$(MAKE) -C tests/sem clean
+	rm -f parser parser.exe y.tab.c y.tab.h lex.yy.c *.o
+	rm -f tests/ast/*.o
+	@$(MAKE) -C tests/sem clean

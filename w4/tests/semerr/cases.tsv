@@ -1,0 +1,17 @@
+# number|name|expected|source
+01|duplicate declaration|DECLARATION_ERROR:12|01_duplicate_declaration.c
+02|undeclared identifier|DECLARATION_ERROR:13|02_undeclared_identifier.c
+03|prototype parameter conflict|DECLARATION_ERROR:22|03_parameter_conflict.c
+04|function return type conflict|DECLARATION_ERROR:26|04_return_type_conflict.c
+05|incomplete forward reference|DECLARATION_ERROR:32|05_incomplete_forward_reference.c
+06|struct or enum tag kind conflict|DECLARATION_ERROR:11|06_tag_kind_conflict.c
+07|named void parameter|DECLARATION_ERROR:14|07_named_void_parameter.c
+08|empty parameter name|DECLARATION_ERROR:23|08_empty_parameter_name.c
+09|illegal function declarator|DECLARATION_ERROR:21|09_illegal_function_declarator.c
+10|duplicate struct field|DECLARATION_ERROR:12|10_duplicate_struct_field.c
+11|legal scope shadowing|OK|11_scope_shadowing_ok.c
+12|resolved forward reference|OK|12_resolved_forward_reference_ok.c
+13|matching prototype and definition|OK|13_matching_prototype_ok.c
+14|void parameter list|OK|14_void_parameter_list_ok.c
+15|yacc syntax classification|SYNTAX_ERROR|15_syntax_error.c
+16|lexical classification|LEXICAL_ERROR|16_lexical_error.c

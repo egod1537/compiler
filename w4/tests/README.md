@@ -7,6 +7,15 @@ from the project root on Unix-like systems:
 make test-sem
 ```
 
+Chapter 5 declaration-error integration cases live under `semerr/` and feed
+real C input to the active Lex/Yacc parser:
+
+```sh
+make test-semerr
+make test-semerr TEST=1
+make test-semerr TEST=list
+```
+
 On Windows:
 
 ```powershell
@@ -57,12 +66,15 @@ make test-sem TEST=list
 make test-sem TEST=4
 make test-ast TEST=4
 make test-ast-exp TEST=4
+make test-astexp TEST=4
+make test-semerr TEST=4
 ```
 
 Selectable C test functions follow one naming rule: `GROUP_NN_Name`.
 
-- `GROUP` is a single uppercase group code: `SEM` for semantic tests, `AST`
-  for AST assertions, or `ASTEXP` for selectable expected-AST tests.
+- `GROUP` is an uppercase group code: `SEM` for legacy semantic unit tests,
+  `SEMERR` for Chapter 5 parser error integration tests, `AST` for parser
+  acceptance tests, or `ASTEXP` for selectable expected-AST tests.
 - `NN` is the suite-local two-digit number used by `TEST=N`.
 - `Name` is a PascalCase description.
 - Examples: `SEM_04_Scope`, `ASTEXP_03_For`.

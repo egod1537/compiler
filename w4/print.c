@@ -64,7 +64,6 @@ char * node_name[] = {
 		"N_INIT_LIST_NIL"};
 void print_ast(A_NODE *);
 void prt_program(A_NODE *, int);
-void prt_initializer(A_NODE *, int);
 void prt_arg_expr_list(A_NODE *, int);
 void prt_statement(A_NODE *, int);
 void prt_statement_list(A_NODE *, int);
@@ -100,23 +99,6 @@ void prt_program(A_NODE *node, int s)
 		switch(node->name) {
 		   case N_PROGRAM:
 				prt_A_ID_LIST(PTR(A_ID, node->clink), s+1);
-				break;
-		   default :
-				printf("****syntax tree error******");
-		}
-}
-void prt_initializer(A_NODE *node, int s)
-{
-		print_node(node,s);
-		switch(node->name) {
-		   case N_INIT_LIST:
-				prt_initializer(node->llink, s+1);
-				prt_initializer(node->rlink, s+1);
-				break;
-		   case N_INIT_LIST_ONE:
-				prt_expression(node->clink, s+1);
-				break;
-		   case N_INIT_LIST_NIL:
 				break;
 		   default :
 				printf("****syntax tree error******");
@@ -389,27 +371,21 @@ void prt_A_ID_LIST(A_ID *id, int s)
 }
 char *id_kind_name[]={"NULL","VAR","FUNC","PARM","FIELD","TYPE","ENUM", 
 						"STRUCT","ENUM_LITERAL"};
-char *spec_name[]={"NULL","AUTO","STATIC","TYPEDEF","EXTERN","REGISTER"};
 void prt_A_ID_NAME(A_ID *id, int s)
 {
 		print_space(s);
-		printf("(ID=\"%s\") TYPE:%p KIND:%s SPEC=%s LEV=%d VAL=%d ADDR=%d \n", id->name, (void *)id->type,id_kind_name[id->kind],
-				spec_name[id->specifier],id->level, id->value, id->address);
+		printf("(ID=\"%s\") TYPE:%p KIND:%s LEV=%d VAL=%d ADDR=%d \n",
+				id->name, (void *)id->type, id_kind_name[id->kind],
+				id->level, id->value, id->address);
 }
 void prt_A_ID(A_ID *id, int s)
 {
 		print_space(s);
-		printf("(ID=\"%s\") TYPE:%p KIND:%s SPEC=%s LEV=%d VAL=%d ADDR=%d \n", id->name, (void *)id->type,id_kind_name[id->kind], 
-				spec_name[id->specifier],id->level, id->value, id->address);
+		printf("(ID=\"%s\") TYPE:%p KIND:%s LEV=%d VAL=%d ADDR=%d \n",
+				id->name, (void *)id->type, id_kind_name[id->kind],
+				id->level, id->value, id->address);
 		if (id->type) {
 				print_space(s);
 				printf("|  TYPE\n");
 				prt_A_TYPE(id->type,s+2);}
-		if (id->init) {
-				print_space(s);
-				printf("|  INIT\n");
-				if (id->kind==ID_ENUM_LITERAL)
-						prt_expression(id->init,s+2);
-				else 
-						prt_initializer(id->init,s+2); }
 }
