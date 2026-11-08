@@ -1,3 +1,5 @@
+%option noyywrap
+
 digit       [0-9]
 letter      [a-zA-Z_]
 delim       [ \t]
@@ -9,10 +11,17 @@ typedef long YYSTYPE;
 
 #include "y.tab.h"
 #include "type.h"
+#include <stdlib.h>
+#include <string.h>
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wint-conversion"
+#endif
+
 extern int line_no;
 extern A_ID *current_id;
-char *makeString();
-int checkIdentifier();
+char *makeString(char *);
+int checkIdentifier(char *);
 %}
 %%
 {ws}                    { }

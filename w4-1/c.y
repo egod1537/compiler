@@ -4,6 +4,14 @@ typedef long YYSTYPE;
 
 #include "type.h"
 #include "support.h"
+#include <stdio.h>
+
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wint-conversion"
+#endif
+
+int yylex(void);
+void yyerror(char *);
 extern int line_no, syntax_err;
 extern A_NODE *root;
 extern A_ID *current_id;
@@ -508,7 +516,7 @@ extern A_TYPE *int_type;
 
 %%
 extern char *yytext;
-yyerror(char *s)
+void yyerror(char *s)
 {
     syntax_err++;
     printf("line %d: %s near %s \n",line_no,s,yytext);

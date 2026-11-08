@@ -2,6 +2,7 @@
 #include "y.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 extern char *yytext;
 
@@ -407,6 +408,10 @@ BOOLEAN isNotSameType(A_TYPE *t1, A_TYPE *t2) {
     return (isNotSameType(t1->element_type, t2->element_type));
   else
     return (t1 != t2);
+}
+
+BOOLEAN isPointerOrArrayType(A_TYPE *t) {
+  return (t && (t->kind == T_POINTER || t->kind == T_ARRAY));
 }
 
 void initialize() {
