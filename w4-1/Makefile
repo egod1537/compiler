@@ -9,7 +9,7 @@ TARGET := parser
 GENERATED := y.tab.c y.tab.h lex.yy.c
 SOURCES := y.tab.c lex.yy.c support.c print.c main.c
 OBJECTS := $(SOURCES:.c=.o)
-HEADERS := type.h
+HEADERS := type.h support.h
 
 .PHONY: all clean test
 
