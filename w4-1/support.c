@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include "type.h"
-#include "support.h"
+#include "y.tab.h"
 
 extern char *yytext;
 
@@ -12,6 +11,42 @@ A_ID *current_id=NIL;
 int syntax_err=0;
 int line_no=1;
 int current_level=0;
+
+A_NODE *makeNode(NODE_NAME,A_NODE *,A_NODE *,A_NODE *);
+A_NODE *makeNodeList(NODE_NAME,A_NODE *,A_NODE *);
+A_ID *makeIdentifier(char *);
+A_ID *makeDummyIdentifier();
+A_TYPE *makeType(T_KIND);
+A_SPECIFIER *makeSpecifier(A_TYPE *,S_KIND);
+A_ID *searchIdentifier(char *,A_ID *);
+A_ID *searchIdentifierAtCurrentLevel(char *,A_ID *);
+A_SPECIFIER *updateSpecifier(A_SPECIFIER *,A_TYPE *,S_KIND);
+void checkForwardReference();
+void setDefaultSpecifier(A_SPECIFIER *);
+A_ID *linkDeclaratorList(A_ID *,A_ID *);
+A_ID *getIdentifierDeclared(char *);
+A_TYPE *getTypeOfStructOrEnumRefIdentifier(T_KIND,char *,ID_KIND);
+A_ID *setDeclaratorInit(A_ID *,A_NODE *);
+A_ID *setDeclaratorKind(A_ID *,ID_KIND);
+A_ID *setDeclaratorType(A_ID *,A_TYPE *);
+A_ID *setDeclaratorElementType(A_ID *,A_TYPE *);
+A_ID *setDeclaratorTypeAndKind(A_ID *,A_TYPE *,ID_KIND);
+A_ID *setDeclaratorListSpecifier(A_ID *,A_SPECIFIER *);
+A_ID *setFunctionDeclaratorSpecifier(A_ID *,A_SPECIFIER *);
+A_ID *setFunctionDeclaratorBody(A_ID *,A_NODE *);
+A_ID *setParameterDeclaratorSpecifier(A_ID *,A_SPECIFIER *);
+A_ID *setStructDeclaratorListSpecifier(A_ID *,A_TYPE *);
+A_TYPE *setTypeNameSpecifier(A_TYPE *,A_SPECIFIER *);
+A_TYPE *setTypeElementType(A_TYPE *,A_TYPE *);
+A_TYPE *setTypeField(A_TYPE *,A_ID *);
+A_TYPE *setTypeExpr(A_TYPE *,A_NODE *);
+A_TYPE *setTypeAndKindOfDeclarator(A_TYPE *,ID_KIND,A_ID *);
+A_TYPE *setTypeStructOrEnumIdentifier(T_KIND,char *,ID_KIND);
+BOOLEAN isNotSameFormalParameters(A_ID *,A_ID *);
+BOOLEAN isNotSameType(A_TYPE *,A_TYPE *);
+BOOLEAN isPointerOrArrayType(A_TYPE *);
+void syntax_error();
+void initialize();
 
 A_NODE *makeNode(NODE_NAME n, A_NODE *a, A_NODE *b, A_NODE *c)
 {
@@ -24,7 +59,7 @@ A_NODE *makeNode(NODE_NAME n, A_NODE *a, A_NODE *b, A_NODE *c)
     m->type=NIL;
     m->line=line_no;
     m->value=0;
-    return m;
+    return(m);
 }
 
 A_NODE *makeNodeList(NODE_NAME n, A_NODE *a, A_NODE *b)
@@ -44,13 +79,13 @@ A_NODE *makeNodeList(NODE_NAME n, A_NODE *a, A_NODE *b)
     k->name=n;
     k->llink=b;
     k->rlink=m;
-    return a;
+    return(a);
 }
 
 A_ID *makeIdentifier(char *s)
 {
     A_ID *id;
-    id=(A_ID *)malloc(sizeof(A_ID));
+    id=malloc(sizeof(A_ID));
     id->name=s;
     id->kind=0;
     id->specifier=0;
@@ -63,13 +98,13 @@ A_ID *makeIdentifier(char *s)
     id->value=0;
     id->prev=current_id;
     current_id=id;
-    return id;
+    return(id);
 }
 
-A_ID *makeDummyIdentifier(void)
+A_ID *makeDummyIdentifier()
 {
     A_ID *id;
-    id=(A_ID *)malloc(sizeof(A_ID));
+    id=malloc(sizeof(A_ID));
     id->name="";
     id->kind=0;
     id->specifier=0;
@@ -81,13 +116,13 @@ A_ID *makeDummyIdentifier(void)
     id->line=line_no;
     id->value=0;
     id->prev=0;
-    return id;
+    return(id);
 }
 
 A_TYPE *makeType(T_KIND k)
 {
     A_TYPE *t;
-    t=(A_TYPE *)malloc(sizeof(A_TYPE));
+    t=malloc(sizeof(A_TYPE));
     t->kind=k;
     t->size=0;
     t->local_var_size=0;
@@ -97,17 +132,17 @@ A_TYPE *makeType(T_KIND k)
     t->check=FALSE;
     t->prt=FALSE;
     t->line=line_no;
-    return t;
+    return(t);
 }
 
-A_SPECIFIER *makeSpecifier(A_TYPE *t)
+A_SPECIFIER *makeSpecifier(A_TYPE *t, S_KIND s)
 {
     A_SPECIFIER *p;
-    p=(A_SPECIFIER *)malloc(sizeof(A_SPECIFIER));
+    p=malloc(sizeof(A_SPECIFIER));
     p->type=t;
-    p->stor=S_NULL;
+    p->stor=s;
     p->line=line_no;
-    return p;
+    return(p);
 }
 
 A_ID *searchIdentifier(char *s, A_ID *id)
@@ -117,22 +152,22 @@ A_ID *searchIdentifier(char *s, A_ID *id)
             break;
         id=id->prev;
     }
-    return id;
+    return(id);
 }
 
 A_ID *searchIdentifierAtCurrentLevel(char *s, A_ID *id)
 {
     while (id) {
         if (id->level<current_level)
-            return NIL;
+            return(NIL);
         if (strcmp(id->name,s)==0)
             break;
         id=id->prev;
     }
-    return id;
+    return(id);
 }
 
-void checkForwardReference(void)
+void checkForwardReference()
 {
     A_ID *id;
     A_TYPE *t;
@@ -151,19 +186,45 @@ void checkForwardReference(void)
 
 void setDefaultSpecifier(A_SPECIFIER *p)
 {
+    A_TYPE *t;
     if (p->type==NIL)
         p->type=int_type;
+    if (p->stor==S_NULL)
+        p->stor=S_AUTO;
+}
+
+A_SPECIFIER *updateSpecifier(A_SPECIFIER *p, A_TYPE *t, S_KIND s)
+{
+    if (t) {
+        if (p->type) {
+            if (p->type==t)
+                ;
+            else
+                syntax_error(24);
+        } else
+            p->type=t;
+    }
+    if (s) {
+        if (p->stor) {
+            if (s==p->stor)
+                ;
+            else
+                syntax_error(24);
+        } else
+            p->stor=s;
+    }
+    return(p);
 }
 
 A_ID *linkDeclaratorList(A_ID *id1, A_ID *id2)
 {
     A_ID *m=id1;
     if (id1==NIL)
-        return id2;
+        return(id2);
     while (m->link)
         m=m->link;
     m->link=id2;
-    return id1;
+    return(id1);
 }
 
 A_ID *getIdentifierDeclared(char *s)
@@ -172,7 +233,7 @@ A_ID *getIdentifierDeclared(char *s)
     id=searchIdentifier(s,current_id);
     if (id==NIL)
         syntax_error(13,s);
-    return id;
+    return(id);
 }
 
 A_TYPE *getTypeOfStructOrEnumRefIdentifier(T_KIND k, char *s, ID_KIND kk)
@@ -182,7 +243,7 @@ A_TYPE *getTypeOfStructOrEnumRefIdentifier(T_KIND k, char *s, ID_KIND kk)
     id=searchIdentifier(s,current_id);
     if (id) {
         if (id->kind==kk && id->type->kind==k) {
-            return id->type;
+            return(id->type);
         } else {
             syntax_error(11,s);
         }
@@ -191,7 +252,13 @@ A_TYPE *getTypeOfStructOrEnumRefIdentifier(T_KIND k, char *s, ID_KIND kk)
     id=makeIdentifier(s);
     id->kind=kk;
     id->type=t;
-    return t;
+    return(t);
+}
+
+A_ID *setDeclaratorInit(A_ID *id, A_NODE *n)
+{
+    id->init=n;
+    return(id);
 }
 
 A_ID *setDeclaratorKind(A_ID *id, ID_KIND k)
@@ -201,13 +268,13 @@ A_ID *setDeclaratorKind(A_ID *id, ID_KIND k)
     if (a)
         syntax_error(12,id->name);
     id->kind=k;
-    return id;
+    return(id);
 }
 
 A_ID *setDeclaratorType(A_ID *id, A_TYPE *t)
 {
     id->type=t;
-    return id;
+    return(id);
 }
 
 A_ID *setDeclaratorElementType(A_ID *id, A_TYPE *t)
@@ -221,23 +288,25 @@ A_ID *setDeclaratorElementType(A_ID *id, A_TYPE *t)
             tt=tt->element_type;
         tt->element_type=t;
     }
-    return id;
+    return(id);
 }
 
 A_ID *setDeclaratorTypeAndKind(A_ID *id, A_TYPE *t, ID_KIND k)
 {
     id=setDeclaratorElementType(id,t);
     id=setDeclaratorKind(id,k);
-    return id;
+    return(id);
 }
 
 A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p)
 {
     A_ID *a;
+    if (p->stor)
+        syntax_error(25);
     setDefaultSpecifier(p);
     if (id->type->kind!=T_FUNC) {
-        syntax_error(21,NIL);
-        return id;
+        syntax_error(21);
+        return(id);
     } else {
         id=setDeclaratorElementType(id,p->type);
         id->kind=ID_FUNC;
@@ -258,17 +327,16 @@ A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p)
         if (strlen(a->name))
             current_id=a;
         else if (a->type)
-            syntax_error(23,NIL);
+            syntax_error(23);
         a=a->link;
     }
-    return id;
+    return(id);
 }
 
 A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *n)
 {
     id->type->expr=n;
-    current_id=id;
-    return id;
+    return(id);
 }
 
 A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *p)
@@ -280,26 +348,30 @@ A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *p)
         if (strlen(a->name) && searchIdentifierAtCurrentLevel(a->name,a->prev))
             syntax_error(12,a->name);
         a=setDeclaratorElementType(a,p->type);
-        if (a->type->kind==T_FUNC)
+        if (p->stor==S_TYPEDEF)
+            a->kind=ID_TYPE;
+        else if (a->type->kind==T_FUNC)
             a->kind=ID_FUNC;
         else
             a->kind=ID_VAR;
-        a->specifier=S_NULL;
+        a->specifier=p->stor;
+        if (a->specifier==S_NULL)
+            a->specifier=S_AUTO;
         a=a->link;
     }
-    return id;
+    return(id);
 }
 
 A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p)
 {
     if (searchIdentifierAtCurrentLevel(id->name,id->prev))
         syntax_error(12,id->name);
-    if (p->type==void_type)
-        syntax_error(14,NIL);
+    if (p->stor || p->type==void_type)
+        syntax_error(14);
     setDefaultSpecifier(p);
     id=setDeclaratorElementType(id,p->type);
     id->kind=ID_PARM;
-    return id;
+    return(id);
 }
 
 A_ID *setStructDeclaratorListSpecifier(A_ID *id, A_TYPE *t)
@@ -313,38 +385,40 @@ A_ID *setStructDeclaratorListSpecifier(A_ID *id, A_TYPE *t)
         a->kind=ID_FIELD;
         a=a->link;
     }
-    return id;
+    return(id);
 }
 
 A_TYPE *setTypeNameSpecifier(A_TYPE *t, A_SPECIFIER *p)
 {
+    if (p->stor)
+        syntax_error(20);
     setDefaultSpecifier(p);
     t=setTypeElementType(t,p->type);
-    return t;
+    return(t);
 }
 
 A_TYPE *setTypeElementType(A_TYPE *t, A_TYPE *s)
 {
     A_TYPE *q;
     if (t==NIL)
-        return s;
+        return(s);
     q=t;
     while (q->element_type)
         q=q->element_type;
     q->element_type=s;
-    return t;
+    return(t);
 }
 
 A_TYPE *setTypeField(A_TYPE *t, A_ID *n)
 {
     t->field=n;
-    return t;
+    return(t);
 }
 
 A_TYPE *setTypeExpr(A_TYPE *t, A_NODE *n)
 {
     t->expr=n;
-    return t;
+    return(t);
 }
 
 A_TYPE *setTypeStructOrEnumIdentifier(T_KIND k, char *s, ID_KIND kk)
@@ -357,7 +431,7 @@ A_TYPE *setTypeStructOrEnumIdentifier(T_KIND k, char *s, ID_KIND kk)
             if (a->type->field) {
                 syntax_error(12,s);
             } else {
-                return a->type;
+                return(a->type);
             }
         } else {
             syntax_error(12,s);
@@ -367,7 +441,7 @@ A_TYPE *setTypeStructOrEnumIdentifier(T_KIND k, char *s, ID_KIND kk)
     t=makeType(k);
     id->type=t;
     id->kind=kk;
-    return t;
+    return(t);
 }
 
 A_TYPE *setTypeAndKindOfDeclarator(A_TYPE *t, ID_KIND k, A_ID *id)
@@ -376,39 +450,34 @@ A_TYPE *setTypeAndKindOfDeclarator(A_TYPE *t, ID_KIND k, A_ID *id)
         syntax_error(12,id->name);
     id->type=t;
     id->kind=k;
-    return t;
+    return(t);
 }
 
 BOOLEAN isNotSameFormalParameters(A_ID *a, A_ID *b)
 {
     if (a==NIL)
-        return FALSE;
+        return(FALSE);
     while (a) {
         if (b==NIL || isNotSameType(a->type,b->type))
-            return TRUE;
+            return(TRUE);
         a=a->link;
         b=b->link;
     }
     if (b)
-        return TRUE;
+        return(TRUE);
     else
-        return FALSE;
+        return(FALSE);
 }
 
 BOOLEAN isNotSameType(A_TYPE *t1, A_TYPE *t2)
 {
     if (isPointerOrArrayType(t1) || isPointerOrArrayType(t2))
-        return isNotSameType(t1->element_type,t2->element_type);
+        return(isNotSameType(t1->element_type,t2->element_type));
     else
-        return t1!=t2;
+        return(t1!=t2);
 }
 
-BOOLEAN isPointerOrArrayType(A_TYPE *t)
-{
-    return t && (t->kind==T_POINTER || t->kind==T_ARRAY);
-}
-
-void initialize(void)
+void initialize()
 {
     int_type=setTypeAndKindOfDeclarator(makeType(T_ENUM),ID_TYPE,makeIdentifier("int"));
     float_type=setTypeAndKindOfDeclarator(makeType(T_ENUM),ID_TYPE,makeIdentifier("float"));
@@ -447,7 +516,7 @@ void initialize(void)
         ID_FUNC);
 }
 
-void syntax_error(int i, const char *s)
+void syntax_error(int i, char *s)
 {
     syntax_err++;
     printf("line %d: syntax error: ",line_no);
@@ -456,15 +525,18 @@ void syntax_error(int i, const char *s)
     case 12: printf("redeclaration of identifier %s",s); break;
     case 13: printf("undefined identifier %s",s); break;
     case 14: printf("illegal type specifier in formal parameter"); break;
+    case 20: printf("illegal storage class in type specifiers"); break;
     case 21: printf("illegal function declarator"); break;
     case 22: printf("conflicting parm type in prototype function %s",s); break;
     case 23: printf("empty parameter name"); break;
+    case 24: printf("illegal declaration specifiers"); break;
+    case 25: printf("illegal function specifiers"); break;
     case 26: printf("illegal or conflicting return type in function %s",s); break;
     case 31: printf("undefined type for identifier %s",s); break;
     case 32: printf("incomplete forward reference for identifier %s",s); break;
     default: printf("unknown"); break;
     }
-    if (yytext==NIL || strlen(yytext)==0)
+    if (strlen(yytext)==0)
         printf(" at end\n");
     else
         printf(" near %s\n",yytext);

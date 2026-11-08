@@ -1,12 +1,31 @@
-#include "support.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include "type.h"
 
-int yyparse(void);
+extern int syntax_err;
+extern int semantic_err;
+extern A_NODE *root;
 
-int main(void)
+FILE *fout;
+
+void initialize();
+void print_ast();
+void print_sem_ast();
+void code_generation();
+void semantic_analysis();
+
+void main(int argc, char *argv[])
 {
+    if ((fout=fopen("a.asm","w"))==NULL) {
+        printf("can not open output file: a.asm\n");
+        exit(1);
+    }
     initialize();
-    if (yyparse()!=0 || syntax_err)
-        return 1;
-    print_ast(root);
-    return 0;
+    yyparse();
+    if (syntax_err) exit(1);
+    //print_ast(root);
+    semantic_analysis(root);
+    if (semantic_err) exit(1);
+    code_generation(root);
+    exit(0);
 }

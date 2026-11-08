@@ -1,4 +1,8 @@
-# Syntax-analyzer test results
+# Previous syntax-analyzer test results
+
+> These results describe the earlier assignment-specific subset. They are
+> retained as historical notes and no longer describe the photographed
+> appendix transcription now in `c.l`, `c.y`, `support.c`, and `main.c`.
 
 Tested on 2026-11-07 after removing assignment-excluded functionality.
 
@@ -10,7 +14,6 @@ Tested on 2026-11-07 after removing assignment-excluded functionality.
 - `parser.cmd`: passed
 - Windows CRLF input: passed
 - Unix LF input: passed
-- pointer-width `_Static_assert`: passed
 - Bison reports only the expected dangling-`else` shift/reduce conflict
 
 ## Assignment-scope probes

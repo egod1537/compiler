@@ -1,6 +1,5 @@
-int main()
-{
-    int value;
-    int value;
-    return 0;
+int a;
+int f() {
+  int a;
+  a = 10;
 }

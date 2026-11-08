@@ -1,124 +1,153 @@
 %{
-#include <stdio.h>
 #include "type.h"
-#include "parse_value.h"
-#include "support.h"
-
-int yylex(void);
-int yyerror(const char *s);
-
-#define P(type, value) YY_TO_PTR(type, value)
-#define V(value) YY_FROM_PTR(value)
+extern int line_no, syntax_err;
+extern A_NODE *root;
+extern A_ID *current_id;
+extern int current_level;
+extern A_TYPE *int_type;
 %}
-
 %start program
-%expect 1
-%token INVALID_TOKEN IDENTIFIER TYPE_IDENTIFIER FLOAT_CONSTANT INTEGER_CONSTANT
+%token IDENTIFIER TYPE_IDENTIFIER FLOAT_CONSTANT INTEGER_CONSTANT
        CHARACTER_CONSTANT STRING_LITERAL PLUS MINUS PLUSPLUS
        MINUSMINUS BAR AMP BARBAR AMPAMP ARROW
        SEMICOLON LSS GTR LEQ GEQ EQL NEQ DOTDOTDOT
-       LP RP LB RB LR RR PERIOD COMMA EXCL STAR SLASH PERCENT ASSIGN COLON
+       LP RP LB RB LR RR PERIOD COMMA EXCL STAR SLASH PERCENT ASSIGN
+       COLON AUTO_SYM STATIC_SYM TYPEDEF_SYM
        STRUCT_SYM ENUM_SYM SIZEOF_SYM UNION_SYM
        IF_SYM ELSE_SYM WHILE_SYM DO_SYM FOR_SYM CONTINUE_SYM
        BREAK_SYM RETURN_SYM SWITCH_SYM CASE_SYM DEFAULT_SYM
-
 %%
 program
     : translation_unit
-      { root=makeNode(N_PROGRAM,NIL,P(A_NODE,$1),NIL); checkForwardReference(); }
+      { root=makeNode(N_PROGRAM,NIL,$1,NIL); checkForwardReference(); }
     ;
 
 translation_unit
-    : external_declaration                  { $$=$1; }
-    | translation_unit external_declaration { $$=V(linkDeclaratorList(P(A_ID,$1),P(A_ID,$2))); }
+    : external_declaration { $$=$1; }
+    | translation_unit external_declaration
+      { $$=linkDeclaratorList($1,$2); }
     ;
 
 external_declaration
     : function_definition { $$=$1; }
-    | declaration         { $$=$1; }
+    | declaration { $$=$1; }
     ;
 
 function_definition
     : declaration_specifiers declarator
-      { $$=V(setFunctionDeclaratorSpecifier(P(A_ID,$2),P(A_SPECIFIER,$1))); }
+      { $$=setFunctionDeclaratorSpecifier($2,$1); }
       compound_statement
-      { $$=V(setFunctionDeclaratorBody(P(A_ID,$3),P(A_NODE,$4))); }
+      { $$=setFunctionDeclaratorBody($3,$4); }
     | declarator
-      { $$=V(setFunctionDeclaratorSpecifier(P(A_ID,$1),makeSpecifier(int_type))); }
+      { $$=setFunctionDeclaratorSpecifier($1,makeSpecifier(int_type,0)); }
       compound_statement
-      { $$=V(setFunctionDeclaratorBody(P(A_ID,$2),P(A_NODE,$3))); }
+      { $$=setFunctionDeclaratorBody($2,$3); }
     ;
 
 declaration_list_opt
-    :                  { $$=V(NIL); }
+    : { $$=NIL; }
     | declaration_list { $$=$1; }
     ;
 
 declaration_list
-    : declaration                          { $$=$1; }
-    | declaration_list declaration         { $$=V(linkDeclaratorList(P(A_ID,$1),P(A_ID,$2))); }
+    : declaration { $$=$1; }
+    | declaration_list declaration
+      { $$=linkDeclaratorList($1,$2); }
     ;
 
 declaration
-    : declaration_specifiers declarator_list_opt SEMICOLON
-      { $$=V(setDeclaratorListSpecifier(P(A_ID,$2),P(A_SPECIFIER,$1))); }
+    : declaration_specifiers init_declarator_list_opt SEMICOLON
+      { $$=setDeclaratorListSpecifier($2,$1); }
     ;
 
 declaration_specifiers
     : type_specifier
-      { $$=V(makeSpecifier(P(A_TYPE,$1))); }
+      { $$=makeSpecifier($1,0); }
+    | storage_class_specifier
+      { $$=makeSpecifier(0,$1); }
+    | type_specifier declaration_specifiers
+      { $$=updateSpecifier($2,$1,0); }
+    | storage_class_specifier declaration_specifiers
+      { $$=updateSpecifier($2,0,$1); }
     ;
 
-declarator_list_opt
-    :                 { $$=V(makeDummyIdentifier()); }
-    | declarator_list { $$=$1; }
+storage_class_specifier
+    : AUTO_SYM { $$=S_AUTO; }
+    | STATIC_SYM { $$=S_STATIC; }
+    | TYPEDEF_SYM { $$=S_TYPEDEF; }
     ;
 
-declarator_list
-    : declarator                       { $$=$1; }
-    | declarator_list COMMA declarator { $$=V(linkDeclaratorList(P(A_ID,$1),P(A_ID,$3))); }
+init_declarator_list_opt
+    : { $$=makeDummyIdentifier(); }
+    | init_declarator_list { $$=$1; }
+    ;
+
+init_declarator_list
+    : init_declarator { $$=$1; }
+    | init_declarator_list COMMA init_declarator
+      { $$=linkDeclaratorList($1,$3); }
+    ;
+
+init_declarator
+    : declarator { $$=$1; }
+    | declarator ASSIGN initializer
+      { $$=setDeclaratorInit($1,$3); }
+    ;
+
+initializer
+    : constant_expression
+      { $$=makeNode(N_INIT_LIST_ONE,NIL,$1,NIL); }
+    | LR initializer_list RR { $$=$2; }
+    ;
+
+initializer_list
+    : initializer
+      { $$=makeNode(N_INIT_LIST,$1,NIL,makeNode(N_INIT_LIST_NIL,NIL,NIL,NIL)); }
+    | initializer_list COMMA initializer
+      { $$=makeNodeList(N_INIT_LIST,$1,$3); }
     ;
 
 type_specifier
     : struct_type_specifier { $$=$1; }
-    | enum_type_specifier   { $$=$1; }
-    | TYPE_IDENTIFIER       { $$=$1; }
+    | enum_type_specifier { $$=$1; }
+    | TYPE_IDENTIFIER { $$=$1; }
     ;
 
 struct_type_specifier
     : struct_or_union IDENTIFIER
-      { $$=V(setTypeStructOrEnumIdentifier((T_KIND)$1,P(char,$2),ID_STRUCT)); }
-      LR { $$=V(current_id); current_level++; } struct_declaration_list RR
-      { checkForwardReference(); $$=V(setTypeField(P(A_TYPE,$3),P(A_ID,$6)));
-        current_level--; current_id=P(A_ID,$5); }
+      { $$=setTypeStructOrEnumIdentifier($1,$2,ID_STRUCT); }
+      LR { $$=current_id; current_level++; } struct_declaration_list RR
+      { checkForwardReference(); $$=setTypeField($3,$6); current_level--;
+        current_id=$5; }
     | struct_or_union
-      { $$=V(makeType((T_KIND)$1)); }
-      LR { $$=V(current_id); current_level++; } struct_declaration_list RR
-      { checkForwardReference(); $$=V(setTypeField(P(A_TYPE,$2),P(A_ID,$5)));
-        current_level--; current_id=P(A_ID,$4); }
+      { $$=makeType($1); }
+      LR { $$=current_id; current_level++; } struct_declaration_list RR
+      { checkForwardReference(); $$=setTypeField($2,$5); current_level--;
+        current_id=$4; }
     | struct_or_union IDENTIFIER
-      { $$=V(getTypeOfStructOrEnumRefIdentifier((T_KIND)$1,P(char,$2),ID_STRUCT)); }
+      { $$=getTypeOfStructOrEnumRefIdentifier($1,$2,ID_STRUCT); }
     ;
 
 struct_or_union
     : STRUCT_SYM { $$=T_STRUCT; }
-    | UNION_SYM  { $$=T_UNION; }
+    | UNION_SYM { $$=T_UNION; }
     ;
 
 struct_declaration_list
-    : struct_declaration                         { $$=$1; }
-    | struct_declaration_list struct_declaration { $$=V(linkDeclaratorList(P(A_ID,$1),P(A_ID,$2))); }
+    : struct_declaration { $$=$1; }
+    | struct_declaration_list struct_declaration
+      { $$=linkDeclaratorList($1,$2); }
     ;
 
 struct_declaration
     : type_specifier struct_declarator_list SEMICOLON
-      { $$=V(setStructDeclaratorListSpecifier(P(A_ID,$2),P(A_TYPE,$1))); }
+      { $$=setStructDeclaratorListSpecifier($2,$1); }
     ;
 
 struct_declarator_list
-    : struct_declarator                         { $$=$1; }
+    : struct_declarator { $$=$1; }
     | struct_declarator_list COMMA struct_declarator
-      { $$=V(linkDeclaratorList(P(A_ID,$1),P(A_ID,$3))); }
+      { $$=linkDeclaratorList($1,$3); }
     ;
 
 struct_declarator
@@ -127,186 +156,196 @@ struct_declarator
 
 enum_type_specifier
     : ENUM_SYM IDENTIFIER
-      { $$=V(setTypeStructOrEnumIdentifier(T_ENUM,P(char,$2),ID_ENUM)); }
+      { $$=setTypeStructOrEnumIdentifier(T_ENUM,$2,ID_ENUM); }
       LR enumerator_list RR
-      { $$=V(setTypeField(P(A_TYPE,$3),P(A_ID,$5))); }
+      { $$=setTypeField($3,$5); }
     | ENUM_SYM
-      { $$=V(makeType(T_ENUM)); }
+      { $$=makeType(T_ENUM); }
       LR enumerator_list RR
-      { $$=V(setTypeField(P(A_TYPE,$2),P(A_ID,$4))); }
+      { $$=setTypeField($2,$4); }
     | ENUM_SYM IDENTIFIER
-      { $$=V(getTypeOfStructOrEnumRefIdentifier(T_ENUM,P(char,$2),ID_ENUM)); }
+      { $$=getTypeOfStructOrEnumRefIdentifier(T_ENUM,$2,ID_ENUM); }
     ;
 
 enumerator_list
-    : enumerator                       { $$=$1; }
-    | enumerator_list COMMA enumerator { $$=V(linkDeclaratorList(P(A_ID,$1),P(A_ID,$3))); }
+    : enumerator { $$=$1; }
+    | enumerator_list COMMA enumerator
+      { $$=linkDeclaratorList($1,$3); }
     ;
 
 enumerator
     : IDENTIFIER
-      { $$=V(setDeclaratorKind(makeIdentifier(P(char,$1)),ID_ENUM_LITERAL)); }
+      { $$=setDeclaratorKind(makeIdentifier($1),ID_ENUM_LITERAL); }
+    | IDENTIFIER
+      { $$=setDeclaratorKind(makeIdentifier($1),ID_ENUM_LITERAL); }
+      ASSIGN expression
+      { $$=setDeclaratorInit($2,$4); }
     ;
 
 declarator
-    : pointer direct_declarator { $$=V(setDeclaratorElementType(P(A_ID,$2),P(A_TYPE,$1))); }
-    | direct_declarator         { $$=$1; }
+    : pointer direct_declarator
+      { $$=setDeclaratorElementType($2,$1); }
+    | direct_declarator { $$=$1; }
     ;
 
 pointer
-    : STAR         { $$=V(makeType(T_POINTER)); }
-    | STAR pointer { $$=V(setTypeElementType(P(A_TYPE,$2),makeType(T_POINTER))); }
+    : STAR { $$=makeType(T_POINTER); }
+    | STAR pointer
+      { $$=setTypeElementType($2,makeType(T_POINTER)); }
     ;
 
 direct_declarator
-    : IDENTIFIER { $$=V(makeIdentifier(P(char,$1))); }
+    : IDENTIFIER { $$=makeIdentifier($1); }
     | LP declarator RP { $$=$2; }
     | direct_declarator LB constant_expression_opt RB
-      { $$=V(setDeclaratorElementType(P(A_ID,$1),setTypeExpr(makeType(T_ARRAY),P(A_NODE,$3)))); }
+      { $$=setDeclaratorElementType($1,setTypeExpr(makeType(T_ARRAY),$3)); }
     | direct_declarator LP
-      { $$=V(current_id); current_level++; }
+      { $$=current_id; current_level++; }
       parameter_type_list_opt RP
-      { checkForwardReference(); current_id=P(A_ID,$3); current_level--;
-        $$=V(setDeclaratorElementType(P(A_ID,$1),setTypeField(makeType(T_FUNC),P(A_ID,$4)))); }
+      { checkForwardReference(); current_id=$3; current_level--;
+        $$=setDeclaratorElementType($1,setTypeField(makeType(T_FUNC),$4)); }
     ;
 
 parameter_type_list_opt
-    :                     { $$=V(NIL); }
+    : { $$=NIL; }
     | parameter_type_list { $$=$1; }
     ;
 
 parameter_type_list
     : parameter_list { $$=$1; }
     | parameter_list COMMA DOTDOTDOT
-      { $$=V(linkDeclaratorList(P(A_ID,$1),setDeclaratorKind(makeDummyIdentifier(),ID_PARM))); }
+      { $$=linkDeclaratorList($1,setDeclaratorKind(makeDummyIdentifier(),ID_PARM)); }
     ;
 
 parameter_list
-    : parameter_declaration                      { $$=$1; }
-    | parameter_list COMMA parameter_declaration { $$=V(linkDeclaratorList(P(A_ID,$1),P(A_ID,$3))); }
+    : parameter_declaration { $$=$1; }
+    | parameter_list COMMA parameter_declaration
+      { $$=linkDeclaratorList($1,$3); }
     ;
 
 parameter_declaration
     : declaration_specifiers declarator
-      { $$=V(setParameterDeclaratorSpecifier(P(A_ID,$2),P(A_SPECIFIER,$1))); }
+      { $$=setParameterDeclaratorSpecifier($2,$1); }
     | declaration_specifiers abstract_declarator_opt
-      { $$=V(setParameterDeclaratorSpecifier(setDeclaratorType(makeDummyIdentifier(),P(A_TYPE,$2)),P(A_SPECIFIER,$1))); }
+      { $$=setParameterDeclaratorSpecifier(setDeclaratorType(makeDummyIdentifier(),$2),$1); }
     ;
 
 abstract_declarator_opt
-    :                     { $$=V(NIL); }
+    : { $$=NIL; }
     | abstract_declarator { $$=$1; }
     ;
 
 abstract_declarator
     : direct_abstract_declarator { $$=$1; }
-    | pointer                    { $$=V(makeType(T_POINTER)); }
+    | pointer { $$=makeType(T_POINTER); }
     | pointer direct_abstract_declarator
-      { $$=V(setTypeElementType(P(A_TYPE,$2),makeType(T_POINTER))); }
+      { $$=setTypeElementType($2,makeType(T_POINTER)); }
     ;
 
 direct_abstract_declarator
     : LP abstract_declarator RP { $$=$2; }
     | LB constant_expression_opt RB
-      { $$=V(setTypeExpr(makeType(T_ARRAY),P(A_NODE,$2))); }
+      { $$=setTypeExpr(makeType(T_ARRAY),$2); }
     | direct_abstract_declarator LB constant_expression_opt RB
-      { $$=V(setTypeElementType(P(A_TYPE,$1),setTypeExpr(makeType(T_ARRAY),P(A_NODE,$3)))); }
+      { $$=setTypeElementType($1,setTypeExpr(makeType(T_ARRAY),$3)); }
     | LP parameter_type_list_opt RP
-      { $$=V(setTypeExpr(makeType(T_FUNC),P(A_NODE,$2))); }
+      { $$=setTypeExpr(makeType(T_FUNC),$2); }
     | direct_abstract_declarator LP parameter_type_list_opt RP
-      { $$=V(setTypeElementType(P(A_TYPE,$1),setTypeExpr(makeType(T_FUNC),P(A_NODE,$3)))); }
+      { $$=setTypeElementType($1,setTypeExpr(makeType(T_FUNC),$3)); }
     ;
 
 statement_list_opt
-    :                { $$=V(makeNode(N_STMT_LIST_NIL,NIL,NIL,NIL)); }
+    : { $$=makeNode(N_STMT_LIST_NIL,NIL,NIL,NIL); }
     | statement_list { $$=$1; }
     ;
 
 statement_list
     : statement
-      { $$=V(makeNode(N_STMT_LIST,P(A_NODE,$1),NIL,makeNode(N_STMT_LIST_NIL,NIL,NIL,NIL))); }
+      { $$=makeNode(N_STMT_LIST,$1,NIL,makeNode(N_STMT_LIST_NIL,NIL,NIL,NIL)); }
     | statement_list statement
-      { $$=V(makeNodeList(N_STMT_LIST,P(A_NODE,$1),P(A_NODE,$2))); }
+      { $$=makeNodeList(N_STMT_LIST,$1,$2); }
     ;
 
 statement
-    : labeled_statement    { $$=$1; }
-    | compound_statement   { $$=$1; }
+    : labeled_statement { $$=$1; }
+    | compound_statement { $$=$1; }
     | expression_statement { $$=$1; }
-    | selection_statement  { $$=$1; }
-    | iteration_statement  { $$=$1; }
-    | jump_statement       { $$=$1; }
+    | selection_statement { $$=$1; }
+    | iteration_statement { $$=$1; }
+    | jump_statement { $$=$1; }
     ;
 
 labeled_statement
     : CASE_SYM constant_expression COLON statement
-      { $$=V(makeNode(N_STMT_LABEL_CASE,P(A_NODE,$2),NIL,P(A_NODE,$4))); }
+      { $$=makeNode(N_STMT_LABEL_CASE,$2,NIL,$4); }
     | DEFAULT_SYM COLON statement
-      { $$=V(makeNode(N_STMT_LABEL_DEFAULT,NIL,P(A_NODE,$3),NIL)); }
+      { $$=makeNode(N_STMT_LABEL_DEFAULT,NIL,$3,NIL); }
     ;
 
 compound_statement
-    : LR { $$=V(current_id); current_level++; } declaration_list_opt statement_list_opt RR
-      { checkForwardReference(); $$=V(makeNode(N_STMT_COMPOUND,P(A_NODE,$3),NIL,P(A_NODE,$4)));
-        current_id=P(A_ID,$2); current_level--; }
+    : LR { $$=current_id; current_level++; } declaration_list_opt
+      statement_list_opt RR
+      { checkForwardReference(); $$=makeNode(N_STMT_COMPOUND,$3,NIL,$4);
+        current_id=$2; current_level--; }
     ;
 
 expression_statement
-    : SEMICOLON            { $$=V(makeNode(N_STMT_EMPTY,NIL,NIL,NIL)); }
-    | expression SEMICOLON { $$=V(makeNode(N_STMT_EXPRESSION,NIL,P(A_NODE,$1),NIL)); }
+    : SEMICOLON { $$=makeNode(N_STMT_EMPTY,NIL,NIL,NIL); }
+    | expression SEMICOLON
+      { $$=makeNode(N_STMT_EXPRESSION,NIL,$1,NIL); }
     ;
 
 selection_statement
     : IF_SYM LP expression RP statement
-      { $$=V(makeNode(N_STMT_IF,P(A_NODE,$3),NIL,P(A_NODE,$5))); }
+      { $$=makeNode(N_STMT_IF,$3,NIL,$5); }
     | IF_SYM LP expression RP statement ELSE_SYM statement
-      { $$=V(makeNode(N_STMT_IF_ELSE,P(A_NODE,$3),P(A_NODE,$5),P(A_NODE,$7))); }
+      { $$=makeNode(N_STMT_IF_ELSE,$3,$5,$7); }
     | SWITCH_SYM LP expression RP statement
-      { $$=V(makeNode(N_STMT_SWITCH,P(A_NODE,$3),NIL,P(A_NODE,$5))); }
+      { $$=makeNode(N_STMT_SWITCH,$3,NIL,$5); }
     ;
 
 iteration_statement
     : WHILE_SYM LP expression RP statement
-      { $$=V(makeNode(N_STMT_WHILE,P(A_NODE,$3),NIL,P(A_NODE,$5))); }
+      { $$=makeNode(N_STMT_WHILE,$3,NIL,$5); }
     | DO_SYM statement WHILE_SYM LP expression RP SEMICOLON
-      { $$=V(makeNode(N_STMT_DO,P(A_NODE,$2),NIL,P(A_NODE,$5))); }
+      { $$=makeNode(N_STMT_DO,$2,NIL,$5); }
     | FOR_SYM LP for_expression RP statement
-      { $$=V(makeNode(N_STMT_FOR,P(A_NODE,$3),NIL,P(A_NODE,$5))); }
+      { $$=makeNode(N_STMT_FOR,$3,NIL,$5); }
     ;
 
 for_expression
     : expression_opt SEMICOLON expression_opt SEMICOLON expression_opt
-      { $$=V(makeNode(N_FOR_EXP,P(A_NODE,$1),P(A_NODE,$3),P(A_NODE,$5))); }
+      { $$=makeNode(N_FOR_EXP,$1,$3,$5); }
     ;
 
 expression_opt
-    :            { $$=V(NIL); }
+    : /* empty */ { $$=NIL; }
     | expression { $$=$1; }
     ;
 
 jump_statement
     : RETURN_SYM expression_opt SEMICOLON
-      { $$=V(makeNode(N_STMT_RETURN,NIL,P(A_NODE,$2),NIL)); }
+      { $$=makeNode(N_STMT_RETURN,NIL,$2,NIL); }
     | CONTINUE_SYM SEMICOLON
-      { $$=V(makeNode(N_STMT_CONTINUE,NIL,NIL,NIL)); }
+      { $$=makeNode(N_STMT_CONTINUE,NIL,NIL,NIL); }
     | BREAK_SYM SEMICOLON
-      { $$=V(makeNode(N_STMT_BREAK,NIL,NIL,NIL)); }
+      { $$=makeNode(N_STMT_BREAK,NIL,NIL,NIL); }
     ;
 
 arg_expression_list_opt
-    :                     { $$=V(makeNode(N_ARG_LIST_NIL,NIL,NIL,NIL)); }
+    : { $$=makeNode(N_ARG_LIST_NIL,NIL,NIL,NIL); }
     | arg_expression_list { $$=$1; }
     ;
 
 arg_expression_list
     : assignment_expression
-      { $$=V(makeNode(N_ARG_LIST,P(A_NODE,$1),NIL,makeNode(N_ARG_LIST_NIL,NIL,NIL,NIL))); }
+      { $$=makeNode(N_ARG_LIST,$1,NIL,makeNode(N_ARG_LIST_NIL,NIL,NIL,NIL)); }
     | arg_expression_list COMMA assignment_expression
-      { $$=V(makeNodeList(N_ARG_LIST,P(A_NODE,$1),P(A_NODE,$3))); }
+      { $$=makeNodeList(N_ARG_LIST,$1,$3); }
     ;
 
 constant_expression_opt
-    :                     { $$=V(NIL); }
+    : { $$=NIL; }
     | constant_expression { $$=$1; }
     ;
 
@@ -325,7 +364,7 @@ comma_expression
 assignment_expression
     : conditional_expression { $$=$1; }
     | unary_expression ASSIGN assignment_expression
-      { $$=V(makeNode(N_EXP_ASSIGN,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_ASSIGN,$1,NIL,$3); }
     ;
 
 conditional_expression
@@ -335,13 +374,13 @@ conditional_expression
 logical_or_expression
     : logical_and_expression { $$=$1; }
     | logical_or_expression BARBAR logical_and_expression
-      { $$=V(makeNode(N_EXP_OR,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_OR,$1,NIL,$3); }
     ;
 
 logical_and_expression
     : bitwise_or_expression { $$=$1; }
     | logical_and_expression AMPAMP bitwise_or_expression
-      { $$=V(makeNode(N_EXP_AND,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_AND,$1,NIL,$3); }
     ;
 
 bitwise_or_expression
@@ -359,21 +398,21 @@ bitwise_and_expression
 equality_expression
     : relational_expression { $$=$1; }
     | equality_expression EQL relational_expression
-      { $$=V(makeNode(N_EXP_EQL,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_EQL,$1,NIL,$3); }
     | equality_expression NEQ relational_expression
-      { $$=V(makeNode(N_EXP_NEQ,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_NEQ,$1,NIL,$3); }
     ;
 
 relational_expression
     : shift_expression { $$=$1; }
     | relational_expression LSS shift_expression
-      { $$=V(makeNode(N_EXP_LSS,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_LSS,$1,NIL,$3); }
     | relational_expression GTR shift_expression
-      { $$=V(makeNode(N_EXP_GTR,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_GTR,$1,NIL,$3); }
     | relational_expression LEQ shift_expression
-      { $$=V(makeNode(N_EXP_LEQ,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_LEQ,$1,NIL,$3); }
     | relational_expression GEQ shift_expression
-      { $$=V(makeNode(N_EXP_GEQ,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_GEQ,$1,NIL,$3); }
     ;
 
 shift_expression
@@ -383,84 +422,87 @@ shift_expression
 additive_expression
     : multiplicative_expression { $$=$1; }
     | additive_expression PLUS multiplicative_expression
-      { $$=V(makeNode(N_EXP_ADD,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_ADD,$1,NIL,$3); }
     | additive_expression MINUS multiplicative_expression
-      { $$=V(makeNode(N_EXP_SUB,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_SUB,$1,NIL,$3); }
     ;
 
 multiplicative_expression
     : cast_expression { $$=$1; }
     | multiplicative_expression STAR cast_expression
-      { $$=V(makeNode(N_EXP_MUL,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_MUL,$1,NIL,$3); }
     | multiplicative_expression SLASH cast_expression
-      { $$=V(makeNode(N_EXP_DIV,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_DIV,$1,NIL,$3); }
     | multiplicative_expression PERCENT cast_expression
-      { $$=V(makeNode(N_EXP_MOD,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_MOD,$1,NIL,$3); }
     ;
 
 cast_expression
     : unary_expression { $$=$1; }
     | LP type_name RP cast_expression
-      { $$=V(makeNode(N_EXP_CAST,P(A_NODE,$2),NIL,P(A_NODE,$4))); }
+      { $$=makeNode(N_EXP_CAST,$2,NIL,$4); }
     ;
 
 unary_expression
     : postfix_expression { $$=$1; }
-    | PLUSPLUS unary_expression { $$=V(makeNode(N_EXP_PRE_INC,NIL,P(A_NODE,$2),NIL)); }
-    | MINUSMINUS unary_expression { $$=V(makeNode(N_EXP_PRE_DEC,NIL,P(A_NODE,$2),NIL)); }
-    | AMP cast_expression { $$=V(makeNode(N_EXP_AMP,NIL,P(A_NODE,$2),NIL)); }
-    | STAR cast_expression { $$=V(makeNode(N_EXP_STAR,NIL,P(A_NODE,$2),NIL)); }
-    | EXCL cast_expression { $$=V(makeNode(N_EXP_NOT,NIL,P(A_NODE,$2),NIL)); }
-    | MINUS cast_expression { $$=V(makeNode(N_EXP_MINUS,NIL,P(A_NODE,$2),NIL)); }
-    | PLUS cast_expression { $$=V(makeNode(N_EXP_PLUS,NIL,P(A_NODE,$2),NIL)); }
-    | SIZEOF_SYM unary_expression { $$=V(makeNode(N_EXP_SIZE_EXP,NIL,P(A_NODE,$2),NIL)); }
-    | SIZEOF_SYM LP type_name RP { $$=V(makeNode(N_EXP_SIZE_TYPE,NIL,P(A_NODE,$3),NIL)); }
+    | PLUSPLUS unary_expression
+      { $$=makeNode(N_EXP_PRE_INC,NIL,$2,NIL); }
+    | MINUSMINUS unary_expression
+      { $$=makeNode(N_EXP_PRE_DEC,NIL,$2,NIL); }
+    | AMP cast_expression
+      { $$=makeNode(N_EXP_AMP,NIL,$2,NIL); }
+    | STAR cast_expression
+      { $$=makeNode(N_EXP_STAR,NIL,$2,NIL); }
+    | EXCL cast_expression
+      { $$=makeNode(N_EXP_NOT,NIL,$2,NIL); }
+    | MINUS cast_expression
+      { $$=makeNode(N_EXP_MINUS,NIL,$2,NIL); }
+    | PLUS cast_expression
+      { $$=makeNode(N_EXP_PLUS,NIL,$2,NIL); }
+    | SIZEOF_SYM unary_expression
+      { $$=makeNode(N_EXP_SIZE_EXP,NIL,$2,NIL); }
+    | SIZEOF_SYM LP type_name RP
+      { $$=makeNode(N_EXP_SIZE_TYPE,NIL,$3,NIL); }
     ;
 
 postfix_expression
     : primary_expression { $$=$1; }
     | postfix_expression LB expression RB
-      { $$=V(makeNode(N_EXP_ARRAY,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_ARRAY,$1,NIL,$3); }
     | postfix_expression LP arg_expression_list_opt RP
-      { $$=V(makeNode(N_EXP_FUNCTION_CALL,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_FUNCTION_CALL,$1,NIL,$3); }
     | postfix_expression PERIOD IDENTIFIER
-      { $$=V(makeNode(N_EXP_STRUCT,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_STRUCT,$1,NIL,$3); }
     | postfix_expression ARROW IDENTIFIER
-      { $$=V(makeNode(N_EXP_ARROW,P(A_NODE,$1),NIL,P(A_NODE,$3))); }
+      { $$=makeNode(N_EXP_ARROW,$1,NIL,$3); }
     | postfix_expression PLUSPLUS
-      { $$=V(makeNode(N_EXP_POST_INC,NIL,P(A_NODE,$1),NIL)); }
+      { $$=makeNode(N_EXP_POST_INC,NIL,$1,NIL); }
     | postfix_expression MINUSMINUS
-      { $$=V(makeNode(N_EXP_POST_DEC,NIL,P(A_NODE,$1),NIL)); }
+      { $$=makeNode(N_EXP_POST_DEC,NIL,$1,NIL); }
     ;
 
 primary_expression
     : IDENTIFIER
-      { $$=V(makeNode(N_EXP_IDENT,NIL,(A_NODE *)getIdentifierDeclared(P(char,$1)),NIL)); }
+      { $$=makeNode(N_EXP_IDENT,NIL,getIdentifierDeclared($1),NIL); }
     | INTEGER_CONSTANT
-      { $$=V(makeNode(N_EXP_INT_CONST,NIL,P(A_NODE,$1),NIL)); }
+      { $$=makeNode(N_EXP_INT_CONST,NIL,$1,NIL); }
     | FLOAT_CONSTANT
-      { $$=V(makeNode(N_EXP_FLOAT_CONST,NIL,P(A_NODE,$1),NIL)); }
+      { $$=makeNode(N_EXP_FLOAT_CONST,NIL,$1,NIL); }
     | CHARACTER_CONSTANT
-      { $$=V(makeNode(N_EXP_CHAR_CONST,NIL,P(A_NODE,$1),NIL)); }
+      { $$=makeNode(N_EXP_CHAR_CONST,NIL,$1,NIL); }
     | STRING_LITERAL
-      { $$=V(makeNode(N_EXP_STRING_LITERAL,NIL,P(A_NODE,$1),NIL)); }
+      { $$=makeNode(N_EXP_STRING_LITERAL,NIL,$1,NIL); }
     | LP expression RP { $$=$2; }
     ;
 
 type_name
     : declaration_specifiers abstract_declarator_opt
-      { $$=V(setTypeNameSpecifier(P(A_TYPE,$2),P(A_SPECIFIER,$1))); }
+      { $$=setTypeNameSpecifier($2,$1); }
     ;
 %%
-
-_Static_assert(sizeof(YYSTYPE)>=sizeof(void *),
-               "YYSTYPE must be able to hold a pointer");
-
 extern char *yytext;
-
-int yyerror(const char *s)
+yyerror(char *s)
 {
     syntax_err++;
     printf("line %d: %s near %s \n",line_no,s,yytext);
-    return 0;
 }

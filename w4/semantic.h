@@ -32,7 +32,6 @@ extern A_TYPE *string_type;
 // - 기본 타입 및 내장 식별자 등록
 // - 심볼 테이블, 스코프 상태 초기화
 void initialize(void);
-
 // 타입 테이블 생성
 // - 지정된 T_KIND에 대응하는 A_TYPE 생성
 A_TYPE *makeType(T_KIND kind);

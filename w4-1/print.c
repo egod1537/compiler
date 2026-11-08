@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <stdint.h>
-#include "parse_value.h"
 #include "type.h"
 char * node_name[] = {
 		"N_NULL",
@@ -98,7 +96,7 @@ void prt_program(A_NODE *node, int s)
 		print_node(node,s);
 		switch(node->name) {
 		   case N_PROGRAM:
-				prt_A_ID_LIST(PTR(A_ID, node->clink), s+1);
+				prt_A_ID_LIST(node->clink, s+1);
 				break;
 		   default :
 				printf("****syntax tree error******");
@@ -109,19 +107,19 @@ void prt_expression(A_NODE *node, int s)
 		print_node(node,s);
 		switch(node->name) {
 		   case N_EXP_IDENT : 
-				prt_A_ID_NAME(PTR(A_ID, node->clink), s+1);
+				prt_A_ID_NAME(node->clink, s+1);
 				break;
 		   case N_EXP_INT_CONST :
-				prt_integer((int)(intptr_t)node->clink, s+1);
+				prt_integer((int)node->clink, s+1);
 				break;
 			   case N_EXP_FLOAT_CONST :
-				prt_STRING(PTR(char, node->clink), s+1);
+				prt_STRING(node->clink, s+1);
 				break;
 		   case N_EXP_CHAR_CONST :
- 				prt_integer((int)(intptr_t)node->clink, s+1);
+				prt_integer((int)node->clink, s+1);
 				break;
 		   case N_EXP_STRING_LITERAL :
-				prt_STRING(PTR(char, node->clink), s+1);
+				prt_STRING(node->clink, s+1);
 				break;
 		   case N_EXP_ARRAY :
 				prt_expression(node->llink, s+1);
@@ -134,7 +132,7 @@ void prt_expression(A_NODE *node, int s)
 		   case N_EXP_STRUCT : 
 		   case N_EXP_ARROW : 
 				prt_expression(node->llink, s+1);
-				prt_STRING(PTR(char, node->rlink), s+1);
+				prt_STRING(node->rlink, s+1);
 				break;
 		   case N_EXP_POST_INC :
 		   case N_EXP_POST_DEC :
@@ -149,10 +147,10 @@ void prt_expression(A_NODE *node, int s)
 				prt_expression(node->clink, s+1);
    				break;
 		   case N_EXP_SIZE_TYPE :
-				prt_A_TYPE(PTR(A_TYPE, node->clink), s+1);
+				prt_A_TYPE(node->clink, s+1);
    				break;
 		   case N_EXP_CAST :
-				prt_A_TYPE(PTR(A_TYPE, node->llink), s+1);
+				prt_A_TYPE(node->llink, s+1);
 				prt_expression(node->rlink, s+1);
    				break;
 		   case N_EXP_MUL :
@@ -204,7 +202,7 @@ void prt_statement(A_NODE *node, int s)
 				break;
 		   case N_STMT_COMPOUND:
 				if(node->llink) 
-						prt_A_ID_LIST(PTR(A_ID, node->llink), s+1);
+						prt_A_ID_LIST(node->llink, s+1);
 				prt_statement_list(node->rlink, s+1);
 				break;
 		   case N_STMT_EMPTY:

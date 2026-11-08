@@ -15,6 +15,7 @@ void print_ast(A_NODE *node);
  *   make test-sem                의미 분석 테스트
  *   make test-semerr             의미 오류 테스트
  *   make test-baseline           w4-1 결과와 비교
+ *   ./parser < 파일 경로 e.g) ./parser tests/ch5/valid/01_functionc.
  *
  * 개별 테스트: make <테스트 타깃> TEST=list 또는 TEST=번호
  */

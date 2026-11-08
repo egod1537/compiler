@@ -1,118 +1,101 @@
 digit       [0-9]
 letter      [a-zA-Z_]
 delim       [ \t]
-line        \r?\n
+line        [\n]
 ws          {delim}+
-
-%option noinput nounput
-
 %{
-#include <stdlib.h>
-#include <string.h>
-#include "type.h"
-#include "parse_value.h"
 #include "y.tab.h"
-
-_Static_assert(sizeof(YYSTYPE)>=sizeof(void *),
-               "YYSTYPE must be able to hold a pointer");
-
+#include "type.h"
+extern int yylval;
 extern int line_no;
 extern A_ID *current_id;
-
-static char *makeString(const char *s);
-static int checkIdentifier(const char *s);
+char *makeString();
+int checkIdentifier();
 %}
-
 %%
 {ws}                    { }
 {line}                  { line_no++; }
-"auto"|"static"|"typedef"|"extern"|"register" { return INVALID_TOKEN; }
-struct                  { return STRUCT_SYM; }
-union                   { return UNION_SYM; }
-enum                    { return ENUM_SYM; }
-sizeof                  { return SIZEOF_SYM; }
-if                      { return IF_SYM; }
-else                    { return ELSE_SYM; }
-while                   { return WHILE_SYM; }
-do                      { return DO_SYM; }
-for                     { return FOR_SYM; }
-continue                { return CONTINUE_SYM; }
-break                   { return BREAK_SYM; }
-return                  { return RETURN_SYM; }
-switch                  { return SWITCH_SYM; }
-case                    { return CASE_SYM; }
-default                 { return DEFAULT_SYM; }
-"++"                    { return PLUSPLUS; }
-"--"                    { return MINUSMINUS; }
-"->"                    { return ARROW; }
-"||"                    { return BARBAR; }
-"&&"                    { return AMPAMP; }
-"<="                    { return LEQ; }
-">="                    { return GEQ; }
-"=="                    { return EQL; }
-"!="                    { return NEQ; }
-"..."                   { return DOTDOTDOT; }
-"+"                     { return PLUS; }
-"-"                     { return MINUS; }
-"|"                     { return BAR; }
-"&"                     { return AMP; }
-";"                     { return SEMICOLON; }
-"<"                     { return LSS; }
-">"                     { return GTR; }
-"("                     { return LP; }
-")"                     { return RP; }
-"["                     { return LB; }
-"]"                     { return RB; }
-"{"                     { return LR; }
-"}"                     { return RR; }
-"."                     { return PERIOD; }
-","                     { return COMMA; }
-"!"                     { return EXCL; }
-"*"                     { return STAR; }
-"/"                     { return SLASH; }
-"%"                     { return PERCENT; }
-"="                     { return ASSIGN; }
-":"                     { return COLON; }
-{digit}+                 { yylval = atoi(yytext); return INTEGER_CONSTANT; }
-{digit}+\.{digit}+       { yylval = YY_FROM_PTR(makeString(yytext)); return FLOAT_CONSTANT; }
-{letter}({letter}|{digit})* { return checkIdentifier(yytext); }
-\"([^"\n]|\\["\n])*\" { yylval = YY_FROM_PTR(makeString(yytext)); return STRING_LITERAL; }
-\'([^'\n]|\\')\'       { yylval = (unsigned char)*(yytext+1); return CHARACTER_CONSTANT; }
+auto                    { return(AUTO_SYM); }
+break                   { return(BREAK_SYM); }
+case                    { return(CASE_SYM); }
+continue                { return(CONTINUE_SYM); }
+default                 { return(DEFAULT_SYM); }
+do                      { return(DO_SYM); }
+else                    { return(ELSE_SYM); }
+enum                    { return(ENUM_SYM); }
+for                     { return(FOR_SYM); }
+if                      { return(IF_SYM); }
+return                  { return(RETURN_SYM); }
+sizeof                  { return(SIZEOF_SYM); }
+static                  { return(STATIC_SYM); }
+struct                  { return(STRUCT_SYM); }
+switch                  { return(SWITCH_SYM); }
+typedef                 { return(TYPEDEF_SYM); }
+union                   { return(UNION_SYM); }
+while                   { return(WHILE_SYM); }
+"\+\+"                  { return(PLUSPLUS); }
+"\-\-"                  { return(MINUSMINUS); }
+"\->"                   { return(ARROW); }
+"<"                     { return(LSS); }
+">"                     { return(GTR); }
+"<="                    { return(LEQ); }
+">="                    { return(GEQ); }
+"=="                    { return(EQL); }
+"!="                    { return(NEQ); }
+"\&\&"                  { return(AMPAMP); }
+"\|\|"                  { return(BARBAR); }
+"\.\.\."                { return(DOTDOTDOT); }
+"\("                    { return(LP); }
+"\)"                    { return(RP); }
+"\["                    { return(LB); }
+"\]"                    { return(RB); }
+"\{"                    { return(LR); }
+"\}"                    { return(RR); }
+":"                     { return(COLON); }
+"\."                    { return(PERIOD); }
+","                     { return(COMMA); }
+"!"                     { return(EXCL); }
+"\*"                    { return(STAR); }
+"/"                     { return(SLASH); }
+"%"                     { return(PERCENT); }
+"&"                     { return(AMP); }
+";"                     { return(SEMICOLON); }
+"\+"                    { return(PLUS); }
+"\-"                    { return(MINUS); }
+"\="                    { return(ASSIGN); }
+{digit}+                 { yylval=atoi(yytext); return(INTEGER_CONSTANT); }
+{digit}+\.{digit}+       { yylval=makeString(yytext); return(FLOAT_CONSTANT); }
+{letter}({letter}|{digit})* { return(checkIdentifier(yytext)); }
+\"([^"\n]|\\[^\n])*\" { yylval=makeString(yytext); return(STRING_LITERAL); }
+\'([^'\n]|\\')\'       { yylval=*(yytext+1); return(CHARACTER_CONSTANT); }
 "//"[^\n]*              { }
-.                       { return (unsigned char)yytext[0]; }
 %%
-
-static char *makeString(const char *s)
-{
-    char *t = (char *)malloc(strlen(s) + 1);
-    strcpy(t, s);
-    return t;
-}
-
-static int checkIdentifier(const char *s)
-{
-    A_ID *id = current_id;
+char *makeString(char *s) {
     char *t;
-
-    while (id) {
-        if (strcmp(id->name, s) == 0)
-            break;
-        id = id->prev;
-    }
-    if (id == 0) {
-        t = makeString(s);
-        yylval = YY_FROM_PTR(t);
-        return IDENTIFIER;
-    } else if (id->kind == ID_TYPE) {
-        yylval = YY_FROM_PTR(id->type);
-        return TYPE_IDENTIFIER;
-    } else {
-        yylval = YY_FROM_PTR(id->name);
-        return IDENTIFIER;
-    }
+    t=malloc(strlen(s)+1);
+    strcpy(t,s);
+    return(t);
 }
 
-int yywrap(void)
-{
-    return 1;
+int checkIdentifier(char *s) {
+    A_ID *id;
+    char *t;
+    id=current_id;
+    while (id) {
+        if (strcmp(id->name,s)==0)
+            break;
+        id=id->prev;
+    }
+    if (id==0) {
+        yylval=makeString(s);
+        return(IDENTIFIER);
+    }
+    else if (id->kind==ID_TYPE) {
+        yylval=id->type;
+        return(TYPE_IDENTIFIER);
+    }
+    else {
+        yylval=id->name;
+        return(IDENTIFIER);
+    }
 }

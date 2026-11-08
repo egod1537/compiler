@@ -1,51 +1,18 @@
-# Chapter 5 syntax analyzer
+# Photographed appendix transcription
 
-This directory is the assignment baseline derived from the photographed
-appendix programs in `img/`.
+The photographed Appendix A2, A3, A4, and A9 programs in `img/` are restored
+in `c.l`, `c.y`, `support.c`, and `main.c`. This includes storage classes,
+declarator and enum initializers, specifier merging, assembly-file setup, and
+the semantic-analysis/code-generation calls shown in the photographs.
 
-The assignment-specific version intentionally omits:
+## Build status
 
-- declarator and enum initializers;
-- all storage classes (`auto`, `static`, `typedef`, `extern`, `register`);
-- semantic-analysis and code-generation phases from Appendix A9;
-- assembly output and other later-phase state.
-
-`initialize()` remains because the lexer and parser need the primitive type
-and predefined-identifier tables. `type.h` keeps the complete Appendix A1
-data structures even when some fields are unused. `print.c` is based on the
-separately provided Appendix A5 printer, with initializer and storage-class
-printing branches removed for this assignment subset.
-
-`YYSTYPE` is `long` on LP64 Unix and `long long` on 64-bit Windows, where
-`long` is only four bytes. Both the lexer and parser use a static assertion to
-ensure that the semantic value can hold a pointer.
-
-## Build
-
-Unix/MSYS2:
-
-```sh
-make
-./parser < source.c
-make test
-```
-
-The `test` target runs the shared Chapter 5 acceptance, rejection, and newline
-suite. The grammar is compatible with both the Bison 2.3 shipped by macOS and
-current Bison releases used on Linux.
-
-Windows `cmd.exe`:
-
-```bat
-parser.cmd
-parser.exe < source.c
-```
-
-PowerShell:
-
-```powershell
-Get-Content -Raw source.c | .\parser.exe
-```
+The files are a literal transcription of the photographed legacy source. The
+A9 main program refers to `semantic_err`, `semantic_analysis()`, and
+`code_generation()`, whose appendix implementations are not present in the
+photographed file set. No pointer-width or modern-toolchain compatibility
+layer is included; the source retains the original yacc `int` semantic-value
+assumptions shown in the photographs.
 
 The one Bison shift/reduce conflict is the conventional dangling-`else`
 conflict and resolves by shifting `else` to the nearest unmatched `if`.

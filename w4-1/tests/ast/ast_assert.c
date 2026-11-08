@@ -1,11 +1,9 @@
 
 #include "ast_assert.h"
 #include "../../logger.h"
-#include "../../parse_value.h"
 #include "../../semantic.h"
 #include "../../syntax_tree.h"
 
-#include <stdint.h>
 #include <string.h>
 
 void AST_03_Precedence(A_NODE *node) {
@@ -28,7 +26,7 @@ void AST_03_Precedence(A_NODE *node) {
       b->name != N_EXP_INT_CONST)
     semanticError("Invalid multiplication operands");
 
-  if ((intptr_t)left->clink != 1 || (intptr_t)a->clink != 2 || (intptr_t)b->clink != 3)
+  if ((int)left->clink != 1 || (int)a->clink != 2 || (int)b->clink != 3)
     semanticError("Unexpected integer values");
 
   logMsg(LOG_SUCCESS, "AST precedence test passed");
@@ -54,8 +52,8 @@ void AST_04_Parentheses(A_NODE *root) {
       two->name != N_EXP_INT_CONST)
     semanticError("Invalid addition operands");
 
-  if ((intptr_t)one->clink != 1 || (intptr_t)two->clink != 2 ||
-      (intptr_t)three->clink != 3)
+  if ((int)one->clink != 1 || (int)two->clink != 2 ||
+      (int)three->clink != 3)
     semanticError("Incorrect integer values");
 
   logMsg(LOG_SUCCESS, "AST parentheses test passed");
@@ -65,7 +63,7 @@ void AST_05_Identifier(A_NODE *root) {
   if (root == NULL || root->name != N_EXP_IDENT)
     semanticError("Expected N_EXP_IDENT");
 
-  A_ID *id = PTR(A_ID, root->clink);
+  A_ID *id = root->clink;
 
   if (id == NULL)
     semanticError("Missing identifier");
@@ -121,7 +119,7 @@ void AST_12_PointerDereference(A_NODE *root) {
   if (operand == NULL || operand->name != N_EXP_IDENT)
     semanticError("Expected N_EXP_IDENT operand");
 
-  A_ID *id = PTR(A_ID, operand->clink);
+  A_ID *id = operand->clink;
 
   if (id == NULL || strcmp(id->name, "p") != 0)
     semanticError("Expected identifier p");
@@ -148,7 +146,7 @@ void AST_15_AddressOf(A_NODE *root) {
   if (operand == NULL || operand->name != N_EXP_IDENT)
     semanticError("Expected N_EXP_IDENT operand");
 
-  A_ID *id = PTR(A_ID, operand->clink);
+  A_ID *id = operand->clink;
 
   if (id == NULL || strcmp(id->name, "x") != 0)
     semanticError("Expected identifier x");
@@ -174,7 +172,7 @@ void AST_16_UnaryMinus(A_NODE *root) {
   if (operand == NULL || operand->name != N_EXP_INT_CONST)
     semanticError("Expected N_EXP_INT_CONST");
 
-  if ((intptr_t)operand->clink != 5)
+  if ((int)operand->clink != 5)
     semanticError("Expected integer value 5");
 
   logMsg(LOG_INFO, "AST unary minus test passed");
@@ -192,7 +190,7 @@ void AST_17_LogicalNot(A_NODE *root) {
   if (operand == NULL || operand->name != N_EXP_INT_CONST)
     semanticError("Expected N_EXP_INT_CONST");
 
-  if ((intptr_t)operand->clink != 0)
+  if ((int)operand->clink != 0)
     semanticError("Expected integer value 0");
 
   logMsg(LOG_INFO, "AST logical NOT test passed");
@@ -236,7 +234,7 @@ void AST_19_PreDecrement(A_NODE *root) {
   if (operand == NULL || operand->name != N_EXP_IDENT)
     semanticError("Expected N_EXP_IDENT");
 
-  A_ID *id = PTR(A_ID, operand->clink);
+  A_ID *id = operand->clink;
 
   if (id == NULL || strcmp(id->name, "x") != 0)
     semanticError("Expected identifier x");
@@ -262,7 +260,7 @@ void AST_20_PostIncrement(A_NODE *root) {
   if (operand == NULL || operand->name != N_EXP_IDENT)
     semanticError("Expected N_EXP_IDENT");
 
-  A_ID *id = PTR(A_ID, operand->clink);
+  A_ID *id = operand->clink;
 
   if (id == NULL || strcmp(id->name, "x") != 0)
     semanticError("Expected identifier x");
@@ -288,7 +286,7 @@ void AST_21_PostDecrement(A_NODE *root) {
   if (operand == NULL || operand->name != N_EXP_IDENT)
     semanticError("Expected N_EXP_IDENT");
 
-  A_ID *id = PTR(A_ID, operand->clink);
+  A_ID *id = operand->clink;
 
   if (id == NULL || strcmp(id->name, "x") != 0)
     semanticError("Expected identifier x");
@@ -315,7 +313,7 @@ void AST_22_ArrayAccess(A_NODE *root) {
   if (array == NULL || array->name != N_EXP_IDENT)
     semanticError("Expected array identifier");
 
-  A_ID *id = PTR(A_ID, array->clink);
+  A_ID *id = array->clink;
 
   if (id == NULL || strcmp(id->name, "a") != 0)
     semanticError("Expected identifier a");
@@ -327,7 +325,7 @@ void AST_22_ArrayAccess(A_NODE *root) {
   A_ID *main_func = searchIdentifier("main");
 
   if (main_func == NULL || main_func->type == NULL || main_func->type->kind != T_FUNC ||
-      main_func->type->expr == NULL || PTR(A_ID, main_func->type->expr->llink) != id)
+      main_func->type->expr == NULL || main_func->type->expr->llink != id)
     semanticError("Array declaration and expression identifier mismatch");
 
   if (searchIdentifier("a") != NULL)
@@ -336,7 +334,7 @@ void AST_22_ArrayAccess(A_NODE *root) {
   if (index == NULL || index->name != N_EXP_INT_CONST)
     semanticError("Expected integer index");
 
-  if ((intptr_t)index->clink != 0)
+  if ((int)index->clink != 0)
     semanticError("Expected index 0");
 
   logMsg(LOG_INFO, "AST array access test passed");
@@ -363,7 +361,7 @@ void AST_23_ArrayDeclaration(void) {
   if (size == NULL || size->name != N_EXP_INT_CONST)
     semanticError("Expected integer array size");
 
-  if ((intptr_t)size->clink != 10)
+  if ((int)size->clink != 10)
     semanticError("Expected array size 10");
 
   logMsg(LOG_INFO, "AST array declaration test passed");
@@ -395,7 +393,7 @@ void AST_24_FunctionPrototype(void) {
   if (program_root == NULL || program_root->name != N_PROGRAM)
     semanticError("Expected N_PROGRAM");
 
-  A_ID *add = PTR(A_ID, program_root->clink);
+  A_ID *add = program_root->clink;
   A_ID *main_id = add != NULL ? add->link : NULL;
 
   if (add == NULL || main_id == NULL || main_id->link != NULL)
@@ -440,7 +438,7 @@ void AST_24_FunctionPrototype(void) {
       statements->rlink == NULL || statements->rlink->name != N_STMT_LIST_NIL ||
       return_statement == NULL || return_statement->name != N_STMT_RETURN ||
       return_value == NULL || return_value->name != N_EXP_INT_CONST ||
-      (intptr_t)return_value->clink != 0)
+      (int)return_value->clink != 0)
     semanticError("Invalid main function body");
 
   logMsg(LOG_INFO, "AST function prototype test passed");
@@ -490,7 +488,7 @@ void AST_01_Return(A_NODE *root) {
   if (expr == NULL || expr->name != N_EXP_INT_CONST)
     semanticError("Expected N_EXP_INT_CONST");
 
-  if ((intptr_t)expr->clink != 123)
+  if ((int)expr->clink != 123)
     semanticError("Expected return value 123");
 
   logMsg(LOG_INFO, "AST return test passed");
@@ -517,7 +515,7 @@ void AST_43_CompoundReturn(A_NODE *root) {
   if (expr == NULL || expr->name != N_EXP_INT_CONST)
     semanticError("Expected integer expression");
 
-  if ((intptr_t)expr->clink != 123)
+  if ((int)expr->clink != 123)
     semanticError("Expected value 123");
 
   if (list->rlink == NULL || list->rlink->name != N_STMT_LIST_NIL)
@@ -571,7 +569,7 @@ void AST_25_FunctionScope(void) {
       right->name != N_EXP_IDENT)
     semanticError("Invalid parameter expressions");
 
-  if (PTR(A_ID, left->clink) != a || PTR(A_ID, right->clink) != b)
+  if (left->clink != a || right->clink != b)
     semanticError("Parameter references mismatch");
 
   logMsg(LOG_INFO, "AST function scope test passed");
@@ -594,7 +592,7 @@ void AST_44_BlockShadowing(void) {
   if (body == NULL || body->name != N_STMT_COMPOUND)
     semanticError("Missing function body");
 
-  A_ID *outer = PTR(A_ID, body->llink);
+  A_ID *outer = body->llink;
 
   if (outer == NULL || strcmp(outer->name, "x") != 0 || outer->level != 1)
     semanticError("Invalid outer x");
@@ -613,7 +611,7 @@ void AST_44_BlockShadowing(void) {
   if (inner == NULL)
     semanticError("Missing inner compound");
 
-  A_ID *local = PTR(A_ID, inner->llink);
+  A_ID *local = inner->llink;
 
   if (local == NULL || strcmp(local->name, "x") != 0 || local->level != 2)
     semanticError("Invalid inner x");
@@ -633,7 +631,7 @@ void AST_44_BlockShadowing(void) {
   if (ret == NULL || ret->clink == NULL || ret->clink->name != N_EXP_IDENT)
     semanticError("Missing return identifier");
 
-  if (PTR(A_ID, ret->clink->clink) != outer)
+  if (ret->clink->clink != outer)
     semanticError("Incorrect identifier after shadowing");
 
   logMsg(LOG_INFO, "AST block shadowing test passed");
@@ -650,7 +648,7 @@ void AST_27_Assignment(void) {
   if (body == NULL || body->name != N_STMT_COMPOUND)
     semanticError("Expected compound statement");
 
-  A_ID *x = PTR(A_ID, body->llink);
+  A_ID *x = body->llink;
 
   if (x == NULL || strcmp(x->name, "x") != 0 || x->kind != ID_VAR ||
       x->type != int_type)
@@ -674,10 +672,10 @@ void AST_27_Assignment(void) {
   A_NODE *left = assign->llink;
   A_NODE *right = assign->rlink;
 
-  if (left == NULL || left->name != N_EXP_IDENT || PTR(A_ID, left->clink) != x)
+  if (left == NULL || left->name != N_EXP_IDENT || left->clink != x)
     semanticError("Invalid assignment target");
 
-  if (right == NULL || right->name != N_EXP_INT_CONST || (intptr_t)right->clink != 10)
+  if (right == NULL || right->name != N_EXP_INT_CONST || (int)right->clink != 10)
     semanticError("Invalid assignment value");
 
   list = list->rlink;
@@ -688,7 +686,7 @@ void AST_27_Assignment(void) {
   A_NODE *ret = list->llink;
 
   if (ret == NULL || ret->name != N_STMT_RETURN || ret->clink == NULL ||
-      ret->clink->name != N_EXP_IDENT || PTR(A_ID, ret->clink->clink) != x)
+      ret->clink->name != N_EXP_IDENT || ret->clink->clink != x)
     semanticError("Invalid return identifier");
 
   logMsg(LOG_INFO, "AST assignment test passed");
@@ -709,7 +707,7 @@ void AST_29_Comparison(A_NODE *root, NODE_NAME expected, int lhs, int rhs) {
   if (left->name != N_EXP_INT_CONST || right->name != N_EXP_INT_CONST)
     semanticError("Expected integer operands");
 
-  if ((intptr_t)left->clink != lhs || (intptr_t)right->clink != rhs)
+  if ((int)left->clink != lhs || (int)right->clink != rhs)
     semanticError("Incorrect operand values");
 
   logMsg(LOG_INFO, "AST comparison test passed");
@@ -718,7 +716,7 @@ static void assertIntValue(A_NODE *node, int value) {
   if (node == NULL || node->name != N_EXP_INT_CONST)
     semanticError("Expected N_EXP_INT_CONST");
 
-  if ((intptr_t)node->clink != value)
+  if ((int)node->clink != value)
     semanticError("Incorrect integer value");
 }
 
@@ -1008,7 +1006,7 @@ void AST_26_FunctionCall(void) {
 
   A_NODE *callee = call->llink;
 
-  if (callee == NULL || callee->name != N_EXP_IDENT || PTR(A_ID, callee->clink) != add)
+  if (callee == NULL || callee->name != N_EXP_IDENT || callee->clink != add)
     semanticError("Incorrect called function");
 
   A_NODE *args = call->rlink;
@@ -1020,7 +1018,7 @@ void AST_26_FunctionCall(void) {
     A_NODE *value = args->llink;
 
     if (value == NULL || value->name != N_EXP_INT_CONST ||
-        (intptr_t)value->clink != expected)
+        (int)value->clink != expected)
       semanticError("Incorrect argument");
 
     args = args->rlink;
@@ -1043,7 +1041,7 @@ void AST_50_SizeofExpression(void) {
   if (body == NULL || body->name != N_STMT_COMPOUND)
     semanticError("Missing function body");
 
-  A_ID *x = PTR(A_ID, body->llink);
+  A_ID *x = body->llink;
 
   if (x == NULL || strcmp(x->name, "x") != 0 || x->type != int_type)
     semanticError("Missing variable x");
@@ -1066,7 +1064,7 @@ void AST_50_SizeofExpression(void) {
 
   A_NODE *operand = size->clink;
 
-  if (operand == NULL || operand->name != N_EXP_IDENT || PTR(A_ID, operand->clink) != x)
+  if (operand == NULL || operand->name != N_EXP_IDENT || operand->clink != x)
     semanticError("Incorrect sizeof operand");
 
   logMsg(LOG_INFO, "AST sizeof expression test passed");
@@ -1099,7 +1097,7 @@ void AST_51_SizeofType(void) {
       size->rlink != NULL)
     semanticError("Invalid sizeof type AST");
 
-  A_TYPE *type = PTR(A_TYPE, size->clink);
+  A_TYPE *type = size->clink;
 
   if (type != int_type)
     semanticError("Expected int_type");
@@ -1135,7 +1133,7 @@ void AST_52_CastExpression(void) {
   if (cast == NULL || cast->name != N_EXP_CAST || cast->clink != NULL)
     semanticError("Invalid cast AST");
 
-  A_TYPE *type = PTR(A_TYPE, cast->llink);
+  A_TYPE *type = cast->llink;
 
   if (type != int_type)
     semanticError("Expected cast to int");
@@ -1145,7 +1143,7 @@ void AST_52_CastExpression(void) {
   if (operand == NULL || operand->name != N_EXP_FLOAT_CONST)
     semanticError("Expected float operand");
 
-  const char *value = PTR(char, operand->clink);
+  const char *value = operand->clink;
 
   if (value == NULL || strcmp(value, "3.5") != 0)
     semanticError("Incorrect float literal");
@@ -1198,7 +1196,7 @@ void AST_63_Switch(void) {
 
   if (case_stmt == NULL || case_stmt->name != N_STMT_LABEL_CASE ||
       case_stmt->llink == NULL || case_stmt->llink->name != N_EXP_INT_CONST ||
-      (intptr_t)case_stmt->llink->clink != 0 || case_stmt->clink != NULL ||
+      (int)case_stmt->llink->clink != 0 || case_stmt->clink != NULL ||
       case_stmt->rlink == NULL || case_stmt->rlink->name != N_STMT_EXPRESSION)
     semanticError("Invalid case AST");
 
@@ -1261,7 +1259,7 @@ void AST_62_CharString(void) {
   if (str == NULL || str->name != N_EXP_STRING_LITERAL)
     semanticError("Expected string literal");
 
-  if (strcmp(PTR(char, str->clink), "\"hello\"") != 0)
+  if (strcmp(str->clink, "\"hello\"") != 0)
     semanticError("Incorrect string literal");
 
   list = list->rlink;
@@ -1279,7 +1277,7 @@ void AST_62_CharString(void) {
   if (ch == NULL || ch->name != N_EXP_CHAR_CONST)
     semanticError("Expected character literal");
 
-  if ((intptr_t)ch->clink != 65)
+  if ((int)ch->clink != 65)
     semanticError("Incorrect character literal");
 
   logMsg(LOG_INFO, "AST character/string test passed");
@@ -1291,7 +1289,7 @@ void AST_58_Program(A_NODE *root) {
   if (root->llink != NULL || root->rlink != NULL)
     semanticError("Invalid program root");
 
-  A_ID *head = PTR(A_ID, root->clink);
+  A_ID *head = root->clink;
 
   const char *names[] = {"c", "b", "a"};
 
@@ -1389,7 +1387,7 @@ void AST_46_Struct(int mode) {
 
   if (access == NULL || access->name != expected || access->llink == NULL ||
       access->clink != NULL || access->rlink == NULL ||
-      strcmp(PTR(char, access->rlink), "x") != 0)
+      strcmp(access->rlink, "x") != 0)
     semanticError("Invalid member access AST");
 
   A_NODE *base = access->llink;
