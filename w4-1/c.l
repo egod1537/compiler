@@ -90,7 +90,6 @@ char *makeString(char *s) {
 
 int checkIdentifier(char *s) {
     A_ID *id;
-    char *t;
     id=current_id;
     while (id) {
         if (strcmp(id->name,s)==0)

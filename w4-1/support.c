@@ -1,5 +1,4 @@
 #include "support.h"
-#include "y.tab.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -141,7 +140,6 @@ void checkForwardReference() {
 }
 
 void setDefaultSpecifier(A_SPECIFIER *p) {
-  A_TYPE *t;
   if (p->type == NIL)
     p->type = int_type;
   if (p->stor == S_NULL)
