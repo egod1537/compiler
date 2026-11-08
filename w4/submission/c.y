@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "logger.h"
+#include "error.h"
 #include "semantic.h"
 #include "syntax_tree.h"
 #include "type.h"
@@ -14,25 +14,26 @@
 int yylex(void);
 int yyerror(const char *s);
 extern int line_no;
+extern char *yytext;
+
+A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right);
 %}
 
-%token IDENTIFIER TYPE_IDENTIFIER
+%token INVALID_TOKEN IDENTIFIER TYPE_IDENTIFIER
 %token INTEGER_CONSTANT FLOAT_CONSTANT CHARACTER_CONSTANT STRING_LITERAL
 
-%token AUTO_SYM BREAK_SYM CASE_SYM CONTINUE_SYM DEFAULT_SYM DO_SYM
-%token ELSE_SYM ENUM_SYM FOR_SYM GOTO_SYM IF_SYM RETURN_SYM SIZEOF_SYM
-%token STATIC_SYM STRUCT_SYM SWITCH_SYM TYPEDEF_SYM UNION_SYM WHILE_SYM
-%token REGISTER_SYM EXTERN_SYM CONST_SYM VOLATILE_SYM
+%token BREAK_SYM CASE_SYM CONTINUE_SYM DEFAULT_SYM DO_SYM
+%token ELSE_SYM ENUM_SYM FOR_SYM IF_SYM RETURN_SYM SIZEOF_SYM
+%token STRUCT_SYM SWITCH_SYM UNION_SYM WHILE_SYM
 
 %token PLUSPLUS MINUSMINUS ARROW
 %token LSS GTR LEQ GEQ EQL NEQ
 %token AMPAMP BARBAR
-%token LSHIFT RSHIFT
 %token DOTDOTDOT
 %token LP RP LB RB LR RR
-%token COLON PERIOD COMMA EXCL TILDE
-%token STAR SLASH PERCENT AMP BAR CARET
-%token SEMICOLON PLUS MINUS ASSIGN QUESTION
+%token COLON PERIOD COMMA EXCL
+%token STAR SLASH PERCENT AMP BAR
+%token SEMICOLON PLUS MINUS ASSIGN
 
 %nonassoc LOWER_THAN_ELSE
 %nonassoc ELSE_SYM
@@ -50,10 +51,8 @@ extern int line_no;
 program
     : translation_unit
     {
-      checkForwardReference();
-
       program_root = makeNode(N_PROGRAM, NULL, PTR(A_NODE, $1), NULL);
-
+      checkForwardReference();
       $$ = YY(program_root);
     }
     ;
@@ -76,54 +75,19 @@ external_declaration
 function_definition
     : declaration_specifiers declarator
     {
-      A_ID *id = setFunctionDeclaratorSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1));
-
-      current_id = id;
-      enterScope();
-
-      for (A_ID *p = id->type->field; p != NULL; p = p->link) {
-        if (p->name == NULL || p->name[0] == '\0')
-          continue;
-
-        p->level = current_level;
-        p->prev = current_id;
-        current_id = p;
-      }
-
-      $$ = YY(id);
+      $$ = YY(setFunctionDeclaratorSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1)));
     }
       compound_statement
     {
-      A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $3), PTR(A_NODE, $4));
-
-      leaveScope();
-      $$ = YY(id);
+      $$ = YY(setFunctionDeclaratorBody(PTR(A_ID, $3), PTR(A_NODE, $4)));
     }
     | declarator
     {
-      A_ID *id =
-          setFunctionDeclaratorSpecifier(PTR(A_ID, $1), makeSpecifier(int_type, S_NULL));
-
-      current_id = id;
-      enterScope();
-
-      for (A_ID *p = id->type->field; p != NULL; p = p->link) {
-        if (p->name == NULL || p->name[0] == '\0')
-          continue;
-
-        p->level = current_level;
-        p->prev = current_id;
-        current_id = p;
-      }
-
-      $$ = YY(id);
+      $$ = YY(setFunctionDeclaratorSpecifier(PTR(A_ID, $1), makeSpecifier(int_type)));
     }
       compound_statement
     {
-      A_ID *id = setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE, $3));
-
-      leaveScope();
-      $$ = YY(id);
+      $$ = YY(setFunctionDeclaratorBody(PTR(A_ID, $2), PTR(A_NODE, $3)));
     }
     ;
 
@@ -145,7 +109,7 @@ declaration_list_opt
     ;
 
 declaration
-    : declaration_specifiers init_declarator_list_opt SEMICOLON
+    : declaration_specifiers declarator_list_opt SEMICOLON
     {
       $$ = YY(setDeclaratorListSpecifier(PTR(A_ID, $2), PTR(A_SPECIFIER, $1)));
     }
@@ -154,84 +118,29 @@ declaration
 declaration_specifiers
     : type_specifier
     {
-      $$ = YY(makeSpecifier(PTR(A_TYPE, $1), S_NULL));
-    }
-    | storage_class_specifier
-    {
-      $$ = YY(makeSpecifier(NULL, (S_KIND)$1));
-    }
-    | type_qualifier
-    {
-      semanticError("Type type_qualifier are not suuported");
-      $$ = YY(NULL);
-    }
-    | type_specifier declaration_specifiers
-    {
-      $$ = YY(updateSpecifier(PTR(A_SPECIFIER, $2), PTR(A_TYPE, $1), S_NULL));
-    }
-    | storage_class_specifier declaration_specifiers
-    {
-      $$ = YY(updateSpecifier(PTR(A_SPECIFIER, $2), NULL, (S_KIND)$1));
-    }
-    | type_qualifier declaration_specifiers
-    {
-      semanticError("Type type_qualifier are not suuported");
-      $$ = $2;
+      $$ = YY(makeSpecifier(PTR(A_TYPE, $1)));
     }
     ;
 
-storage_class_specifier
-    : AUTO_SYM { $$ = YY(S_AUTO); }
-    | STATIC_SYM { $$ = YY(S_STATIC); }
-    | TYPEDEF_SYM { $$ = YY(S_TYPEDEF); }
-    | REGISTER_SYM
-    {
-      semanticError("register is not supported");
-      $$ = YY(S_NULL);
-    }
-    | EXTERN_SYM
-    {
-      semanticError("extern is not supported");
-      $$ = YY(S_NULL);
-    }
-    ;
-
-type_qualifier
-    : CONST_SYM
-    | VOLATILE_SYM
-    ;
-
-init_declarator_list_opt
+declarator_list_opt
     :
     {
-      $$ = YY(NULL);
+      $$ = YY(makeDummyIdentifier());
     }
-    | init_declarator_list
+    | declarator_list
     {
       $$ = $1;
     }
     ;
 
-init_declarator_list
-    : init_declarator
-    {
-      $$ = $1;
-    }
-    | init_declarator_list COMMA init_declarator
-    {
-      $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $3)));
-    }
-    ;
-
-init_declarator
+declarator_list
     : declarator
     {
       $$ = $1;
     }
-    | declarator ASSIGN initializer
+    | declarator_list COMMA declarator
     {
-      semanticError("Initializers are not supported");
-      $$ = YY(NULL);
+      $$ = YY(linkDeclaratorList(PTR(A_ID, $1), PTR(A_ID, $3)));
     }
     ;
 
@@ -252,18 +161,26 @@ struct_specifier
       char *name = PTR(char, $2);
       $$ = YY(setTypeStructOrEnumIdentifier((T_KIND)$1, name, ID_STRUCT));
       free(name);
+    
+      enterScope();
     }
       LR struct_declaration_list RR
     {
+      checkForwardReference();
       $$ = YY(setTypeField(PTR(A_TYPE, $3), PTR(A_ID, $5)));
+      leaveScope();
     }
     | struct_or_union
     {
       $$ = YY(makeType((T_KIND)$1));
+    
+      enterScope();
     }
       LR struct_declaration_list RR
     {
+      checkForwardReference();
       $$ = YY(setTypeField(PTR(A_TYPE, $2), PTR(A_ID, $4)));
+      leaveScope();
     }
     | struct_or_union IDENTIFIER
     {
@@ -303,16 +220,6 @@ struct_declarator_list
 
 struct_declarator
     : declarator { $$ = $1; }
-    | COLON constant_expression
-    {
-      semanticError("Bit-fields are not implemented");
-      $$ = YY(NULL);
-    }
-    | declarator COLON constant_expression
-    {
-      semanticError("Bit-fields are not implemented");
-      $$ = YY(NULL);
-    }
     ;
 
 /* 3.3 열거형 지정자 및 열거자 */
@@ -354,13 +261,8 @@ enumerator
       char *name = PTR(char, $1);
       A_ID *id = makeIdentifier(name);
       free(name);
-
+    
       $$ = YY(setDeclaratorKind(id, ID_ENUM_LITERAL));
-    }
-    | IDENTIFIER ASSIGN constant_expression
-    {
-      semanticError("Enumerator initializers are not supported");
-      $$ = YY(NULL);
     }
     ;
 
@@ -368,7 +270,7 @@ enumerator
  * 4. 선언자 및 매개변수
  * ============================================================ */
 
-/* 4.1 선언자, 포인터 및 한정자 */
+/* 4.1 선언자 및 포인터 */
 
 declarator
     : pointer direct_declarator
@@ -382,24 +284,14 @@ declarator
     ;
 
 pointer
-    : STAR type_qualifier_list_opt
+    : STAR
     {
       $$ = YY(makeType(T_POINTER));
     }
-    | STAR type_qualifier_list_opt pointer
+    | STAR pointer
     {
-      $$ = YY(setTypeElementType(PTR(A_TYPE, $3), makeType(T_POINTER)));
+      $$ = YY(setTypeElementType(PTR(A_TYPE, $2), makeType(T_POINTER)));
     }
-    ;
-
-type_qualifier_list_opt
-    :
-    | type_qualifier_list
-    ;
-
-type_qualifier_list
-    : type_qualifier
-    | type_qualifier_list type_qualifier
     ;
 
 /* 4.2 직접 선언자 및 배열 크기 */
@@ -408,10 +300,10 @@ direct_declarator
     : IDENTIFIER
     {
       char *name = PTR(char, $1);
-
+    
       A_ID *id = makeIdentifier(name);
       free(name);
-
+    
       $$ = YY(id);
     }
     | LP declarator RP
@@ -430,10 +322,11 @@ direct_declarator
       parameter_type_list_opt RP
     {
       A_ID *params = PTR(A_ID, $4);
-
+    
       $$ = YY(
           setDeclaratorElementType(PTR(A_ID, $1), setTypeField(makeType(T_FUNC), params)));
-
+    
+      checkForwardReference();
       leaveScope();
     }
     ;
@@ -466,8 +359,8 @@ parameter_type_list
     : parameter_list
     | parameter_list COMMA DOTDOTDOT
     {
-      semanticError("Variadic parameters are not supported");
-      $$ = YY(NULL);
+      $$ = YY(linkDeclaratorList(PTR(A_ID, $1),
+                                 setDeclaratorKind(makeDummyIdentifier(), ID_PARM)));
     }
     ;
 
@@ -490,9 +383,9 @@ parameter_declaration
     | declaration_specifiers abstract_declarator_opt
     {
       A_ID *id = makeDummyIdentifier();
-
+    
       setDeclaratorElementType(id, PTR(A_TYPE, $2));
-
+    
       $$ = YY(setParameterDeclaratorSpecifier(id, PTR(A_SPECIFIER, $1)));
     }
     ;
@@ -548,39 +441,6 @@ direct_abstract_declarator
     }
     ;
 
-/* 4.4 초기화 */
-
-initializer
-    : assignment_expression
-    {
-      semanticError("Initializers are not supported");
-      $$ = YY(NULL);
-    }
-    | LR initializer_list RR
-    {
-      semanticError("Initializers are not supported");
-      $$ = YY(NULL);
-    }
-    | LR initializer_list COMMA RR
-    {
-      semanticError("Initializers are not supported");
-      $$ = YY(NULL);
-    }
-    ;
-
-initializer_list
-    : initializer
-    {
-      semanticError("Initializers are not supported");
-      $$ = YY(NULL);
-    }
-    | initializer_list COMMA initializer
-    {
-      semanticError("Initializers are not supported");
-      $$ = YY(NULL);
-    }
-    ;
-
 /* ============================================================
  * 5. 문장
  * ============================================================ */
@@ -589,7 +449,7 @@ initializer_list
 
 statement
     : labeled_statement { $$ = $1; }
-    | scoped_compound_statement
+    | compound_statement
     {
       $$ = $1;
     }
@@ -605,18 +465,6 @@ statement
     }
     ;
 
-scoped_compound_statement
-    :
-    {
-      enterScope();
-    }
-      compound_statement
-    {
-      $$ = $2;
-      leaveScope();
-    }
-    ;
-
 labeled_statement
     : CASE_SYM constant_expression COLON statement
     {
@@ -626,19 +474,21 @@ labeled_statement
     {
       $$ = YY(makeNode(N_STMT_LABEL_DEFAULT, NULL, PTR(A_NODE, $3), NULL));
     }
-    | IDENTIFIER COLON statement
-    {
-      semanticError("User labels are not supported");
-      $$ = YY(NULL);
-    }
     ;
 
 /* 5.2 복합문 및 문장 목록 */
 
 compound_statement
-    : LR declaration_list_opt statement_list_opt RR
+    : LR
     {
-      $$ = YY(makeNode(N_STMT_COMPOUND, PTR(A_NODE, $2), NULL, PTR(A_NODE, $3)));
+      enterScope();
+    }
+      declaration_list_opt statement_list_opt RR
+    {
+      $$ = YY(makeNode(N_STMT_COMPOUND, PTR(A_NODE, $3), NULL, PTR(A_NODE, $4)));
+    
+      checkForwardReference();
+      leaveScope();
     }
     ;
 
@@ -741,12 +591,13 @@ for_expression
     }
     ;
 
-/* 5.6 점프문: return, continue, break, goto */
+/* 5.6 점프문: return, continue, break */
 
 jump_statement
     : RETURN_SYM expression_opt SEMICOLON
     {
       $$ = YY(makeNode(N_STMT_RETURN, NULL, PTR(A_NODE, $2), NULL));
+    
     }
     | CONTINUE_SYM SEMICOLON
     {
@@ -755,11 +606,6 @@ jump_statement
     | BREAK_SYM SEMICOLON
     {
       $$ = YY(makeNode(N_STMT_BREAK, NULL, NULL, NULL));
-    }
-    | GOTO_SYM IDENTIFIER SEMICOLON
-    {
-      semanticError("goto is not supported");
-      $$ = YY(NULL);
     }
     ;
 
@@ -775,7 +621,7 @@ primary_expression
       char *name = PTR(char, $1);
       A_ID *id = getIdentifierDeclared(name);
       free(name);
-
+    
       $$ = YY(makeNode(N_EXP_IDENT, NULL, PTR(A_NODE, id), NULL));
     }
     | INTEGER_CONSTANT
@@ -884,14 +730,9 @@ unary_expression
     {
       $$ = YY(makeNode(N_EXP_MINUS, NULL, PTR(A_NODE, $2), NULL));
     }
-    | TILDE cast_expression
-    {
-      semanticError("Bitwise complement is not supported");
-      $$ = YY(NULL);
-    }
     | PLUS cast_expression
     {
-      $$ = $2;
+      $$ = YY(makeNode(N_EXP_PLUS, NULL, PTR(A_NODE, $2), NULL));
     }
     | SIZEOF_SYM unary_expression
     {
@@ -921,7 +762,7 @@ type_name
     }
     ;
 
-/* 6.3 곱셈, 덧셈 및 시프트 수식 */
+/* 6.3 곱셈 및 덧셈 수식 */
 
 multiplicative_expression
     : cast_expression
@@ -959,16 +800,6 @@ additive_expression
 
 shift_expression
     : additive_expression { $$ = $1; }
-    | shift_expression LSHIFT additive_expression
-    {
-      semanticError("Left shift is not supported");
-      $$ = YY(NULL);
-    }
-    | shift_expression RSHIFT additive_expression
-    {
-      semanticError("Right shift is not supported");
-      $$ = YY(NULL);
-    }
     ;
 
 /* 6.4 관계 및 동등 수식 */
@@ -1011,33 +842,18 @@ equality_expression
     }
     ;
 
-/* 6.5 비트 및 논리 수식 */
+/* 6.5 논리 수식 */
 
 AND_expression
     : equality_expression { $$ = $1; }
-    | AND_expression AMP equality_expression
-    {
-      semanticError("Bitwise AND is not supported");
-      $$ = YY(NULL);
-    }
     ;
 
 exclusive_OR_expression
     : AND_expression { $$ = $1; }
-    | exclusive_OR_expression CARET AND_expression
-    {
-      semanticError("Bitwise XOR is not supported");
-      $$ = YY(NULL);
-    }
     ;
 
 inclusive_OR_expression
     : exclusive_OR_expression { $$ = $1; }
-    | inclusive_OR_expression BAR exclusive_OR_expression
-    {
-      semanticError("Bitwise OR is not supported");
-      $$ = YY(NULL);
-    }
     ;
 
 logical_AND_expression
@@ -1056,17 +872,12 @@ logical_OR_expression
     }
     ;
 
-/* 6.6 조건, 대입 및 콤마 수식 */
+/* 6.6 대입 수식 */
 
 conditional_expression
     : logical_OR_expression
     {
       $$ = $1;
-    }
-    | logical_OR_expression QUESTION expression COLON conditional_expression
-    {
-      semanticError("Conditional operator is not supported");
-      $$ = YY(NULL);
     }
     ;
 
@@ -1086,11 +897,6 @@ comma_expression
     {
       $$ = $1;
     }
-    | comma_expression COMMA assignment_expression
-    {
-      semanticError("Comma expressions are not supported");
-      $$ = YY(NULL);
-    }
     ;
 
 /* 6.7 수식 루트 및 상수 수식 */
@@ -1106,12 +912,18 @@ constant_expression
     : conditional_expression
     ;
 %%
-
 /* ============================================================
  * 7. 보조 C 함수
  * ============================================================ */
 
 int yyerror(const char *s) {
-  logMsg(LOG_ERROR, "Syntax error at line %d: %s", line_no, s);
+  syntax_err++;
+  if (!compiler_error_tags_enabled()) {
+    printf("line %d: %s near %s \n", line_no, s, yytext);
+  } else if (yytext == NULL || yytext[0] == '\0') {
+    report_compiler_error(SYNTAX_ERROR, 0, line_no, "%s at end", s);
+  } else {
+    report_compiler_error(SYNTAX_ERROR, 0, line_no, "%s near '%s'", s, yytext);
+  }
   return 0;
 }

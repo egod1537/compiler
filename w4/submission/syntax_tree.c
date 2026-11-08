@@ -12,6 +12,7 @@ A_NODE *makeNode(NODE_NAME name, A_NODE *left, A_NODE *center, A_NODE *right) {
   }
 
   node->name = name;
+  node->line = line_no;
   node->llink = left;
   node->clink = center;
   node->rlink = right;

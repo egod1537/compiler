@@ -14,6 +14,8 @@
 // 현재 식별자 목록의 시작점, 현재 스코프 레벨
 extern A_ID *current_id;
 extern int current_level;
+extern int line_no;
+extern int syntax_err;
 
 // 기본 타입 테이블
 extern A_TYPE *int_type;
@@ -63,8 +65,11 @@ void enterScope(void);
 // - current_level 감소
 void leaveScope(void);
 
-// 의미 분석 오류 처리
+// 컴파일러 내부 상태 오류 처리
 void semanticError(const char *message);
+
+// 강의자료의 선언 오류 번호를 유지한 오류 처리
+void syntax_error(int code, const char *name);
 
 // 선언자 목록 연결
 // - 두 식별자 목록을 하나로 연결
@@ -98,13 +103,9 @@ A_TYPE *setTypeField(A_TYPE *type, A_ID *field);
  * ============================================================ */
 
 // 선언 지정자 생성
-// - 타입 지정자와 저장 클래스 결합
+// - 타입 지정자를 선언 지정자 객체로 구성
 // - A_SPECIFIER 테이블 생성
-A_SPECIFIER *makeSpecifier(A_TYPE *type, S_KIND stor);
-
-// 선언 지정자 갱신
-// - 여러 타입 지정자 및 저장 클래스 속성 결합
-A_SPECIFIER *updateSpecifier(A_SPECIFIER *specifier, A_TYPE *type, S_KIND stor);
+A_SPECIFIER *makeSpecifier(A_TYPE *type);
 
 // 기본 선언 지정자 설정
 // - 타입이 생략된 경우 기본 타입(int) 설정
@@ -113,8 +114,7 @@ void setDefaultSpecifier(A_SPECIFIER *specifier);
 // 일반 선언문 분석
 // - 선언자 목록의 중복 선언 검사
 // - 각 명칭의 최종 타입 구성
-// - 명칭 종류 결정 (ID_TYPE, ID_FUNC, ID_VAR)
-// - 저장 클래스 설정
+// - 명칭 종류 결정 (ID_FUNC, ID_VAR)
 A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *specifier);
 
 // 구조체 필드 선언 분석
@@ -137,7 +137,7 @@ A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *body);
 
 // 매개변수 선언 분석
 // - 매개변수 명칭의 중복 선언 검사
-// - 저장 클래스 및 void 타입 사용 검사
+// - void 타입 사용 검사
 // - 매개변수의 최종 타입 구성
 // - 명칭 종류를 ID_PARM으로 설정
 A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier);

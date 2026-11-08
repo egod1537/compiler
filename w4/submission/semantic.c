@@ -1,13 +1,17 @@
 #include "semantic.h"
-#include "logger.h"
+#include "error.h"
 #include "type.h"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+extern char *yytext;
+
 A_ID *current_id = NULL;
 int current_level = 0;
+int line_no = 1;
+int syntax_err = 0;
 
 A_TYPE *int_type = NULL;
 A_TYPE *float_type = NULL;
@@ -22,24 +26,24 @@ void initialize(void) {
     semanticError("Semantic state already initialized");
 
   int_type = makeType(T_ENUM);
-  int_type->size = sizeof(int);
-
   float_type = makeType(T_ENUM);
-  float_type->size = sizeof(float);
-
   char_type = makeType(T_ENUM);
-  char_type->size = sizeof(char);
-
   void_type = makeType(T_VOID);
+  string_type = setTypeElementType(makeType(T_POINTER), char_type);
+
+  int_type->size = 4;
+  float_type->size = 4;
+  char_type->size = 1;
   void_type->size = 0;
+  string_type->size = 4;
 
-  string_type = makeType(T_POINTER);
-  setTypeElementType(string_type, char_type);
-  string_type->size = sizeof(char *);
+  int_type->check = TRUE;
+  float_type->check = TRUE;
+  char_type->check = TRUE;
+  void_type->check = TRUE;
+  string_type->check = TRUE;
 
-  A_ID *id;
-
-  id = makeIdentifier("int");
+  A_ID *id = makeIdentifier("int");
   id->kind = ID_TYPE;
   id->type = int_type;
 
@@ -54,19 +58,41 @@ void initialize(void) {
   id = makeIdentifier("void");
   id->kind = ID_TYPE;
   id->type = void_type;
+
+  A_ID *format = makeDummyIdentifier();
+  format->kind = ID_PARM;
+  format->type = string_type;
+  A_ID *variadic = makeDummyIdentifier();
+  variadic->kind = ID_PARM;
+
   id = makeIdentifier("printf");
   id->kind = ID_FUNC;
-  id->type = makeType(T_FUNC);
-  setTypeElementType(id->type, int_type);
+  id->type = setTypeField(setTypeElementType(makeType(T_FUNC), void_type),
+                          linkDeclaratorList(format, variadic));
+
+  format = makeDummyIdentifier();
+  format->kind = ID_PARM;
+  format->type = string_type;
+  variadic = makeDummyIdentifier();
+  variadic->kind = ID_PARM;
 
   id = makeIdentifier("scanf");
   id->kind = ID_FUNC;
-  id->type = makeType(T_FUNC);
-  setTypeElementType(id->type, int_type);
+  id->type = setTypeField(setTypeElementType(makeType(T_FUNC), void_type),
+                          linkDeclaratorList(format, variadic));
+
+  A_ID *size = makeDummyIdentifier();
+  size->kind = ID_PARM;
+  size->type = int_type;
+
+  id = makeIdentifier("malloc");
+  id->kind = ID_FUNC;
+  id->type = setTypeField(setTypeElementType(makeType(T_FUNC), string_type), size);
 }
 
 static int isSameType(const A_TYPE *a, const A_TYPE *b);
 static int isSameFormalParameters(const A_ID *a, const A_ID *b);
+static int isPointerOrArrayType(const A_TYPE *type);
 
 static int isSameType(const A_TYPE *a, const A_TYPE *b) {
   if (a == b)
@@ -75,30 +101,25 @@ static int isSameType(const A_TYPE *a, const A_TYPE *b) {
   if (a == NULL || b == NULL)
     return 0;
 
-  if (a->kind != b->kind)
-    return 0;
-
-  switch (a->kind) {
-  case T_POINTER:
+  if (isPointerOrArrayType(a) && isPointerOrArrayType(b))
     return isSameType(a->element_type, b->element_type);
 
-  case T_ARRAY:
-    return a->expr == b->expr && isSameType(a->element_type, b->element_type);
-
-  case T_FUNC:
+  if (a->kind == T_FUNC && b->kind == T_FUNC)
     return isSameType(a->element_type, b->element_type) &&
            isSameFormalParameters(a->field, b->field);
 
-  case T_VOID:
-    return 1;
-
-  default:
-    return 0;
-  }
+  return 0;
 }
 
 static int isSameFormalParameters(const A_ID *a, const A_ID *b) {
+  if (a == NULL)
+    return 1;
+
   while (a != NULL && b != NULL) {
+    if (a->type == NULL || b->type == NULL)
+      return a->type == NULL && b->type == NULL && a->link == NULL &&
+             b->link == NULL;
+
     if (!isSameType(a->type, b->type))
       return 0;
 
@@ -106,7 +127,11 @@ static int isSameFormalParameters(const A_ID *a, const A_ID *b) {
     b = b->link;
   }
 
-  return a == NULL && b == NULL;
+  return a == b;
+}
+
+static int isPointerOrArrayType(const A_TYPE *type) {
+  return type != NULL && (type->kind == T_POINTER || type->kind == T_ARRAY);
 }
 
 A_TYPE *makeType(T_KIND kind) {
@@ -117,6 +142,7 @@ A_TYPE *makeType(T_KIND kind) {
   }
 
   t->kind = kind;
+  t->line = line_no;
 
   return t;
 }
@@ -137,6 +163,7 @@ A_ID *makeIdentifier(char *name) {
   strcpy(id->name, name);
 
   id->level = current_level;
+  id->line = line_no;
   id->prev = current_id;
   current_id = id;
 
@@ -147,8 +174,7 @@ A_ID *searchIdentifier(const char *name) {
   A_ID *id = current_id;
 
   while (id != NULL) {
-    if (id->kind != ID_STRUCT && id->kind != ID_ENUM && id->kind != ID_FIELD &&
-        strcmp(id->name, name) == 0)
+    if (strcmp(id->name, name) == 0)
       return id;
 
     id = id->prev;
@@ -164,8 +190,7 @@ A_ID *searchIdentifierAtCurrentLevel(const char *name, A_ID *start) {
     if (id->level < current_level)
       break;
 
-    if (id->level == current_level && id->kind != ID_STRUCT && id->kind != ID_ENUM &&
-        id->kind != ID_FIELD && strcmp(id->name, name) == 0)
+    if (strcmp(id->name, name) == 0)
       return id;
 
     id = id->prev;
@@ -201,8 +226,6 @@ void leaveScope(void) {
     semanticError("scope stack underflow");
   }
 
-  checkForwardReference();
-
   ScopreFrame *frame = scope_stack;
 
   current_id = frame->saved_id;
@@ -213,8 +236,110 @@ void leaveScope(void) {
 }
 
 void semanticError(const char *message) {
-  logMsg(LOG_ERROR, "Semantic error: %s", message);
+  report_compiler_error(INTERNAL_ERROR, 0, line_no, "%s", message);
   exit(EXIT_FAILURE);
+}
+
+void syntax_error(int code, const char *name) {
+  syntax_err++;
+  const char *identifier = name != NULL ? name : "";
+
+  if (!compiler_error_tags_enabled()) {
+    printf("line %d: syntax error: ", line_no);
+    switch (code) {
+    case 11:
+      printf("illegal referencing struct or union identifier %s", identifier);
+      break;
+    case 12:
+      printf("redeclaration of identifier %s", identifier);
+      break;
+    case 13:
+      printf("undefined identifier %s", identifier);
+      break;
+    case 14:
+      printf("illegal type specifier in formal parameter");
+      break;
+    case 21:
+      printf("illegal function declarator");
+      break;
+    case 22:
+      printf("conflicting parm type in prototype function %s", identifier);
+      break;
+    case 23:
+      printf("empty parameter name");
+      break;
+    case 26:
+      printf("illegal or conflicting return type in function %s", identifier);
+      break;
+    case 31:
+      printf("undefined type for identifier %s", identifier);
+      break;
+    case 32:
+      printf("incomplete forward reference for identifier %s", identifier);
+      break;
+    default:
+      printf("unknown");
+      break;
+    }
+
+    if (yytext == NULL || yytext[0] == '\0')
+      printf(" at end\n");
+    else
+      printf(" near %s\n", yytext);
+    return;
+  }
+
+  switch (code) {
+  case 11:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "illegal reference to struct or union identifier '%s'",
+                          identifier);
+    break;
+  case 12:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "redeclaration of identifier '%s'", identifier);
+    break;
+  case 13:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "undefined identifier '%s'", identifier);
+    break;
+  case 14:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "illegal type specifier in formal parameter");
+    break;
+  case 21:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "illegal function declarator");
+    break;
+  case 22:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "conflicting parameter type in prototype function '%s'",
+                          identifier);
+    break;
+  case 23:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "empty parameter name");
+    break;
+  case 26:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "illegal or conflicting return type in function '%s'",
+                          identifier);
+    break;
+  case 31:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "undefined type for identifier '%s'", identifier);
+    break;
+  case 32:
+    report_compiler_error(DECLARATION_ERROR, code, line_no,
+                          "incomplete forward reference for identifier '%s'",
+                          identifier);
+    break;
+  default:
+    report_compiler_error(INTERNAL_ERROR, code, line_no,
+                          "unknown declaration error");
+    break;
+  }
+
 }
 
 // head 뒤에 tail 연결함. insert(head.end(), v.begin(), v.end()) 느낌?
@@ -240,7 +365,7 @@ A_ID *linkDeclaratorList(A_ID *head, A_ID *tail) {
 // A_TYPE -> A_TYPE
 A_TYPE *setTypeElementType(A_TYPE *t1, A_TYPE *t2) {
   if (t1 == NULL)
-    semanticError("Null type in setTypeElementType");
+    return t2;
 
   A_TYPE *current = t1;
 
@@ -280,69 +405,20 @@ A_TYPE *setTypeField(A_TYPE *type, A_ID *field) {
   if (type == NULL)
     semanticError("NULL type in setTypeField");
 
-  if (type->kind == T_STRUCT || type->kind == T_UNION) {
-    for (A_ID *member = field; member != NULL; member = member->link) {
-      for (A_ID *previous = field; previous != member; previous = previous->link) {
-        if (strcmp(previous->name, member->name) == 0)
-          semanticError("Duplicate struct field");
-      }
-    }
-  }
-
   type->field = field;
-
-  if (type->kind == T_STRUCT || type->kind == T_UNION) {
-    for (A_ID *member = field; member != NULL; member = member->link) {
-      if (current_id == member) {
-        current_id = member->prev;
-        continue;
-      }
-
-      A_ID *id = current_id;
-
-      while (id != NULL && id->prev != member)
-        id = id->prev;
-
-      if (id == NULL)
-        semanticError("Struct field is missing from identifier table");
-
-      id->prev = member->prev;
-    }
-  }
 
   return type;
 }
 
-A_SPECIFIER *makeSpecifier(A_TYPE *type, S_KIND stor) {
+A_SPECIFIER *makeSpecifier(A_TYPE *type) {
   A_SPECIFIER *specifier = calloc(1, sizeof(A_SPECIFIER));
 
   if (specifier == NULL)
     semanticError("Memory allocation failed in makeSpecifier");
 
   specifier->type = type;
-  specifier->stor = stor;
-  specifier->line = 0;
-
-  return specifier;
-}
-
-A_SPECIFIER *updateSpecifier(A_SPECIFIER *specifier, A_TYPE *type, S_KIND stor) {
-  if (specifier == NULL)
-    semanticError("Null specifier in updateSpecifier");
-
-  if (type != NULL) {
-    if (specifier->type != NULL)
-      semanticError("Duplicate type specifier");
-
-    specifier->type = type;
-  }
-
-  if (stor != S_NULL) {
-    if (specifier->stor != S_NULL)
-      semanticError("Duplicate storage class specifier");
-
-    specifier->stor = stor;
-  }
+  specifier->stor = S_NULL;
+  specifier->line = line_no;
 
   return specifier;
 }
@@ -371,7 +447,7 @@ A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *specifier) {
     // 현재 스코프 중복 검사
     if (current->name != NULL && current->name[0] != '\0' &&
         searchIdentifierAtCurrentLevel(current->name, current->prev) != NULL) {
-      semanticError("Redeclaration of identifier");
+      syntax_error(12, current->name);
     }
 
     // 선언자의 최종 타입 결정
@@ -381,19 +457,13 @@ A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *specifier) {
       semanticError("Unresolved declarator type");
 
     // 식별자 종류 결정
-    if (specifier->stor == S_TYPEDEF) {
-      current->kind = ID_TYPE;
-    } else if (current->type->kind == T_FUNC) {
+    if (current->type->kind == T_FUNC) {
       current->kind = ID_FUNC;
     } else {
       current->kind = ID_VAR;
     }
 
-    // 저장 클래스 적용
-    current->specifier = specifier->stor;
-
-    if (current->specifier == S_NULL)
-      current->specifier = S_AUTO;
+    current->specifier = S_NULL;
 
     current = current->link;
   }
@@ -409,10 +479,8 @@ A_ID *setStructDeclaratorListSpecifier(A_ID *id, A_TYPE *type) {
     if (field->name == NULL || field->name[0] == '\0')
       semanticError("Missing struct field name");
 
-    for (A_ID *previous = id; previous != field; previous = previous->link) {
-      if (strcmp(previous->name, field->name) == 0)
-        semanticError("Duplicate struct field");
-    }
+    if (searchIdentifierAtCurrentLevel(field->name, field->prev) != NULL)
+      syntax_error(12, field->name);
 
     setDeclaratorElementType(field, type);
     field->kind = ID_FIELD;
@@ -425,13 +493,12 @@ A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
   if (id == NULL || specifier == NULL)
     semanticError("Null argument in setFunctionDeclaratorSpecifier");
 
-  if (specifier->stor != S_NULL)
-    semanticError("Illegal function specifiers");
-
   setDefaultSpecifier(specifier);
 
-  if (id->type == NULL || id->type->kind != T_FUNC)
-    semanticError("Illegal function specifiers");
+  if (id->type == NULL || id->type->kind != T_FUNC) {
+    syntax_error(21, id->name);
+    return id;
+  }
 
   setDeclaratorElementType(id, specifier->type);
   id->kind = ID_FUNC;
@@ -440,23 +507,24 @@ A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
 
   if (previous != NULL) {
     if (previous->kind != ID_FUNC || previous->type == NULL ||
-        previous->type->kind != T_FUNC || previous->type->expr != NULL)
-      semanticError("Redeclaration of function");
+        previous->type->kind != T_FUNC || previous->type->expr != NULL) {
+      syntax_error(12, id->name);
+    } else {
+      if (!isSameFormalParameters(previous->type->field, id->type->field))
+        syntax_error(22, id->name);
 
-    if (!isSameFormalParameters(previous->type->field, id->type->field))
-      semanticError("Redeclaration of function");
-
-    if (!isSameType(previous->type->element_type, id->type->element_type))
-      semanticError("Redeclaration of function");
+      if (!isSameType(previous->type->element_type, id->type->element_type))
+        syntax_error(26, previous->name);
+    }
   }
 
   A_ID *param = id->type->field;
 
   while (param != NULL) {
-    if ((param->name == NULL || param->name[0] == '\0') && param->type != NULL &&
-        param->type->kind != T_VOID) {
-      semanticError("Empty parameter name");
-    }
+    if (param->name != NULL && param->name[0] != '\0')
+      current_id = param;
+    else if (param->type != NULL)
+      syntax_error(23, NULL);
 
     param = param->link;
   }
@@ -468,16 +536,13 @@ A_ID *setFunctionDeclaratorBody(A_ID *id, A_NODE *body) {
   if (id == NULL)
     semanticError("Null identifier in setFunctionDeclaratorBody");
 
-  if (id->kind != ID_FUNC || id->type == NULL || id->type->kind != T_FUNC)
-    semanticError("Illegal function declarator");
-
-  if (body == NULL)
-    semanticError("Null function body");
-
-  if (id->type->expr != NULL)
-    semanticError("Function body already defined");
+  if (id->type == NULL || id->type->kind != T_FUNC) {
+    current_id = id->prev;
+    return id;
+  }
 
   id->type->expr = body;
+  current_id = id;
 
   return id;
 }
@@ -486,28 +551,14 @@ A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *specifier) {
   if (id == NULL || specifier == NULL)
     semanticError("Null argument in setParameterDeclaratorSpecifier");
 
-  // 파라미터에 허용되지 않는 저장 클래스 검사 (이번 과제는 하지 않음)
-  if (specifier->stor != S_NULL)
-    semanticError("Illegal storage class in formal parameter");
+  if (searchIdentifierAtCurrentLevel(id->name, id->prev) != NULL)
+    syntax_error(12, id->name);
 
-  // 파라미터는 명시적인 타입이 있어야됨
-  if (specifier->type == NULL)
-    semanticError("Missing paramater type");
+  if (specifier->type == void_type)
+    syntax_error(14, NULL);
 
-  // 같이 스코프에서 이름 중복 검사
-  if (id->name != NULL && id->name[0] != '\0') {
-    if (searchIdentifierAtCurrentLevel(id->name, id->prev) != NULL)
-      semanticError("Redeclaration of parameter");
-  }
-
-  // 타입 설정
+  setDefaultSpecifier(specifier);
   setDeclaratorElementType(id, specifier->type);
-
-  // 이름이 있는 void 파라미터는 X
-  if (id->type == void_type) {
-    if (id->name != NULL && id->name[0] != '\0')
-      semanticError("Named paramater of void type");
-  }
 
   id->kind = ID_PARM;
 
@@ -518,78 +569,54 @@ A_ID *getIdentifierDeclared(const char *name) {
   A_ID *id = searchIdentifier(name);
 
   if (id == NULL)
-    semanticError("Undeclared identifier");
+    syntax_error(13, name);
 
   return id;
 }
 
 A_ID *makeDummyIdentifier(void) {
-  return makeIdentifier("");
+  A_ID *id = calloc(1, sizeof(A_ID));
+
+  if (id == NULL)
+    semanticError("memory allocation failed");
+
+  id->name = malloc(1);
+  if (id->name == NULL)
+    semanticError("memory allocation failed");
+
+  id->name[0] = '\0';
+  id->level = current_level;
+  id->line = line_no;
+  return id;
 }
 
 A_TYPE *setTypeNameSpecifier(A_TYPE *type, A_SPECIFIER *specifier) {
   if (specifier == NULL)
     semanticError("Null type specifier");
 
-  if (specifier->stor != S_NULL)
-    semanticError("Illegal storage clss in type name");
-
-  if (specifier->type == NULL)
-    semanticError("Missing type in type name");
-
-  if (type == NULL)
-    return specifier->type;
-
+  setDefaultSpecifier(specifier);
   return setTypeElementType(type, specifier->type);
-}
-
-static int isTagIdentifier(const A_ID *id) {
-  return id != NULL && (id->kind == ID_STRUCT || id->kind == ID_ENUM);
-}
-
-static void validateTagKind(T_KIND kind, ID_KIND id_kind) {
-  if (id_kind == ID_STRUCT) {
-    if (kind != T_STRUCT && kind != T_UNION)
-      semanticError("Invalid struct or union tag kind");
-  } else if (id_kind == ID_ENUM) {
-    if (kind != T_ENUM)
-      semanticError("Invalid enum tag kind");
-  } else {
-    semanticError("Invalid tag identifier kind");
-  }
-}
-
-static A_ID *searchTagIdentifier(const char *name, int current_scope_only) {
-  for (A_ID *id = current_id; id != NULL; id = id->prev) {
-    if (current_scope_only && id->level < current_level)
-      break;
-
-    if (isTagIdentifier(id) && strcmp(id->name, name) == 0)
-      return id;
-  }
-
-  return NULL;
 }
 
 A_TYPE *setTypeStructOrEnumIdentifier(T_KIND kind, char *name, ID_KIND id_kind) {
   if (name == NULL || name[0] == '\0')
     semanticError("Missing struct or enum tag");
 
-  validateTagKind(kind, id_kind);
+  A_ID *previous = searchIdentifierAtCurrentLevel(name, current_id);
 
-  A_ID *id = searchTagIdentifier(name, 1);
-
-  if (id != NULL) {
-    if (id->kind != id_kind || id->type == NULL || id->type->kind != kind)
-      semanticError("Conflicting struct or enum tag declaration");
-
-    if (id->type->field != NULL)
-      semanticError("Redefinition of struct or enum tag");
-
-    return id->type;
+  if (previous != NULL) {
+    if (previous->kind == id_kind && previous->type != NULL &&
+        previous->type->kind == kind) {
+      if (previous->type->field != NULL)
+        syntax_error(12, name);
+      else
+        return previous->type;
+    } else {
+      syntax_error(12, name);
+    }
   }
 
-  id = makeIdentifier(name);
+  A_ID *id = makeIdentifier(name);
   id->kind = id_kind;
   id->type = makeType(kind);
 
@@ -600,17 +627,19 @@ A_TYPE *getTypeOfStructOrEnumIdentifier(T_KIND kind, char *name, ID_KIND id_kind
   if (name == NULL || name[0] == '\0')
     semanticError("Missing struct or enum tag");
 
-  validateTagKind(kind, id_kind);
+  A_ID *id = searchIdentifier(name);
 
-  A_ID *id = searchTagIdentifier(name, 0);
+  if (id != NULL) {
+    if (id->kind == id_kind && id->type != NULL && id->type->kind == kind)
+      return id->type;
+    syntax_error(11, name);
+  }
 
-  if (id == NULL)
-    return setTypeStructOrEnumIdentifier(kind, name, id_kind);
-
-  if (id->kind != id_kind || id->type == NULL || id->type->kind != kind)
-    semanticError("Struct or enum tag kind mismatch");
-
-  return id->type;
+  A_TYPE *type = makeType(kind);
+  id = makeIdentifier(name);
+  id->kind = id_kind;
+  id->type = type;
+  return type;
 }
 
 A_ID *setDeclaratorKind(A_ID *id, ID_KIND kind) {
@@ -618,7 +647,7 @@ A_ID *setDeclaratorKind(A_ID *id, ID_KIND kind) {
     semanticError("Null identifier");
 
   if (searchIdentifierAtCurrentLevel(id->name, id->prev) != NULL)
-    semanticError("Redeclaration of identifier");
+    syntax_error(12, id->name);
 
   id->kind = kind;
   return id;
@@ -632,10 +661,10 @@ void checkForwardReference(void) {
       break;
 
     if (id->kind == ID_NULL)
-      semanticError("Undefined identifier");
-
-    if (id->kind == ID_STRUCT && id->type != NULL && id->type->field == NULL)
-      semanticError("Incomplete forward reference");
+      syntax_error(31, id->name);
+    else if ((id->kind == ID_STRUCT || id->kind == ID_ENUM) && id->type != NULL &&
+             id->type->field == NULL)
+      syntax_error(32, id->name);
 
     id = id->prev;
   }

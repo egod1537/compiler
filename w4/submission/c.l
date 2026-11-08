@@ -1,19 +1,20 @@
 digit       [0-9]
 letter      [a-zA-Z_]
-delim       [ \t\r]
-line        [\n]
+delim       [ \t]
+line        \r?\n
 ws          {delim}+
+
+%option noinput nounput
 
 %{
 #include "parse_value.h"
 #include "semantic.h"
+#include "error.h"
 #include "y.tab.h"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-int line_no = 1;
 
 int checkIdentifier(char *s);
 %}
@@ -23,11 +24,7 @@ int checkIdentifier(char *s);
 {ws}                        {}
 {line}                      { line_no++; }
 
-auto                        { return (AUTO_SYM); }
-static                      { return (STATIC_SYM); }
-typedef                     { return (TYPEDEF_SYM); }
-register                    { return (REGISTER_SYM); }
-extern                      { return (EXTERN_SYM); }
+"auto"|"static"|"typedef"|"register"|"extern" { return (INVALID_TOKEN); }
 
 break                       { return (BREAK_SYM); }
 case                        { return (CASE_SYM); }
@@ -37,7 +34,6 @@ do                          { return (DO_SYM); }
 else                        { return (ELSE_SYM); }
 enum                        { return (ENUM_SYM); }
 for                         { return (FOR_SYM); }
-goto                        { return (GOTO_SYM); }
 if                          { return (IF_SYM); }
 return                      { return (RETURN_SYM); }
 sizeof                      { return (SIZEOF_SYM); }
@@ -45,9 +41,6 @@ struct                      { return (STRUCT_SYM); }
 switch                      { return (SWITCH_SYM); }
 union                       { return (UNION_SYM); }
 while                       { return (WHILE_SYM); }
-
-const                       { return (CONST_SYM); }
-volatile                    { return (VOLATILE_SYM); }
 
 "++"                        { return (PLUSPLUS); }
 "--"                        { return (MINUSMINUS); }
@@ -60,9 +53,6 @@ volatile                    { return (VOLATILE_SYM); }
 
 "&&"                        { return (AMPAMP); }
 "||"                        { return (BARBAR); }
-
-"<<"                        { return (LSHIFT); }
-">>"                        { return (RSHIFT); }
 
 "..."                       { return (DOTDOTDOT); }
 
@@ -80,7 +70,6 @@ volatile                    { return (VOLATILE_SYM); }
 "."                         { return (PERIOD); }
 ","                         { return (COMMA); }
 "!"                         { return (EXCL); }
-"~"                         { return (TILDE); }
 
 "*"                         { return (STAR); }
 "/"                         { return (SLASH); }
@@ -88,7 +77,6 @@ volatile                    { return (VOLATILE_SYM); }
 
 "&"                         { return (AMP); }
 "|"                         { return (BAR); }
-"^"                         { return (CARET); }
 
 ";"                         { return (SEMICOLON); }
 
@@ -97,21 +85,13 @@ volatile                    { return (VOLATILE_SYM); }
 
 "="                         { return (ASSIGN); }
 
-"?"                         { return (QUESTION); }
-
 "//"[^\n]*                  {}
-"/*"([^*]|\*+[^*/])*\*+"/"  {
-  for (char *p = yytext; *p != '\0'; p++) {
-    if (*p == '\n')
-      line_no++;
-  }
-}
 
 {digit}+\.{digit}+          {
   char *value = malloc(strlen(yytext) + 1);
 
   if (value == NULL) {
-    fprintf(stderr, "Out of memory\n");
+    report_compiler_error(INTERNAL_ERROR, 0, line_no, "memory allocation failed");
     exit(EXIT_FAILURE);
   }
 
@@ -121,14 +101,14 @@ volatile                    { return (VOLATILE_SYM); }
   return (FLOAT_CONSTANT);
 }
 {digit}+                    {
-  yylval = atol(yytext);
+  yylval = atoi(yytext);
   return (INTEGER_CONSTANT);
 }
 
 \"([^"\n]|\\["\n])*\"        {
   char *value = malloc(strlen(yytext) + 1);
   if (value == NULL) {
-    fprintf(stderr, "Out of memory\n");
+    report_compiler_error(INTERNAL_ERROR, 0, line_no, "memory allocation failed");
     exit(EXIT_FAILURE);
   }
 
@@ -136,11 +116,12 @@ volatile                    { return (VOLATILE_SYM); }
   yylval = YY(value);
   return (STRING_LITERAL);
 }
-\'([^'\n]|\\.)\'             { 
+\'([^'\n]|\\.)\'             {
   int value = (unsigned char)yytext[1];
+
   if (yytext[1] == '\\') {
     switch (yytext[2]) {
-    case '0': value = 0; break;
+    case '0': value = '\0'; break;
     case 'a': value = '\a'; break;
     case 'b': value = '\b'; break;
     case 'f': value = '\f'; break;
@@ -153,11 +134,13 @@ volatile                    { return (VOLATILE_SYM); }
     case '"': value = '"'; break;
     case '?': value = '?'; break;
     default:
-      fprintf(stderr, "Unsupported character escape: %s\n", yytext);
+      report_compiler_error(LEXICAL_ERROR, 0, line_no,
+                            "unsupported character escape '%s'", yytext);
       exit(EXIT_FAILURE);
     }
   }
-  yylval = value;
+
+  yylval = (YYSTYPE)value;
   return(CHARACTER_CONSTANT);
 }
 
@@ -171,7 +154,7 @@ volatile                    { return (VOLATILE_SYM); }
     char *name = malloc(strlen(yytext) + 1);
 
     if (name == NULL) {
-      fprintf(stderr, "Out of memory\n");
+      report_compiler_error(INTERNAL_ERROR, 0, line_no, "memory allocation failed");
       exit(EXIT_FAILURE);
     }
 
@@ -183,24 +166,18 @@ volatile                    { return (VOLATILE_SYM); }
 }
 
 . {
-  fprintf(stderr, "Lexical error at line %d: invalid character '%s'\n", line_no,
-          yytext);
-  exit(EXIT_FAILURE);
+  if (compiler_error_tags_enabled()) {
+    report_compiler_error(LEXICAL_ERROR, 0, line_no,
+                          "invalid character '%s'", yytext);
+    exit(EXIT_FAILURE);
+  }
+
+  return (unsigned char)yytext[0];
 }
 
 
 %%
 int checkIdentifier(char *s) {
-  const char *types[] = {"int",   "float", "double", "char",    "void",
-                         "short", "long",  "signed", "unsigned"};
-
-  int count = sizeof(types) / sizeof(types[0]);
-
-  for (int i = 0; i < count; i++) {
-    if (strcmp(s, types[i]) == 0)
-      return TYPE_IDENTIFIER;
-  }
-
   A_ID *id = searchIdentifier(s);
   if (id != NULL && id->kind == ID_TYPE)
     return TYPE_IDENTIFIER;
