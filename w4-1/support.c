@@ -20,7 +20,6 @@ A_NODE *makeNode(NODE_NAME n, A_NODE *a, A_NODE *b, A_NODE *c) {
   m->clink = b;
   m->rlink = c;
   m->type = NIL;
-  m->line = line_no;
   m->value = 0;
   return (m);
 }
@@ -36,7 +35,6 @@ A_NODE *makeNodeList(NODE_NAME n, A_NODE *a, A_NODE *b) {
   m->clink = NIL;
   m->rlink = NIL;
   m->type = NIL;
-  m->line = line_no;
   m->value = 0;
   k->name = n;
   k->llink = b;
@@ -55,7 +53,6 @@ A_ID *makeIdentifier(char *s) {
   id->init = NIL;
   id->type = NIL;
   id->link = NIL;
-  id->line = line_no;
   id->value = 0;
   id->prev = current_id;
   current_id = id;
@@ -73,7 +70,6 @@ A_ID *makeDummyIdentifier() {
   id->init = NIL;
   id->type = NIL;
   id->link = NIL;
-  id->line = line_no;
   id->value = 0;
   id->prev = 0;
   return (id);
@@ -84,13 +80,10 @@ A_TYPE *makeType(T_KIND k) {
   t = malloc(sizeof(A_TYPE));
   t->kind = k;
   t->size = 0;
-  t->local_var_size = 0;
   t->element_type = NIL;
   t->field = NIL;
   t->expr = NIL;
-  t->check = FALSE;
   t->prt = FALSE;
-  t->line = line_no;
   return (t);
 }
 
@@ -99,7 +92,6 @@ A_SPECIFIER *makeSpecifier(A_TYPE *t, S_KIND s) {
   p = malloc(sizeof(A_SPECIFIER));
   p->type = t;
   p->stor = s;
-  p->line = line_no;
   return (p);
 }
 
@@ -422,16 +414,7 @@ void initialize() {
   void_type = setTypeAndKindOfDeclarator(makeType(T_VOID), ID_TYPE,
                                          makeIdentifier("void"));
   string_type = setTypeElementType(makeType(T_POINTER), char_type);
-  int_type->size = 4;
-  int_type->check = TRUE;
-  float_type->size = 4;
-  float_type->check = TRUE;
   char_type->size = 1;
-  char_type->check = TRUE;
-  void_type->size = 0;
-  void_type->check = TRUE;
-  string_type->size = 4;
-  string_type->check = TRUE;
 
   setDeclaratorTypeAndKind(
       makeIdentifier("printf"),

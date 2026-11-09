@@ -20,7 +20,6 @@ A_NODE *makeNode(NODE_NAME n, A_NODE *a, A_NODE *b, A_NODE *c) {
   m->clink = b;
   m->rlink = c;
   m->type = NIL;
-  m->line = line_no;
   m->value = 0;
   return (m);
 }
@@ -36,7 +35,6 @@ A_NODE *makeNodeList(NODE_NAME n, A_NODE *a, A_NODE *b) {
   m->clink = NIL;
   m->rlink = NIL;
   m->type = NIL;
-  m->line = line_no;
   m->value = 0;
   k->name = n;
   k->llink = b;
@@ -55,14 +53,13 @@ A_ID *makeIdentifier(char *s) {
   id->init = NIL;
   id->type = NIL;
   id->link = NIL;
-  id->line = line_no;
   id->value = 0;
   id->prev = current_id;
   current_id = id;
   return (id);
 }
 
-A_ID *makeDummyIdentifier() {
+A_ID *makeDummyIdentifier(void) {
   A_ID *id;
   id = malloc(sizeof(A_ID));
   id->name = "";
@@ -73,7 +70,6 @@ A_ID *makeDummyIdentifier() {
   id->init = NIL;
   id->type = NIL;
   id->link = NIL;
-  id->line = line_no;
   id->value = 0;
   id->prev = 0;
   return (id);
@@ -84,13 +80,10 @@ A_TYPE *makeType(T_KIND k) {
   t = malloc(sizeof(A_TYPE));
   t->kind = k;
   t->size = 0;
-  t->local_var_size = 0;
   t->element_type = NIL;
   t->field = NIL;
   t->expr = NIL;
-  t->check = FALSE;
   t->prt = FALSE;
-  t->line = line_no;
   return (t);
 }
 
@@ -99,7 +92,6 @@ A_SPECIFIER *makeSpecifier(A_TYPE *t, S_KIND s) {
   p = malloc(sizeof(A_SPECIFIER));
   p->type = t;
   p->stor = s;
-  p->line = line_no;
   return (p);
 }
 
@@ -123,7 +115,7 @@ A_ID *searchIdentifierAtCurrentLevel(char *s, A_ID *id) {
   return (id);
 }
 
-void checkForwardReference() {
+void checkForwardReference(void) {
   A_ID *id;
   A_TYPE *t;
   id = current_id;
@@ -152,7 +144,7 @@ A_SPECIFIER *updateSpecifier(A_SPECIFIER *p, A_TYPE *t, S_KIND s) {
       if (p->type == t)
         ;
       else
-        syntax_error(24);
+        syntax_error(24, NULL);
     } else
       p->type = t;
   }
@@ -161,7 +153,7 @@ A_SPECIFIER *updateSpecifier(A_SPECIFIER *p, A_TYPE *t, S_KIND s) {
       if (s == p->stor)
         ;
       else
-        syntax_error(24);
+        syntax_error(24, NULL);
     } else
       p->stor = s;
   }
@@ -245,10 +237,10 @@ A_ID *setDeclaratorTypeAndKind(A_ID *id, A_TYPE *t, ID_KIND k) {
 A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p) {
   A_ID *a;
   if (p->stor)
-    syntax_error(25);
+    syntax_error(25, NULL);
   setDefaultSpecifier(p);
   if (id->type->kind != T_FUNC) {
-    syntax_error(21);
+    syntax_error(21, NULL);
     return (id);
   } else {
     id = setDeclaratorElementType(id, p->type);
@@ -270,7 +262,7 @@ A_ID *setFunctionDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p) {
     if (strlen(a->name))
       current_id = a;
     else if (a->type)
-      syntax_error(23);
+      syntax_error(23, NULL);
     a = a->link;
   }
   return (id);
@@ -307,7 +299,7 @@ A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p) {
   if (searchIdentifierAtCurrentLevel(id->name, id->prev))
     syntax_error(12, id->name);
   if (p->stor || p->type == void_type)
-    syntax_error(14);
+    syntax_error(14, NULL);
   setDefaultSpecifier(p);
   id = setDeclaratorElementType(id, p->type);
   id->kind = ID_PARM;
@@ -329,7 +321,7 @@ A_ID *setStructDeclaratorListSpecifier(A_ID *id, A_TYPE *t) {
 
 A_TYPE *setTypeNameSpecifier(A_TYPE *t, A_SPECIFIER *p) {
   if (p->stor)
-    syntax_error(20);
+    syntax_error(20, NULL);
   setDefaultSpecifier(p);
   t = setTypeElementType(t, p->type);
   return (t);
@@ -412,7 +404,7 @@ BOOLEAN isPointerOrArrayType(A_TYPE *t) {
   return (t && (t->kind == T_POINTER || t->kind == T_ARRAY));
 }
 
-void initialize() {
+void initialize(void) {
   int_type = setTypeAndKindOfDeclarator(makeType(T_ENUM), ID_TYPE,
                                         makeIdentifier("int"));
   float_type = setTypeAndKindOfDeclarator(makeType(T_ENUM), ID_TYPE,
@@ -422,16 +414,7 @@ void initialize() {
   void_type = setTypeAndKindOfDeclarator(makeType(T_VOID), ID_TYPE,
                                          makeIdentifier("void"));
   string_type = setTypeElementType(makeType(T_POINTER), char_type);
-  int_type->size = 4;
-  int_type->check = TRUE;
-  float_type->size = 4;
-  float_type->check = TRUE;
   char_type->size = 1;
-  char_type->check = TRUE;
-  void_type->size = 0;
-  void_type->check = TRUE;
-  string_type->size = 4;
-  string_type->check = TRUE;
 
   setDeclaratorTypeAndKind(
       makeIdentifier("printf"),

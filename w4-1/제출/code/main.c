@@ -3,8 +3,8 @@
 extern int syntax_err;
 extern A_NODE *root;
 
-void initialize();
-int yyparse();
+void initialize(void);
+int yyparse(void);
 void print_ast(A_NODE *);
 
 /*
@@ -13,7 +13,7 @@ flex -o lex.yy.c c.l
 gcc -o parser y.tab.c lex.yy.c support.c print.c main.c
 */
 
-int main() {
+int main(void) {
   initialize();
 
   if (yyparse() || syntax_err)

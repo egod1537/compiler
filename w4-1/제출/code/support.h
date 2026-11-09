@@ -6,13 +6,13 @@
 A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
 A_NODE *makeNodeList(NODE_NAME, A_NODE *, A_NODE *);
 A_ID *makeIdentifier(char *);
-A_ID *makeDummyIdentifier();
+A_ID *makeDummyIdentifier(void);
 A_TYPE *makeType(T_KIND);
 A_SPECIFIER *makeSpecifier(A_TYPE *, S_KIND);
 A_ID *searchIdentifier(char *, A_ID *);
 A_ID *searchIdentifierAtCurrentLevel(char *, A_ID *);
 A_SPECIFIER *updateSpecifier(A_SPECIFIER *, A_TYPE *, S_KIND);
-void checkForwardReference();
+void checkForwardReference(void);
 void setDefaultSpecifier(A_SPECIFIER *);
 A_ID *linkDeclaratorList(A_ID *, A_ID *);
 A_ID *getIdentifierDeclared(char *);
@@ -36,7 +36,7 @@ A_TYPE *setTypeStructOrEnumIdentifier(T_KIND, char *, ID_KIND);
 BOOLEAN isNotSameFormalParameters(A_ID *, A_ID *);
 BOOLEAN isNotSameType(A_TYPE *, A_TYPE *);
 BOOLEAN isPointerOrArrayType(A_TYPE *);
-void syntax_error();
-void initialize();
+void syntax_error(int, char *);
+void initialize(void);
 
 #endif
