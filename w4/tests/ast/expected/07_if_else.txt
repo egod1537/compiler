@@ -1,0 +1,38 @@
+AST 07 — if_else
+Source: tests/ast/cases/07_if_else.c
+
+int main() {
+    int x;
+    x = 1;
+    if (x > 0) return 1;
+    else return 0;
+}
+
+MANUALLY DERIVED EXPECTED STRUCTURE
+N_PROGRAM
+└─ clink → A_ID "main" [ID_FUNC, level=0, specifier=S_NULL]
+   └─ type → T_FUNC
+      ├─ field → NULL
+      ├─ element_type → int
+      └─ expr → N_STMT_COMPOUND
+         ├─ llink → A_ID "x" [ID_VAR, level=1, specifier=S_NULL, type=int]  [X_LOCAL]
+         └─ rlink → N_STMT_LIST
+            ├─ llink → N_STMT_EXPRESSION
+            │  └─ clink → N_EXP_ASSIGN
+            │     ├─ llink → N_EXP_IDENT → X_LOCAL
+            │     └─ rlink → N_EXP_INT_CONST(1)
+            └─ rlink → N_STMT_LIST
+               ├─ llink → N_STMT_IF_ELSE
+               │  ├─ llink → N_EXP_GTR
+               │  │  ├─ llink → N_EXP_IDENT → X_LOCAL
+               │  │  └─ rlink → N_EXP_INT_CONST(0)
+               │  ├─ clink → N_STMT_RETURN
+               │  │  └─ clink → N_EXP_INT_CONST(1)
+               │  └─ rlink → N_STMT_RETURN
+               │     └─ clink → N_EXP_INT_CONST(0)
+               └─ rlink → N_STMT_LIST_NIL
+
+MANUAL VALIDATION
+- IF_ELSE children are (condition, then statement, else statement).
+- No implicit N_STMT_COMPOUND is introduced for single-statement branches.
+- Both references to x resolve to the same local A_ID (level=1).

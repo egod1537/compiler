@@ -1,0 +1,323 @@
+{
+  "test": "7",
+  "source": "tests/ast/cases/07_if_else.c",
+  "manual_reference": "tests/ast/expected/07_if_else.txt",
+  "root": "program",
+  "objects": [
+    {
+      "id": "int",
+      "class": "A_TYPE",
+      "Kind": "T_INT",
+      "ElementType": null,
+      "Field": null,
+      "Expr": null
+    },
+    {
+      "id": "local_x",
+      "class": "A_ID",
+      "Name": "x",
+      "Kind": "ID_VAR",
+      "Level": 1,
+      "Specifier": "S_AUTO",
+      "Value": 0,
+      "Address": 0,
+      "Type": {
+        "ref": "int"
+      },
+      "Init": null,
+      "Link": null
+    },
+    {
+      "id": "one_assign",
+      "class": "A_NODE",
+      "Name": "N_EXP_INT_CONST",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": 1,
+      "Rlink": null
+    },
+    {
+      "id": "initialize_x_lhs_ref",
+      "class": "A_ID_REF",
+      "Name": "x",
+      "Kind": "ID_VAR",
+      "Level": 1,
+      "Specifier": "S_AUTO",
+      "Value": 0,
+      "Address": 0,
+      "Type": {
+        "ref": "int"
+      },
+      "Target": {
+        "ref": "local_x"
+      }
+    },
+    {
+      "id": "initialize_x_lhs",
+      "class": "A_NODE",
+      "Name": "N_EXP_IDENT",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": {
+        "ref": "initialize_x_lhs_ref"
+      },
+      "Rlink": null
+    },
+    {
+      "id": "initialize_x_expr",
+      "class": "A_NODE",
+      "Name": "N_EXP_ASSIGN",
+      "Type": null,
+      "Value": 0,
+      "Llink": {
+        "ref": "initialize_x_lhs"
+      },
+      "Clink": null,
+      "Rlink": {
+        "ref": "one_assign"
+      }
+    },
+    {
+      "id": "initialize_x",
+      "class": "A_NODE",
+      "Name": "N_STMT_EXPRESSION",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": {
+        "ref": "initialize_x_expr"
+      },
+      "Rlink": null
+    },
+    {
+      "id": "condition_x_ref",
+      "class": "A_ID_REF",
+      "Name": "x",
+      "Kind": "ID_VAR",
+      "Level": 1,
+      "Specifier": "S_AUTO",
+      "Value": 0,
+      "Address": 0,
+      "Type": {
+        "ref": "int"
+      },
+      "Target": {
+        "ref": "local_x"
+      }
+    },
+    {
+      "id": "condition_x",
+      "class": "A_NODE",
+      "Name": "N_EXP_IDENT",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": {
+        "ref": "condition_x_ref"
+      },
+      "Rlink": null
+    },
+    {
+      "id": "zero_condition",
+      "class": "A_NODE",
+      "Name": "N_EXP_INT_CONST",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": 0,
+      "Rlink": null
+    },
+    {
+      "id": "condition",
+      "class": "A_NODE",
+      "Name": "N_EXP_GTR",
+      "Type": null,
+      "Value": 0,
+      "Llink": {
+        "ref": "condition_x"
+      },
+      "Clink": null,
+      "Rlink": {
+        "ref": "zero_condition"
+      }
+    },
+    {
+      "id": "one_return",
+      "class": "A_NODE",
+      "Name": "N_EXP_INT_CONST",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": 1,
+      "Rlink": null
+    },
+    {
+      "id": "return_one",
+      "class": "A_NODE",
+      "Name": "N_STMT_RETURN",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": {
+        "ref": "one_return"
+      },
+      "Rlink": null
+    },
+    {
+      "id": "zero_return",
+      "class": "A_NODE",
+      "Name": "N_EXP_INT_CONST",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": 0,
+      "Rlink": null
+    },
+    {
+      "id": "return_zero",
+      "class": "A_NODE",
+      "Name": "N_STMT_RETURN",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": {
+        "ref": "zero_return"
+      },
+      "Rlink": null
+    },
+    {
+      "id": "if_else",
+      "class": "A_NODE",
+      "Name": "N_STMT_IF_ELSE",
+      "Type": null,
+      "Value": 0,
+      "Llink": {
+        "ref": "condition"
+      },
+      "Clink": {
+        "ref": "return_one"
+      },
+      "Rlink": {
+        "ref": "return_zero"
+      }
+    },
+    {
+      "id": "stmt_end",
+      "class": "A_NODE",
+      "Name": "N_STMT_LIST_NIL",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": null,
+      "Rlink": null
+    },
+    {
+      "id": "stmt_2",
+      "class": "A_NODE",
+      "Name": "N_STMT_LIST",
+      "Type": null,
+      "Value": 0,
+      "Llink": {
+        "ref": "if_else"
+      },
+      "Clink": null,
+      "Rlink": {
+        "ref": "stmt_end"
+      }
+    },
+    {
+      "id": "stmt_1",
+      "class": "A_NODE",
+      "Name": "N_STMT_LIST",
+      "Type": null,
+      "Value": 0,
+      "Llink": {
+        "ref": "initialize_x"
+      },
+      "Clink": null,
+      "Rlink": {
+        "ref": "stmt_2"
+      }
+    },
+    {
+      "id": "body",
+      "class": "A_NODE",
+      "Name": "N_STMT_COMPOUND",
+      "Type": null,
+      "Value": 0,
+      "Llink": {
+        "ref": "local_x"
+      },
+      "Clink": null,
+      "Rlink": {
+        "ref": "stmt_1"
+      }
+    },
+    {
+      "id": "void",
+      "class": "A_TYPE",
+      "Kind": "T_VOID",
+      "ElementType": null,
+      "Field": null,
+      "Expr": null
+    },
+    {
+      "id": "void_param",
+      "class": "A_ID",
+      "Name": "",
+      "Kind": "ID_PARM",
+      "Level": 1,
+      "Specifier": "S_NULL",
+      "Value": 0,
+      "Address": 0,
+      "Type": {
+        "ref": "void"
+      },
+      "Init": null,
+      "Link": null
+    },
+    {
+      "id": "main_type",
+      "class": "A_TYPE",
+      "Kind": "T_FUNC",
+      "ElementType": {
+        "ref": "int"
+      },
+      "Field": {
+        "ref": "void_param"
+      },
+      "Expr": {
+        "ref": "body"
+      }
+    },
+    {
+      "id": "main",
+      "class": "A_ID",
+      "Name": "main",
+      "Kind": "ID_FUNC",
+      "Level": 0,
+      "Specifier": "S_NULL",
+      "Value": 0,
+      "Address": 0,
+      "Type": {
+        "ref": "main_type"
+      },
+      "Init": null,
+      "Link": null
+    },
+    {
+      "id": "program",
+      "class": "A_NODE",
+      "Name": "N_PROGRAM",
+      "Type": null,
+      "Value": 0,
+      "Llink": null,
+      "Clink": {
+        "ref": "main"
+      },
+      "Rlink": null
+    }
+  ]
+}

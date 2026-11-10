@@ -1,0 +1,39 @@
+AST 24 — function_prototype
+Source: tests/ast/cases/24_function_prototype.c
+
+int add(int a, int b);
+int main() { return 0; }
+
+MANUALLY DERIVED EXPECTED STRUCTURE (not captured program output)
+Notation: indentation = child/field relationship; next = A_ID.link.
+
+N_PROGRAM
+└─ clink / global A_ID list
+   ├─ A_ID "add"  [ID_FUNC, level=0, specifier=S_NULL]
+   │  └─ type: T_FUNC
+   │     ├─ field / parameters
+   │     │  ├─ A_ID "a" [ID_PARM, level=1, type=int]
+   │     │  └─ next → A_ID "b" [ID_PARM, level=1, type=int]
+   │     ├─ element_type: int
+   │     └─ expr: NULL    (prototype: no function body)
+   └─ next → A_ID "main" [ID_FUNC, level=0, specifier=S_NULL]
+      └─ type: T_FUNC
+         ├─ field: NULL
+         │  (unnamed void marker; denotes no arguments)
+         ├─ element_type: int
+         └─ expr: N_STMT_COMPOUND
+            ├─ llink: NULL (no local declarations)
+            └─ rlink: N_STMT_LIST
+               ├─ llink: N_STMT_RETURN
+               │  └─ clink: N_EXP_INT_CONST
+               │     └─ clink: 0
+               └─ rlink: N_STMT_LIST_NIL
+
+MANUAL VALIDATION
+- Global A_ID order is add → main, and terminates. No add function definition.
+- add's two formal parameters do NOT occur in the global A_ID list.
+- add.type.expr is NULL, while main.type.expr is non-NULL.
+- N_STMT_LIST_NIL is the end-of-list sentinel.
+- The professor baseline models main() with an empty parameter list.
+  it does not mean the function accepts one argument.
+- Pointer addresses printed by print.c are runtime-dependent and not part of this reference.

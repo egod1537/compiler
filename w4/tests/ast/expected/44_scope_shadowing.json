@@ -1,0 +1,42 @@
+{
+  "test": "44",
+  "source": "tests/ast/cases/44_scope_shadowing.c",
+  "manual_reference": "tests/ast/expected/44_scope_shadowing.txt",
+  "root": "program",
+  "objects": [
+    {"id":"program","class":"A_NODE","Name":"N_PROGRAM","Type":null,"Value":0,"Llink":null,"Clink":{"ref":"global_x"},"Rlink":null},
+    {"id":"global_x","class":"A_ID","Name":"x","Kind":"ID_VAR","Level":0,"Specifier":"S_NULL","Value":0,"Address":0,"Type":{"ref":"int"},"Init":null,"Link":{"ref":"main"}},
+    {"id":"main","class":"A_ID","Name":"main","Kind":"ID_FUNC","Level":0,"Specifier":"S_NULL","Value":0,"Address":0,"Type":{"ref":"main_type"},"Init":null,"Link":null},
+    {"id":"main_type","class":"A_TYPE","Kind":"T_FUNC","ElementType":{"ref":"int"},"Field":null,"Expr":{"ref":"outer_body"}},
+    {"id":"void_param","class":"A_ID","Name":"","Kind":"ID_PARM","Level":1,"Specifier":"S_NULL","Value":0,"Address":0,"Type":{"ref":"void"},"Init":null,"Link":null},
+
+    {"id":"outer_body","class":"A_NODE","Name":"N_STMT_COMPOUND","Type":null,"Value":0,"Llink":{"ref":"outer_x"},"Clink":null,"Rlink":{"ref":"outer_list_1"}},
+    {"id":"outer_x","class":"A_ID","Name":"x","Kind":"ID_VAR","Level":1,"Specifier":"S_NULL","Value":0,"Address":0,"Type":{"ref":"int"},"Init":null,"Link":null},
+    {"id":"outer_list_1","class":"A_NODE","Name":"N_STMT_LIST","Type":null,"Value":0,"Llink":{"ref":"assign_stmt_1"},"Clink":null,"Rlink":{"ref":"outer_list_2"}},
+    {"id":"assign_stmt_1","class":"A_NODE","Name":"N_STMT_EXPRESSION","Type":null,"Value":0,"Llink":null,"Clink":{"ref":"assign_1"},"Rlink":null},
+    {"id":"assign_1","class":"A_NODE","Name":"N_EXP_ASSIGN","Type":null,"Value":0,"Llink":{"ref":"ident_outer_1"},"Clink":null,"Rlink":{"ref":"const_1"}},
+    {"id":"ident_outer_1","class":"A_NODE","Name":"N_EXP_IDENT","Type":null,"Value":0,"Llink":null,"Clink":{"ref":"ref_outer_1"},"Rlink":null},
+    {"id":"ref_outer_1","class":"A_ID_REF","Name":"x","Kind":"ID_VAR","Level":1,"Specifier":"S_NULL","Value":0,"Address":0,"Type":{"ref":"int"},"Target":{"ref":"outer_x"}},
+    {"id":"const_1","class":"A_NODE","Name":"N_EXP_INT_CONST","Type":null,"Value":0,"Llink":null,"Clink":1,"Rlink":null},
+
+    {"id":"outer_list_2","class":"A_NODE","Name":"N_STMT_LIST","Type":null,"Value":0,"Llink":{"ref":"inner_body"},"Clink":null,"Rlink":{"ref":"outer_list_3"}},
+    {"id":"inner_body","class":"A_NODE","Name":"N_STMT_COMPOUND","Type":null,"Value":0,"Llink":{"ref":"inner_x"},"Clink":null,"Rlink":{"ref":"inner_list"}},
+    {"id":"inner_x","class":"A_ID","Name":"x","Kind":"ID_VAR","Level":2,"Specifier":"S_NULL","Value":0,"Address":0,"Type":{"ref":"int"},"Init":null,"Link":null},
+    {"id":"inner_list","class":"A_NODE","Name":"N_STMT_LIST","Type":null,"Value":0,"Llink":{"ref":"assign_stmt_2"},"Clink":null,"Rlink":{"ref":"inner_nil"}},
+    {"id":"assign_stmt_2","class":"A_NODE","Name":"N_STMT_EXPRESSION","Type":null,"Value":0,"Llink":null,"Clink":{"ref":"assign_2"},"Rlink":null},
+    {"id":"assign_2","class":"A_NODE","Name":"N_EXP_ASSIGN","Type":null,"Value":0,"Llink":{"ref":"ident_inner"},"Clink":null,"Rlink":{"ref":"const_2"}},
+    {"id":"ident_inner","class":"A_NODE","Name":"N_EXP_IDENT","Type":null,"Value":0,"Llink":null,"Clink":{"ref":"ref_inner"},"Rlink":null},
+    {"id":"ref_inner","class":"A_ID_REF","Name":"x","Kind":"ID_VAR","Level":2,"Specifier":"S_NULL","Value":0,"Address":0,"Type":{"ref":"int"},"Target":{"ref":"inner_x"}},
+    {"id":"const_2","class":"A_NODE","Name":"N_EXP_INT_CONST","Type":null,"Value":0,"Llink":null,"Clink":2,"Rlink":null},
+    {"id":"inner_nil","class":"A_NODE","Name":"N_STMT_LIST_NIL","Type":null,"Value":0,"Llink":null,"Clink":null,"Rlink":null},
+
+    {"id":"outer_list_3","class":"A_NODE","Name":"N_STMT_LIST","Type":null,"Value":0,"Llink":{"ref":"return"},"Clink":null,"Rlink":{"ref":"outer_nil"}},
+    {"id":"return","class":"A_NODE","Name":"N_STMT_RETURN","Type":null,"Value":0,"Llink":null,"Clink":{"ref":"ident_outer_return"},"Rlink":null},
+    {"id":"ident_outer_return","class":"A_NODE","Name":"N_EXP_IDENT","Type":null,"Value":0,"Llink":null,"Clink":{"ref":"ref_outer_return"},"Rlink":null},
+    {"id":"ref_outer_return","class":"A_ID_REF","Name":"x","Kind":"ID_VAR","Level":1,"Specifier":"S_NULL","Value":0,"Address":0,"Type":{"ref":"int"},"Target":{"ref":"outer_x"}},
+    {"id":"outer_nil","class":"A_NODE","Name":"N_STMT_LIST_NIL","Type":null,"Value":0,"Llink":null,"Clink":null,"Rlink":null},
+
+    {"id":"int","class":"A_TYPE","Kind":"T_INT","ElementType":null,"Field":null,"Expr":null},
+    {"id":"void","class":"A_TYPE","Kind":"T_VOID","ElementType":null,"Field":null,"Expr":null}
+  ]
+}

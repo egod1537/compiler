@@ -1,0 +1,149 @@
+#include "semantic.h"
+#include "sem_test_support.h"
+#include "type.h"
+#include <assert.h>
+#include <string.h>
+
+void SEM_02_MakeIdentifier(void) {
+  A_ID *a = makeIdentifier("a");
+  A_ID *b = makeIdentifier("b");
+
+  assert(strcmp(a->name, "a") == 0);
+  assert(strcmp(b->name, "b") == 0);
+  assert(b->prev == a);
+  assert(current_id == b);
+  assert(a->prev == NULL);
+  assert(a->link == NULL);
+
+
+  semTestFreeIdentifierChain();
+}
+
+void SEM_03_SearchIdentifier(void) {
+  current_id = NULL;
+  current_level = 0;
+
+  A_ID *global_x = makeIdentifier("x");
+  A_ID *global_y = makeIdentifier("y");
+  assert(searchIdentifier("x") == global_x);
+  assert(searchIdentifier("y") == global_y);
+  assert(searchIdentifier("z") == NULL);
+
+  current_level = 1;
+
+  A_ID *local_x = makeIdentifier("x");
+  assert(searchIdentifier("x") == local_x);
+  assert(searchIdentifierAtCurrentLevel("x", local_x->prev) == NULL);
+
+  A_ID *duplicate_x = makeIdentifier("x");
+  assert(searchIdentifierAtCurrentLevel("x", duplicate_x->prev) == local_x);
+
+
+  semTestFreeIdentifierChain();
+  current_level = 0;
+}
+
+void SEM_05_LinkDeclaratorList(void) {
+  assert(current_id == NULL);
+  assert(current_level == 0);
+
+  A_ID *a = makeIdentifier("a");
+  A_ID *b = makeIdentifier("b");
+  A_ID *c = makeIdentifier("c");
+
+  A_ID *list = linkDeclaratorList(a, b);
+  list = linkDeclaratorList(list, c);
+
+  // 선언자 목록 연결 검증
+  assert(list == a);
+  assert(a->link == b);
+  assert(b->link == c);
+  assert(c->link == NULL);
+
+  // 심볼 테이블 연결은 변경되지 않아야 함
+  assert(current_id == c);
+  assert(c->prev == b);
+  assert(b->prev == a);
+  assert(a->prev == NULL);
+
+  // 빈 리스트 처리 검증
+  assert(linkDeclaratorList(NULL, NULL) == NULL);
+  assert(linkDeclaratorList(NULL, a) == a);
+  assert(linkDeclaratorList(a, NULL) == a);
+
+  semTestFreeIdentifierChain();
+
+}
+
+void SEM_13_Initialize(void) {
+  assert(current_id == NULL);
+  assert(current_level == 0);
+  assert(int_type == NULL);
+
+  initialize();
+
+  // 기본 타입 생성 확인
+  assert(int_type != NULL);
+  assert(float_type != NULL);
+  assert(char_type != NULL);
+  assert(void_type != NULL);
+  assert(string_type != NULL);
+
+  assert(int_type->kind == T_ENUM);
+  assert(float_type->kind == T_ENUM);
+  assert(char_type->kind == T_ENUM);
+  assert(void_type->kind == T_VOID);
+
+  assert(string_type->kind == T_POINTER);
+  assert(string_type->element_type == char_type);
+
+  // 기본 타입 명칭 검색
+  A_ID *id = searchIdentifier("int");
+  assert(id != NULL);
+  assert(id->kind == ID_TYPE);
+  assert(id->type == int_type);
+
+  id = searchIdentifier("float");
+  assert(id != NULL);
+  assert(id->type == float_type);
+
+  id = searchIdentifier("char");
+  assert(id != NULL);
+  assert(id->type == char_type);
+
+  id = searchIdentifier("void");
+  assert(id != NULL);
+  assert(id->type == void_type);
+
+  assert(searchIdentifier("double") == NULL);
+
+  // 기본 함수 검색
+  id = searchIdentifier("printf");
+  assert(id != NULL);
+  assert(id->kind == ID_FUNC);
+  assert(id->type->kind == T_FUNC);
+  assert(id->type->element_type == void_type);
+  assert(id->type->field != NULL);
+  assert(id->type->field->type == string_type);
+  assert(id->type->field->link != NULL);
+  assert(id->type->field->link->type == NULL);
+
+  id = searchIdentifier("scanf");
+  assert(id != NULL);
+  assert(id->kind == ID_FUNC);
+  assert(id->type->element_type == void_type);
+
+  id = searchIdentifier("malloc");
+  assert(id != NULL);
+  assert(id->kind == ID_FUNC);
+  assert(id->type->element_type == string_type);
+  assert(id->type->field != NULL);
+  assert(id->type->field->type == int_type);
+
+  // 모든 기본 명칭은 전역 레벨에 등록됨
+  assert(id->level == 0);
+
+  semTestResetInitializedState();
+
+}
+

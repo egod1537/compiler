@@ -1,0 +1,10 @@
+If:
+  PathMatch: .*\.(c|h)$
+
+CompileFlags:
+  Remove:
+    - -x
+    - -std=*
+  Add:
+    - -xc
+    - -std=c11

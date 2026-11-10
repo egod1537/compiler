@@ -1,0 +1,10 @@
+/lex.yy.c
+/build.log
+/parser
+/parser.exe
+/y.tab.c
+/y.tab.h
+/*.o
+/tests/ast/*.o
+/tests/bin/
+/tests/sem/bin/

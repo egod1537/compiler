@@ -1,0 +1,23 @@
+AST 59 — function_declarator
+Source: tests/ast/cases/59_function_declarator.c
+
+int f();
+
+MANUALLY DERIVED EXPECTED STRUCTURE (not captured program output)
+
+N_PROGRAM
+└─ clink / global A_ID list
+   └─ A_ID "f" [ID_FUNC, level=0, specifier=S_NULL]
+      ├─ type: T_FUNC
+      │  ├─ field / parameters: NULL (empty parameter list)
+      │  ├─ element_type: int
+      │  └─ expr: NULL (prototype / declaration only)
+      └─ next: NULL
+
+MANUAL VALIDATION
+- f is a function declaration, not a function body.
+- T_FUNC.field is empty for f(); unlike the explicit unnamed void marker
+  potentially generated for f(void) by this particular grammar.
+- No N_STMT_COMPOUND or N_STMT_RETURN appears.
+- No parameter or other global declaration is appended.
+- Pointer addresses printed by print.c are runtime-dependent.

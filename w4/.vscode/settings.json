@@ -1,0 +1,22 @@
+{
+  "files.associations": {
+    "c.y": "c"
+  },
+  "editor.tabFocusMode": false,
+  "[c]": {
+    "editor.autoIndent": "full",
+    "editor.detectIndentation": false,
+    "editor.formatOnType": false,
+    "editor.indentSize": "tabSize",
+    "editor.insertSpaces": true,
+    "editor.stickyTabStops": true,
+    "editor.tabSize": 2,
+    "editor.useTabStops": true
+  },
+  "prettier.requireConfig": true,
+  "files.watcherExclude": {
+    "**/lex.yy.c": true,
+    "**/y.tab.c": true,
+    "**/*.exe": true
+  }
+}

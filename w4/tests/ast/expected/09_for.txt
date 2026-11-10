@@ -1,0 +1,48 @@
+AST 09 — for
+Source: tests/ast/cases/09_for.c
+
+int main() {
+    int i; int sum;
+    i = 0; sum = 0;
+    for (i = 0; i < 10; i++) sum = sum + i;
+    return sum;
+}
+
+MANUALLY DERIVED EXPECTED STRUCTURE
+N_PROGRAM
+└─ clink → A_ID "main" [ID_FUNC, level=0, specifier=S_NULL]
+   └─ type → T_FUNC
+      ├─ field → NULL
+      ├─ element_type → int
+      └─ expr → N_STMT_COMPOUND
+         ├─ llink → A_ID "i" [ID_VAR, level=1, type=int]
+         │  └─ link → A_ID "sum" [ID_VAR, level=1, type=int]
+         └─ rlink → N_STMT_LIST
+            ├─ llink → N_STMT_EXPRESSION
+            │  └─ clink → N_EXP_ASSIGN(N_EXP_IDENT(i), N_EXP_INT_CONST(0))
+            └─ rlink → N_STMT_LIST
+               ├─ llink → N_STMT_EXPRESSION
+               │  └─ clink → N_EXP_ASSIGN(N_EXP_IDENT(sum), N_EXP_INT_CONST(0))
+               └─ rlink → N_STMT_LIST
+                  ├─ llink → N_STMT_FOR
+                  │  ├─ llink → N_FOR_EXP
+                  │  │  ├─ llink → N_EXP_ASSIGN(N_EXP_IDENT(i), N_EXP_INT_CONST(0))
+                  │  │  ├─ clink → N_EXP_LSS(N_EXP_IDENT(i), N_EXP_INT_CONST(10))
+                  │  │  └─ rlink → N_EXP_POST_INC
+                  │  │     └─ clink → N_EXP_IDENT(i)
+                  │  └─ rlink → N_STMT_EXPRESSION
+                  │     └─ clink → N_EXP_ASSIGN
+                  │        ├─ llink → N_EXP_IDENT(sum)
+                  │        └─ rlink → N_EXP_ADD
+                  │           ├─ llink → N_EXP_IDENT(sum)
+                  │           └─ rlink → N_EXP_IDENT(i)
+                  └─ rlink → N_STMT_LIST
+                     ├─ llink → N_STMT_RETURN
+                     │  └─ clink → N_EXP_IDENT(sum)
+                     └─ rlink → N_STMT_LIST_NIL
+
+MANUAL VALIDATION
+- The N_FOR_EXP three children are initialization, condition, increment, in that order.
+- The loop body is one N_STMT_EXPRESSION, not a compound node.
+- All i references resolve to the local i declaration, and all sum references to local sum.
+- Existing checker.ps1 must support N_STMT_FOR and N_FOR_EXP before this case can pass.
