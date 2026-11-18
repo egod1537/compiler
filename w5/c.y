@@ -109,7 +109,7 @@ extern A_TYPE *int_type;
   ;
 
   initializer
-  : constant_expression
+  : assignment_expression
     { $$=makeNode(N_INIT_LIST_ONE,NIL,$1,NIL); }
   | LR initializer_list RR { $$=$2; }
   ;
@@ -192,7 +192,7 @@ extern A_TYPE *int_type;
     { $$=setDeclaratorKind(makeIdentifier($1),ID_ENUM_LITERAL); }
   | IDENTIFIER
     { $$=setDeclaratorKind(makeIdentifier($1),ID_ENUM_LITERAL); }
-  ASSIGN expression
+  ASSIGN constant_expression
     { $$=setDeclaratorInit($2,$4); }
   ;
 
@@ -364,7 +364,7 @@ extern A_TYPE *int_type;
   ;
 
   constant_expression
-  : expression { $$=$1; }
+  : conditional_expression { $$=$1; }
   ;
 
   expression

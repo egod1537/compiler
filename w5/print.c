@@ -164,6 +164,7 @@ void prt_expression(A_NODE *node, int s) {
   case N_EXP_AND:
   case N_EXP_OR:
   case N_EXP_ASSIGN:
+  case N_EXP_COMMA:
     prt_expression(node->llink, s + 1);
     prt_expression(node->rlink, s + 1);
     break;
