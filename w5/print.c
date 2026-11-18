@@ -28,6 +28,8 @@ char *node_name[] = {"N_NULL",
                      "N_EXP_MOD",
                      "N_EXP_ADD",
                      "N_EXP_SUB",
+                     "N_EXP_LSHIFT",
+                     "N_EXP_RSHIFT",
                      "N_EXP_LSS",
                      "N_EXP_GTR",
                      "N_EXP_LEQ",
@@ -163,6 +165,8 @@ void prt_expression(A_NODE *node, int s) {
   case N_EXP_AND:
   case N_EXP_OR:
   case N_EXP_ASSIGN:
+  case N_EXP_LSHIFT:
+  case N_EXP_RSHIFT:
     prt_expression(node->llink, s + 1);
     prt_expression(node->rlink, s + 1);
     break;

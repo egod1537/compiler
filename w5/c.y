@@ -28,6 +28,7 @@ extern A_TYPE *int_type;
        STRUCT_SYM ENUM_SYM SIZEOF_SYM UNION_SYM
        IF_SYM ELSE_SYM WHILE_SYM DO_SYM FOR_SYM CONTINUE_SYM
        BREAK_SYM RETURN_SYM SWITCH_SYM CASE_SYM DEFAULT_SYM
+       LSHIFT RSHIFT
 
 %%
 
@@ -431,6 +432,10 @@ extern A_TYPE *int_type;
 
   shift_expression
   : additive_expression { $$=$1; }
+  | shift_expression LSHIFT additive_expression
+    {$$ = makeNode(N_EXP_LSHIFT, $1, NUL, $3);}
+  | shift_expression RSHIFT additive_expression
+    {$$ = makeNode(N_EXP_RSHIFT, $1, NUL, $3);}
   ;
 
   additive_expression

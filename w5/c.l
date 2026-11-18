@@ -48,7 +48,9 @@ while                   { return(WHILE_SYM); }
 "\-\-"                  { return(MINUSMINUS); }
 "\->"                   { return(ARROW); }
 "<"                     { return(LSS); }
+"<<"                     { return(LSHIFT); }
 ">"                     { return(GTR); }
+">>"                     { return(RSHIFT); }
 "<="                    { return(LEQ); }
 ">="                    { return(GEQ); }
 "=="                    { return(EQL); }
