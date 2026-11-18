@@ -125,7 +125,7 @@ void checkForwardReference() {
     t = id->type;
     if (id->kind == ID_NULL)
       syntax_error(31, id->name);
-    else if ((id->kind == ID_STRUCT || id->kind == ID_ENUM) && t->field == NIL)
+    else if (id->kind == ID_STRUCT && t->field == NIL)
       syntax_error(32, id->name);
     id = id->prev;
   }
@@ -181,14 +181,25 @@ A_ID *getIdentifierDeclared(char *s) {
 A_TYPE *getTypeOfStructOrEnumRefIdentifier(T_KIND k, char *s, ID_KIND kk) {
   A_TYPE *t;
   A_ID *id;
+
   id = searchIdentifier(s, current_id);
+
   if (id) {
-    if (id->kind == kk && id->type->kind == k) {
+    if (id->kind == kk && id->type && id->type->kind == k) {
+      if (kk == ID_ENUM && id->type->field == NIL)
+        syntax_error(32, s);
       return (id->type);
     } else {
       syntax_error(11, s);
     }
   }
+
+  if (kk == ID_ENUM) {
+    if (id == NIL)
+      syntax_error(31, s);
+    return makeType(k);
+  }
+
   t = makeType(k);
   id = makeIdentifier(s);
   id->kind = kk;
