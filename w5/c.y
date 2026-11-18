@@ -51,7 +51,7 @@ extern A_TYPE *int_type;
   : declaration_specifiers declarator
     { $$=setFunctionDeclaratorSpecifier($2,$1); }
   compound_statement
-    { $$=setFunctionDeclaratorBody($3,$4); }
+    { $$=setFunctionDeclaratorBody($3,$4);  }
   | declarator
     { $$=setFunctionDeclaratorSpecifier($1,makeSpecifier(int_type,0)); }
   compound_statement
@@ -109,7 +109,7 @@ extern A_TYPE *int_type;
   ;
 
   initializer
-  : constant_expression
+  : assignment_expression
     { $$=makeNode(N_INIT_LIST_ONE,NIL,$1,NIL); }
   | LR initializer_list RR { $$=$2; }
   ;
