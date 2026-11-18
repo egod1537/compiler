@@ -1,0 +1,14 @@
+[
+{
+  "directory": "C:/Users/egod1/proj/compiler/w2/build-w2",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -g -std=c17 -Wall -Wextra -Wpedantic -o CMakeFiles\\w2.dir\\main.c.obj -c C:\\Users\\egod1\\proj\\compiler\\w2\\main.c",
+  "file": "C:/Users/egod1/proj/compiler/w2/main.c",
+  "output": "C:/Users/egod1/proj/compiler/w2/build-w2/CMakeFiles/w2.dir/main.c.obj"
+},
+{
+  "directory": "C:/Users/egod1/proj/compiler/w2/build-w2",
+  "command": "C:\\msys64\\ucrt64\\bin\\gcc.exe -g -std=c17 -Wall -Wextra -Wpedantic -o CMakeFiles\\grader.dir\\grader.c.obj -c C:\\Users\\egod1\\proj\\compiler\\w2\\grader.c",
+  "file": "C:/Users/egod1/proj/compiler/w2/grader.c",
+  "output": "C:/Users/egod1/proj/compiler/w2/build-w2/CMakeFiles/grader.dir/grader.c.obj"
+}
+]
