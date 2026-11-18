@@ -26,6 +26,7 @@ A_ID *setDeclaratorListSpecifier(A_ID *, A_SPECIFIER *);
 A_ID *setFunctionDeclaratorSpecifier(A_ID *, A_SPECIFIER *);
 A_ID *setFunctionDeclaratorBody(A_ID *, A_NODE *);
 A_ID *setParameterDeclaratorSpecifier(A_ID *, A_SPECIFIER *);
+A_ID *normalizeVoidParameterList(A_ID *);
 A_ID *setStructDeclaratorListSpecifier(A_ID *, A_TYPE *);
 A_TYPE *setTypeNameSpecifier(A_TYPE *, A_SPECIFIER *);
 A_TYPE *setTypeElementType(A_TYPE *, A_TYPE *);

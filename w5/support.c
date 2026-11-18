@@ -298,12 +298,33 @@ A_ID *setDeclaratorListSpecifier(A_ID *id, A_SPECIFIER *p) {
 A_ID *setParameterDeclaratorSpecifier(A_ID *id, A_SPECIFIER *p) {
   if (searchIdentifierAtCurrentLevel(id->name, id->prev))
     syntax_error(12, id->name);
-  if (p->stor || p->type == void_type)
+
+  if (p->stor)
     syntax_error(14);
+
   setDefaultSpecifier(p);
   id = setDeclaratorElementType(id, p->type);
+
+  if (id->type == void_type && strlen(id->name))
+    syntax_error(14);
+
   id->kind = ID_PARM;
   return (id);
+}
+
+A_ID *normalizeVoidParameterList(A_ID *id) {
+  A_ID *a = id;
+
+  if (id && id->link == NIL && id->type == void_type && strlen(id->name) == 0)
+    return NIL;
+
+  while (a) {
+    if (a->type == void_type)
+      syntax_error(14);
+    a = a->link;
+  }
+
+  return id;
 }
 
 A_ID *setStructDeclaratorListSpecifier(A_ID *id, A_TYPE *t) {

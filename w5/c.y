@@ -222,7 +222,7 @@ extern A_TYPE *int_type;
 
   parameter_type_list_opt
   : { $$=NIL; }
-  | parameter_type_list { $$=$1; }
+  | parameter_type_list { $$= normalizeVoidParameterList($1); }
   ;
 
   parameter_type_list
