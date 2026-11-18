@@ -433,9 +433,9 @@ extern A_TYPE *int_type;
   shift_expression
   : additive_expression { $$=$1; }
   | shift_expression LSHIFT additive_expression
-    {$$ = makeNode(N_EXP_LSHIFT, $1, NUL, $3);}
+    {$$ = makeNode(N_EXP_LSHIFT, $1, NIL, $3);}
   | shift_expression RSHIFT additive_expression
-    {$$ = makeNode(N_EXP_RSHIFT, $1, NUL, $3);}
+    {$$ = makeNode(N_EXP_RSHIFT, $1, NIL, $3);}
   ;
 
   additive_expression
