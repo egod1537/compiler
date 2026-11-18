@@ -60,7 +60,7 @@ char *node_name[] = {"N_NULL",
                      "N_INIT_LIST_ONE",
                      "N_INIT_LIST_NIL"};
 void print_ast(A_NODE *);
-void print_initializer(A_NODE *, int);
+void prt_initializer(A_NODE *, int);
 void prt_program(A_NODE *, int);
 void prt_arg_expr_list(A_NODE *, int);
 void prt_statement(A_NODE *, int);
