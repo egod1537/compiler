@@ -373,6 +373,8 @@ extern A_TYPE *int_type;
 
   comma_expression
   : assignment_expression { $$=$1; }
+  | comma_expression COMMA assignment_expression
+    {$$ = makeNode(N_EXP_COMMA, $1, NIL, $3);}
   ;
 
   assignment_expression
