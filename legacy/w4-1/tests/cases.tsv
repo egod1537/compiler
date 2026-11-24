@@ -1,0 +1,66 @@
+# id|category|description|exit|source|check1|check2|check3
+P01|parse|global variable declaration|0|cases/parse/P01_global_variable.c|(ID="global_value")|KIND:VAR|
+P02|parse|multiple declarators|0|cases/parse/P02_multiple_declarators.c|(ID="first")|(ID="second")|(ID="third")
+P03|parse|scalar initializer|0|cases/parse/P03_scalar_initializer.c|(ID="answer")|KIND:VAR|
+P04|parse|function prototype|0|cases/parse/P04_function_prototype.c|(ID="add")|FUNCTION|(ID="left")
+P05|parse|function definition|0|cases/parse/P05_function_definition.c|(ID="identity")|N_STMT_RETURN|(ID="value")
+P06|parse|function call|0|cases/parse/P06_function_call.c|N_EXP_FUNCTION_CALL|N_ARG_LIST|(ID="add")
+P07|parse|struct definition|0|cases/parse/P07_struct_definition.c|STRUCT|(ID="x")|(ID="y")
+P08|parse|union definition|0|cases/parse/P08_union_definition.c|UNION|(ID="integer")|(ID="real")
+P09|parse|enum definition|0|cases/parse/P09_enum_definition.c|ENUM|(ID="RED")|(ID="BLUE")
+P10|parse|array declaration|0|cases/parse/P10_array_declaration.c|(ID="values")|ARRAY|N_EXP_INT_CONST
+P11|parse|pointer declaration|0|cases/parse/P11_pointer_declaration.c|(ID="pointer")|POINTER|KIND:VAR
+P12|parse|double pointer declaration|0|cases/parse/P12_double_pointer.c|(ID="pointer")|POINTER|ELEMENT_TYPE
+P13|parse|array of pointers|0|cases/parse/P13_array_of_pointers.c|(ID="items")|ARRAY|POINTER
+P14|parse|pointer to array|0|cases/parse/P14_pointer_to_array.c|(ID="matrix")|POINTER|ARRAY
+P15|parse|if else statement|0|cases/parse/P15_if_else.c|N_STMT_IF_ELSE|(ID="condition")|N_STMT_RETURN
+P16|parse|while statement|0|cases/parse/P16_while_loop.c|N_STMT_WHILE|N_EXP_ASSIGN|N_EXP_SUB
+P17|parse|do while statement|0|cases/parse/P17_do_while_loop.c|N_STMT_DO|N_EXP_ASSIGN|N_EXP_SUB
+P18|parse|for statement|0|cases/parse/P18_for_loop.c|N_STMT_FOR|N_FOR_EXP|N_EXP_LSS
+P19|parse|switch labels|0|cases/parse/P19_switch_statement.c|N_STMT_SWITCH|N_STMT_LABEL_CASE|N_STMT_LABEL_DEFAULT
+P20|parse|typedef name use|0|cases/parse/P20_typedef_use.c|(ID="number")|KIND:TYPE|(ID="value")
+A01|ast|multiplication binds before addition|0|cases/ast/A01_multiplicative_precedence.c|expected/ast/A01.nodes||
+A02|ast|parentheses override precedence|0|cases/ast/A02_parenthesized_addition.c|expected/ast/A02.nodes||
+A03|ast|assignment is right associative|0|cases/ast/A03_right_associative_assignment.c|expected/ast/A03.nodes||
+A04|ast|logical and binds before logical or|0|cases/ast/A04_logical_precedence.c|expected/ast/A04.nodes||
+A05|ast|relational binds before equality|0|cases/ast/A05_equality_relational_precedence.c|expected/ast/A05.nodes||
+A06|ast|nested unary operators|0|cases/ast/A06_nested_unary.c|expected/ast/A06.nodes||
+A07|ast|pre and post increment nodes|0|cases/ast/A07_pre_and_post_increment.c|expected/ast/A07.nodes||
+A08|ast|function call argument list|0|cases/ast/A08_function_call_arguments.c|expected/ast/A08.nodes||
+A09|ast|array access children|0|cases/ast/A09_array_access.c|expected/ast/A09.nodes||
+A10|ast|struct member access|0|cases/ast/A10_struct_member.c|expected/ast/A10.nodes||
+A11|ast|pointer member access|0|cases/ast/A11_pointer_member.c|expected/ast/A11.nodes||
+A12|ast|cast expression child|0|cases/ast/A12_cast_expression.c|expected/ast/A12.nodes||
+A13|ast|sizeof expression and type|0|cases/ast/A13_sizeof_forms.c|expected/ast/A13.nodes||
+A14|ast|if else child statements|0|cases/ast/A14_if_else_children.c|expected/ast/A14.nodes||
+A15|ast|for expression children|0|cases/ast/A15_for_expression_children.c|expected/ast/A15.nodes||
+E01|error|error 12 duplicate global|1|cases/error/E01_duplicate_global.c|line 2: syntax error: redeclaration of identifier value near ;||
+E02|error|error 12 duplicate local|1|cases/error/E02_duplicate_local.c|line 4: syntax error: redeclaration of identifier value near ;||
+E03|error|error 12 duplicate parameter|1|cases/error/E03_duplicate_parameter.c|line 1: syntax error: redeclaration of identifier value near )||
+E04|error|error 12 duplicate struct field|1|cases/error/E04_duplicate_struct_field.c|line 3: syntax error: redeclaration of identifier x near ;||
+E05|error|error 13 undeclared identifier|1|cases/error/E05_undeclared_identifier.c|line 3: syntax error: undefined identifier missing near missing||
+E06|error|error 13 undeclared function|1|cases/error/E06_undeclared_function.c|line 3: syntax error: undefined identifier missing near missing||
+E07|error|error 14 named void parameter|1|cases/error/E07_named_void_parameter.c|line 1: syntax error: illegal type specifier in formal parameter near )||
+E08|error|error 14 parameter storage class|1|cases/error/E08_parameter_storage_class.c|line 1: syntax error: illegal type specifier in formal parameter near )||
+E09|error|error 20 storage class in type name|1|cases/error/E09_storage_class_in_cast.c|line 4: syntax error: illegal storage class in type specifiers near )||
+E10|error|errors 21 and 31 illegal function declarator|1|cases/error/E10_illegal_function_declarator.c|line 2: syntax error: illegal function declarator near {|line 5: syntax error: undefined type for identifier value at end|
+E11|error|error 22 prototype parameter conflict|1|cases/error/E11_parameter_type_conflict.c|line 4: syntax error: conflicting parm type in prototype function calculate near {||
+E12|error|error 23 unnamed definition parameter|1|cases/error/E12_unnamed_definition_parameter.c|line 2: syntax error: empty parameter name near {||
+E13|error|error 24 conflicting declaration specifiers|1|cases/error/E13_conflicting_type_specifiers.c|line 1: syntax error: illegal declaration specifiers near value||
+E14|error|error 25 function storage class|1|cases/error/E14_function_storage_class.c|line 2: syntax error: illegal function specifiers near {||
+E15|error|error 26 return type conflict|1|cases/error/E15_return_type_conflict.c|line 4: syntax error: illegal or conflicting return type in function convert near {||
+E16|error|errors 11 and 32 tag kind conflict|1|cases/error/E16_tag_kind_conflict.c|line 5: syntax error: illegal referencing struct or union identifier Item near *|line 6: syntax error: incomplete forward reference for identifier Item at end|
+E17|error|error 32 incomplete struct reference|1|cases/error/E17_incomplete_struct_reference.c|line 2: syntax error: incomplete forward reference for identifier Missing at end||
+E18|error|error 32 incomplete enum reference|1|cases/error/E18_incomplete_enum_reference.c|line 2: syntax error: incomplete forward reference for identifier Missing at end||
+E19|error|yyerror missing semicolon|1|cases/error/E19_missing_semicolon.c|line 4: syntax error near return||
+E20|error|yyerror trailing argument comma|1|cases/error/E20_trailing_argument_comma.c|line 8: syntax error near )||
+B01|boundary|empty function body|0|cases/boundary/B01_empty_function_body.c|(ID="empty")|N_STMT_COMPOUND|N_STMT_LIST_NIL
+B02|boundary|empty nested block|0|cases/boundary/B02_empty_nested_block.c|(ID="main")|N_STMT_COMPOUND|N_STMT_LIST_NIL
+B03|boundary|empty statement|0|cases/boundary/B03_empty_statement.c|(ID="main")|N_STMT_EMPTY|N_STMT_RETURN
+B04|boundary|declaration only block|0|cases/boundary/B04_declaration_only_block.c|(ID="declarations_only")|(ID="value")|N_STMT_LIST_NIL
+B05|boundary|nested scope shadowing|0|cases/boundary/B05_nested_scope_shadowing.c|LEV=2|N_EXP_ASSIGN|N_STMT_COMPOUND
+B06|boundary|resolved forward reference|0|cases/boundary/B06_resolved_forward_reference.c|(ID="head")|STRUCT|(ID="main")
+B07|boundary|recursive struct pointer|0|cases/boundary/B07_recursive_struct_pointer.c|(ID="next")|STRUCT|POINTER
+B08|boundary|empty parameter prototype and definition|0|cases/boundary/B08_empty_parameter_prototype.c|(ID="answer")|FUNCTION|N_STMT_RETURN
+B09|boundary|function pointer declarator|0|cases/boundary/B09_function_pointer_declaration.c|(ID="handler")|POINTER|FUNCTION
+B10|boundary|multidimensional array of pointers|0|cases/boundary/B10_multidimensional_pointer_array.c|(ID="table")|ARRAY|POINTER
