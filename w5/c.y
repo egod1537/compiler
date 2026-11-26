@@ -28,6 +28,7 @@ extern A_TYPE *int_type;
        STRUCT_SYM ENUM_SYM SIZEOF_SYM UNION_SYM
        IF_SYM ELSE_SYM WHILE_SYM DO_SYM FOR_SYM CONTINUE_SYM
        BREAK_SYM RETURN_SYM SWITCH_SYM CASE_SYM DEFAULT_SYM
+       LSHIFT RSHIFT
 
 %%
 
@@ -51,7 +52,7 @@ extern A_TYPE *int_type;
   : declaration_specifiers declarator
     { $$=setFunctionDeclaratorSpecifier($2,$1); }
   compound_statement
-    { $$=setFunctionDeclaratorBody($3,$4); }
+    { $$=setFunctionDeclaratorBody($3,$4);  }
   | declarator
     { $$=setFunctionDeclaratorSpecifier($1,makeSpecifier(int_type,0)); }
   compound_statement
@@ -109,7 +110,7 @@ extern A_TYPE *int_type;
   ;
 
   initializer
-  : constant_expression
+  : assignment_expression
     { $$=makeNode(N_INIT_LIST_ONE,NIL,$1,NIL); }
   | LR initializer_list RR { $$=$2; }
   ;
@@ -192,8 +193,8 @@ extern A_TYPE *int_type;
     { $$=setDeclaratorKind(makeIdentifier($1),ID_ENUM_LITERAL); }
   | IDENTIFIER
     { $$=setDeclaratorKind(makeIdentifier($1),ID_ENUM_LITERAL); }
-  ASSIGN expression
-    { $$=setDeclaratorInit($2,$4); }
+  ASSIGN constant_expression
+    { $=setDeclaratorInit($2,$4); }
   ;
 
   declarator
@@ -221,8 +222,8 @@ extern A_TYPE *int_type;
   ;
 
   parameter_type_list_opt
-  : { $$=NIL; }
-  | parameter_type_list { $$=$1; }
+  : { $=NIL; }
+  | parameter_type_list { $= normalizeVoidParameterList($1); }
   ;
 
   parameter_type_list
@@ -364,7 +365,7 @@ extern A_TYPE *int_type;
   ;
 
   constant_expression
-  : expression { $$=$1; }
+  : conditional_expression { $=$1; }
   ;
 
   expression
@@ -372,7 +373,9 @@ extern A_TYPE *int_type;
   ;
 
   comma_expression
-  : assignment_expression { $$=$1; }
+  : assignment_expression { $=$1; }
+  | comma_expression COMMA assignment_expression
+    {$ = makeNode(N_EXP_COMMA, $1, NIL, $3);}
   ;
 
   assignment_expression
@@ -430,7 +433,11 @@ extern A_TYPE *int_type;
   ;
 
   shift_expression
-  : additive_expression { $$=$1; }
+  : additive_expression { $=$1; }
+  | shift_expression LSHIFT additive_expression
+    {$ = makeNode(N_EXP_LSHIFT, $1, NIL, $3);}
+  | shift_expression RSHIFT additive_expression
+    {$ = makeNode(N_EXP_RSHIFT, $1, NIL, $3);}
   ;
 
   additive_expression

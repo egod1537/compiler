@@ -28,6 +28,8 @@ char *node_name[] = {"N_NULL",
                      "N_EXP_MOD",
                      "N_EXP_ADD",
                      "N_EXP_SUB",
+                     "N_EXP_LSHIFT",
+                     "N_EXP_RSHIFT",
                      "N_EXP_LSS",
                      "N_EXP_GTR",
                      "N_EXP_LEQ",
@@ -58,8 +60,10 @@ char *node_name[] = {"N_NULL",
                      "N_STMT_LIST_NIL",
                      "N_INIT_LIST",
                      "N_INIT_LIST_ONE",
-                     "N_INIT_LIST_NIL"};
+                     "N_INIT_LIST_NIL",
+                     "N_EXP_COMMA"};
 void print_ast(A_NODE *);
+void prt_initializer(A_NODE *, int);
 void prt_program(A_NODE *, int);
 void prt_arg_expr_list(A_NODE *, int);
 void prt_statement(A_NODE *, int);
@@ -154,6 +158,9 @@ void prt_expression(A_NODE *node, int s) {
   case N_EXP_MOD:
   case N_EXP_ADD:
   case N_EXP_SUB:
+  case N_EXP_LSHIFT:
+  case N_EXP_RSHIFT:
+  case N_EXP_COMMA:
   case N_EXP_LSS:
   case N_EXP_GTR:
   case N_EXP_LEQ:
@@ -375,14 +382,46 @@ void prt_A_ID_NAME(A_ID *id, int s) {
          (void *)id->type, id_kind_name[id->kind], id->level, id->value,
          id->address);
 }
+
+void prt_initializer(A_NODE *node, int s) {
+  if (node == NIL)
+    return;
+
+  print_node(node, s);
+
+  switch (node->name) {
+  case N_INIT_LIST:
+    prt_initializer(node->llink, s + 1);
+    prt_initializer(node->rlink, s + 1);
+    break;
+
+  case N_INIT_LIST_ONE:
+    prt_expression(node->clink, s + 1);
+    break;
+
+  case N_INIT_LIST_NIL:
+    break;
+
+  default:
+    printf("****syntax tree error******");
+  }
+}
+
 void prt_A_ID(A_ID *id, int s) {
   print_space(s);
   printf("(ID=\"%s\") TYPE:%p KIND:%s LEV=%d VAL=%d ADDR=%d \n", id->name,
          (void *)id->type, id_kind_name[id->kind], id->level, id->value,
          id->address);
+
   if (id->type) {
     print_space(s);
     printf("|  TYPE\n");
     prt_A_TYPE(id->type, s + 2);
+  }
+
+  if (id->kind == ID_VAR && id->init) {
+    print_space(s);
+    printf("|  INITIALIZER\n");
+    prt_initializer(id->init, s + 2);
   }
 }
