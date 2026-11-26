@@ -194,7 +194,7 @@ extern A_TYPE *int_type;
   | IDENTIFIER
     { $$=setDeclaratorKind(makeIdentifier($1),ID_ENUM_LITERAL); }
   ASSIGN constant_expression
-    { $=setDeclaratorInit($2,$4); }
+    { $$=setDeclaratorInit($2,$4); }
   ;
 
   declarator
@@ -222,8 +222,8 @@ extern A_TYPE *int_type;
   ;
 
   parameter_type_list_opt
-  : { $=NIL; }
-  | parameter_type_list { $= normalizeVoidParameterList($1); }
+  : { $$=NIL; }
+  | parameter_type_list { $$= normalizeVoidParameterList($1); }
   ;
 
   parameter_type_list
@@ -365,7 +365,7 @@ extern A_TYPE *int_type;
   ;
 
   constant_expression
-  : conditional_expression { $=$1; }
+  : conditional_expression { $$=$1; }
   ;
 
   expression
@@ -373,9 +373,9 @@ extern A_TYPE *int_type;
   ;
 
   comma_expression
-  : assignment_expression { $=$1; }
+  : assignment_expression { $$=$1; }
   | comma_expression COMMA assignment_expression
-    {$ = makeNode(N_EXP_COMMA, $1, NIL, $3);}
+    {$$ = makeNode(N_EXP_COMMA, $1, NIL, $3);}
   ;
 
   assignment_expression
@@ -433,11 +433,11 @@ extern A_TYPE *int_type;
   ;
 
   shift_expression
-  : additive_expression { $=$1; }
+  : additive_expression { $$=$1; }
   | shift_expression LSHIFT additive_expression
-    {$ = makeNode(N_EXP_LSHIFT, $1, NIL, $3);}
+    {$$ = makeNode(N_EXP_LSHIFT, $1, NIL, $3);}
   | shift_expression RSHIFT additive_expression
-    {$ = makeNode(N_EXP_RSHIFT, $1, NIL, $3);}
+    {$$ = makeNode(N_EXP_RSHIFT, $1, NIL, $3);}
   ;
 
   additive_expression
