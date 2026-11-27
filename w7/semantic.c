@@ -1,5 +1,5 @@
 #include "type.h"
-#include <stdint.h>
+#include "support.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -129,8 +129,8 @@ A_TYPE *sem_expression(A_NODE *node) {
     break;
   case N_EXP_FLOAT_CONST:
     lit.type = float_type;
-    lit.value.f = INT_TO_NODE(atof(node->clink));
-    node->clink = put_literal(lit, node->line);
+    lit.value.f = atof((char *)node->clink);
+    node->clink = INT_TO_NODE(put_literal(lit, node->line));
     result = float_type;
     break;
   case N_EXP_CHAR_CONST:
@@ -139,7 +139,7 @@ A_TYPE *sem_expression(A_NODE *node) {
   case N_EXP_STRING_LITERAL:
     lit.type = string_type;
     lit.value.s = node->clink;
-    node->clink = put_literal(lit, node->line);
+    node->clink = INT_TO_NODE(put_literal(lit, node->line));
     result = string_type;
     break;
   case N_EXP_ARRAY:
@@ -210,7 +210,7 @@ A_TYPE *sem_expression(A_NODE *node) {
     if (isArrayType(t) && t->size == 0 || isFunctionType(t) || isVoidType(t))
       semantic_error(39, node->line);
     else
-      node->clink = i;
+      node->clink = INT_TO_NODE(i);
     result = int_type;
     break;
   case N_EXP_SIZE_EXP:
@@ -220,7 +220,7 @@ A_TYPE *sem_expression(A_NODE *node) {
         (isArrayType(t) && t->size == 0 || isFunctionType(t)))
       semantic_error(39, node->line);
     else
-      node->clink = t->size;
+      node->clink = INT_TO_NODE(t->size);
     result = int_type;
     break;
   case N_EXP_PLUS:
@@ -421,7 +421,7 @@ int sem_statement(A_NODE *node, int addr, A_TYPE *ret, BOOLEAN sw, BOOLEAN brk,
       semantic_error(71, node->line);
     lit = getTypeAndValueOfExpression(node->llink);
     if (isIntegralType(lit.type))
-      node->llink = lit.value.i;
+      node->llink = INT_TO_NODE(lit.value.i);
     else
       semantic_error(51, node->line);
     local_size = sem_statement(node->rlink, addr, ret, sw, brk, cnt);
@@ -574,7 +574,7 @@ int sem_A_TYPE(A_TYPE *t) {
           semantic_error(81, id->line);
         i = lit.value.i;
       }
-      id->init = i++;
+      id->init = INT_TO_NODE(i++);
       id = id->link;
     }
     result = 4;
@@ -586,9 +586,9 @@ int sem_A_TYPE(A_TYPE *t) {
         semantic_error(82, t->line);
         t->expr = 0;
       } else
-        t->expr = lit.value.i;
+        t->expr = INT_TO_NODE(lit.value.i);
     }
-    i = sem_A_TYPE(t->element_type) * (int)t->expr;
+    i = sem_A_TYPE(t->element_type) * NODE_TO_INT(t->expr);
     if (isVoidType(t->element_type) || isFunctionType(t->element_type))
       semantic_error(83, t->line);
     else
@@ -912,6 +912,7 @@ BOOLEAN isPointerType(A_TYPE *t) {
   else
     return (FALSE);
 }
+
 BOOLEAN isIntType(A_TYPE *t) {
   if (t && t == int_type)
     return (TRUE);
@@ -970,20 +971,20 @@ A_LITERAL getTypeAndValueOfExpression(A_NODE *node) {
       semantic_error(19, node->line, id->name);
     else {
       result.type = int_type;
-      result.value.i = id->init;
+      result.value.i = NODE_TO_INT(id->init);
     }
     break;
   case N_EXP_INT_CONST:
     result.type = int_type;
-    result.value.i = (int)node->clink;
+    result.value.i = NODE_TO_INT(node->clink);
     break;
   case N_EXP_CHAR_CONST:
     result.type = char_type;
-    result.value.c = (char)node->clink;
+    result.value.c = NODE_TO_INT(node->clink);
     break;
   case N_EXP_FLOAT_CONST:
     result.type = float_type;
-    result.value.f = atof(node->clink);
+    result.value.f = atof((char *)node->clink);
     break;
   case N_EXP_STRING_LITERAL:
   case N_EXP_ARRAY:

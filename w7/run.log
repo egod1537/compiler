@@ -1,6 +1,6 @@
 =======  syntax tree  ==========
 N_PROGRAM (0x0,0)
-|  (ID="main") TYPE:0x104766440 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  (ID="main") TYPE:0x1008825c0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
 |  |  TYPE
 |  |  |  FUNCTION
 |  |  |  |  PARAMETER
@@ -22,8 +22,28 @@ N_PROGRAM (0x0,0)
 |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
 |  |  |  |  |  |  |  |  |  |  |  1
 |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
-*** semantic error at line 1: fatal compiler error in parse result
-*** semantic error at line 1: fatal compiler error in parse result
-*** semantic error at line 1: incompatible type in additive expression
-*** semantic error at line 1: not permitted type casting in expression
-run exit: 1
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x1008825c0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x100881ab0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_LSHIFT (0x100881ab0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100881ab0,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100881ab0,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  N_EXP_RSHIFT (0x100881ab0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100881ab0,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=8
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100881ab0,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+run exit: 0
