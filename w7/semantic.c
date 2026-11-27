@@ -654,6 +654,20 @@ int sem_declaration(A_ID *id, int addr) {
   A_LITERAL lit;
   switch (id->kind) {
   case ID_VAR:
+    if (isArrayType(id->type) && !id->type->check && id->type->expr == NIL &&
+        id->init && id->init->name == N_INIT_LIST &&
+        isScalarType(id->type->element_type)) {
+      A_NODE *node = id->init;
+      int n = 0;
+
+      while (node->name == N_INIT_LIST) {
+        n++;
+        node = node->rlink;
+      }
+
+      id->type->expr = makeNode(N_EXP_INT_CONST, NIL, INT_TO_NODE(n), NIL);
+    }
+
     i = sem_A_TYPE(id->type);
     if (isArrayType(id->type) && id->type->expr == NIL)
       semantic_error(86, id->line);
