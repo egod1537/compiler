@@ -1,0 +1,38 @@
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x104a86440 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x104a864f0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  (none)
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 1: illegal array size or empty array 
+run exit: 1

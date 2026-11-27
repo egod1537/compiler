@@ -1,0 +1,5 @@
+<stdin>:1:22: error: definition of variable with array type needs an explicit size or an initializer
+    1 | int main(void) { int a[]; return 0; }
+      |                      ^
+1 error generated.
+cc exit: 1
