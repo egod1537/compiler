@@ -1,0 +1,72 @@
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x104302300 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x1043023e0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+--- warning at line 1:incompatible types in assignment expression
+--- warning at line 1:incompatible types in assignment expression
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x104302300 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,8)
+|  |  |  |  |  |  (ID="a") TYPE:0x1043023e0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (0x104301800,0)
+|  |  |  |  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1043018e0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_CAST (0x104301800,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1043018e0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1043018e0,0)
+|  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+run exit: 0

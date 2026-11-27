@@ -16,6 +16,7 @@ void sem_for_expression(A_NODE *);
 int sem_A_TYPE(A_TYPE *);
 int sem_declaration_list(A_ID *, int);
 int sem_declaration(A_ID *, int);
+void sem_initializer(A_NODE *, A_TYPE *);
 void sem_arg_expr_list(A_NODE *, A_ID *);
 A_ID *getStructFieldIdentifier(A_TYPE *, char *);
 A_ID *getPointerFieldIdentifier(A_TYPE *, char *);
@@ -667,6 +668,10 @@ int sem_declaration(A_ID *id, int addr) {
       id->address = addr;
       size = i;
     }
+
+    if (id->init)
+      sem_initializer(id->init, id->type);
+
     if (id->init && id->init->name == N_INIT_LIST_ONE &&
         isScalarType(id->type)) {
       t = sem_expression(id->init->clink);
@@ -720,6 +725,31 @@ int sem_declaration(A_ID *id, int addr) {
     break;
   }
   return (size);
+}
+void sem_initializer(A_NODE *node, A_TYPE *t) {
+  A_TYPE *tt;
+  int i = 0;
+
+  if (node->name == N_INIT_LIST_ONE && isScalarType(t)) {
+    tt = sem_expression(node->clink);
+
+    if (isAllowableAssignmentConversion(t, tt, node->clink)) {
+      if (isArithmeticType(t) && isArithmeticType(tt))
+        node->clink = convertUsualAssignmentConversion(t, node->clink);
+    } else
+      semantic_error(58, node->line);
+  } else if (node->name == N_INIT_LIST && isArrayType(t) && t->expr &&
+             isScalarType(t->element_type)) {
+    while (node->name == N_INIT_LIST) {
+      if (++i > NODE_TO_INT(t->expr)) {
+        semantic_error(87, node->line);
+        break;
+      }
+
+      sem_initializer(node->llink, t->element_type);
+      node = node->rlink;
+    }
+  }
 }
 A_ID *getStructFieldIdentifier(A_TYPE *t, char *s) {
   A_ID *id = NIL;
@@ -1274,6 +1304,9 @@ void semantic_error(int i, int ll, char *s) {
     break;
   case 86:
     printf("illegal array size or empty array \n");
+    break;
+  case 87:
+    printf("excess elements in array initializer\n");
     break;
   case 89:
     printf("unknown identifier kind: %s\n", s);
