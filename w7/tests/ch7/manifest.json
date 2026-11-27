@@ -1,0 +1,48 @@
+[
+  {"id":"TC01","file":"TC01_scalar_init.c","category":"variables","kind":"normal","purpose":"지역 정수 초기화와 주소 배치","expected":"정상 종료, int 타입·초기화·ADDR=12 출력","diagnostic":"","checks":["(ID=\"a\")","ADDR=12","N_INIT_LIST_ONE"]},
+  {"id":"TC02","file":"TC02_multi_init.c","category":"variables","kind":"normal","purpose":"다중 선언자 초기화와 순차 주소 배치","expected":"정상 종료, a와 b 및 ADDR=16 출력","diagnostic":"","checks":["(ID=\"a\")","(ID=\"b\")","ADDR=16"]},
+  {"id":"TC03","file":"TC03_global_local_init.c","category":"variables","kind":"normal","purpose":"전역·지역 초기화와 식별자 연결","expected":"정상 종료, g와 x의 초기화 트리 출력","diagnostic":"","checks":["(ID=\"g\")","(ID=\"x\")","N_INIT_LIST_ONE"]},
+  {"id":"TC04","file":"TC04_undeclared_initializer.c","category":"variables","kind":"error","purpose":"초기화식의 미선언 식별자 검출","expected":"오류 종료, undefined identifier unknown","diagnostic":"undefined identifier unknown","checks":[]},
+  {"id":"TC05","file":"TC05_excess_scalar_initializer.c","category":"variables","kind":"error","purpose":"스칼라의 과다 중괄호 초기값 검출","expected":"오류 종료, excess elements in scalar initializer","diagnostic":"excess elements in scalar initializer","checks":[]},
+  {"id":"TC06","file":"TC06_float_to_int_init_warning.c","category":"variables","kind":"warning","purpose":"float에서 int로의 초기화 변환","expected":"경고 후 정상 종료, assignment conversion cast","diagnostic":"incompatible types in assignment expression","checks":["N_EXP_CAST"]},
+
+  {"id":"TC07","file":"TC07_array_initializer.c","category":"arrays","kind":"normal","purpose":"고정 크기 배열과 원소 초기화","expected":"정상 종료, ARRAY와 INDEX=3 출력","diagnostic":"","checks":["ARRAY","INT=3","N_INIT_LIST"]},
+  {"id":"TC08","file":"TC08_inferred_array_size.c","category":"arrays","kind":"normal","purpose":"빈 배열 크기의 초기화 원소 수 추론","expected":"정상 종료, 추론된 INDEX=3 출력","diagnostic":"","checks":["ARRAY","INT=3","(ID=\"a\")"]},
+  {"id":"TC09","file":"TC09_pointer_dereference.c","category":"arrays","kind":"normal","purpose":"포인터 주소 연산과 역참조","expected":"정상 종료, POINTER·AMP·STAR 출력","diagnostic":"","checks":["POINTER","N_EXP_AMP","N_EXP_STAR"]},
+  {"id":"TC10","file":"TC10_zero_array_size.c","category":"arrays","kind":"error","purpose":"0인 배열 크기 검출","expected":"오류 종료, illegal array size of type","diagnostic":"illegal array size of type","checks":[]},
+  {"id":"TC11","file":"TC11_excess_array_initializer.c","category":"arrays","kind":"error","purpose":"배열 크기보다 많은 초기값 검출","expected":"오류 종료, excess elements in array initializer","diagnostic":"excess elements in array initializer","checks":[]},
+  {"id":"TC12","file":"TC12_incompatible_pointer_assignment.c","category":"arrays","kind":"error","purpose":"실수에서 포인터로의 잘못된 대입 검출","expected":"오류 종료, not permitted type casting","diagnostic":"not permitted type casting inexpression","checks":[]},
+
+  {"id":"TC13","file":"TC13_struct_fields.c","category":"aggregates","kind":"normal","purpose":"구조체 필드 타입과 주소 계산","expected":"정상 종료, STRUCT와 N_EXP_STRUCT 출력","diagnostic":"","checks":["STRUCT","N_EXP_STRUCT","ADDR=4"]},
+  {"id":"TC14","file":"TC14_union_fields.c","category":"aggregates","kind":"normal","purpose":"공용체 필드 타입과 공용 주소 계산","expected":"정상 종료, UNION과 n.i 참조 출력","diagnostic":"","checks":["UNION","N_EXP_STRUCT","(ID=\"i\")"]},
+  {"id":"TC15","file":"TC15_enum_shift_constant.c","category":"aggregates","kind":"normal","purpose":"enum 시프트 상수식과 자동 증가","expected":"정상 종료, A=4와 B=5 출력","diagnostic":"","checks":["(ID=\"A\")","INT=4","(ID=\"B\")","INT=5"]},
+  {"id":"TC16","file":"TC16_missing_struct_field.c","category":"aggregates","kind":"error","purpose":"존재하지 않는 구조체 필드 검출","expected":"오류 종료, illegal struct field identifier","diagnostic":"illegal struct field identifier","checks":[]},
+  {"id":"TC17","file":"TC17_float_enum_value.c","category":"aggregates","kind":"error","purpose":"enum의 비정수 초기값 검출","expected":"오류 종료, integer type expression required in enumerator","diagnostic":"integer type expression required in enumerator","checks":[]},
+
+  {"id":"TC18","file":"TC18_arithmetic_precedence.c","category":"expressions","kind":"normal","purpose":"산술 우선순위와 이항 타입 결정","expected":"정상 종료, ADD와 MUL AST 출력","diagnostic":"","checks":["N_EXP_ADD","N_EXP_MUL","(int)"]},
+  {"id":"TC19","file":"TC19_integer_shifts.c","category":"expressions","kind":"normal","purpose":"정수 좌·우 시프트 분석","expected":"정상 종료, LSHIFT와 RSHIFT 출력","diagnostic":"","checks":["N_EXP_LSHIFT","N_EXP_RSHIFT"]},
+  {"id":"TC20","file":"TC20_comma_expression.c","category":"expressions","kind":"normal","purpose":"콤마 표현식 타입 전파","expected":"정상 종료, N_EXP_COMMA 출력","diagnostic":"","checks":["N_EXP_COMMA","N_EXP_ASSIGN"]},
+  {"id":"TC21","file":"TC21_explicit_cast.c","category":"expressions","kind":"normal","purpose":"명시적 float-int 형변환","expected":"정상 종료, N_EXP_CAST와 int 타입 출력","diagnostic":"","checks":["N_EXP_CAST","(int)","LITERAL: 3.500000"]},
+  {"id":"TC22","file":"TC22_float_shift_error.c","category":"expressions","kind":"error","purpose":"실수 시프트 피연산자 검출","expected":"오류 종료, integral type expression required","diagnostic":"integral type expression required in expression","checks":[]},
+  {"id":"TC23","file":"TC23_float_mod_error.c","category":"expressions","kind":"error","purpose":"실수 나머지 연산 피연산자 검출","expected":"오류 종료, integral type expression required","diagnostic":"integral type expression required in expression","checks":[]},
+  {"id":"TC24","file":"TC24_mixed_arithmetic_warning.c","category":"expressions","kind":"warning","purpose":"정수·실수 이항 산술 변환","expected":"경고 후 정상 종료, binary conversion cast","diagnostic":"incompatible types in binary expression","checks":["N_EXP_CAST","LITERAL: 2.500000"]},
+
+  {"id":"TC25","file":"TC25_fixed_parameter_call.c","category":"functions","kind":"normal","purpose":"고정 매개변수 호출과 인자 크기","expected":"정상 종료, 두 매개변수와 인자 목록 출력","diagnostic":"","checks":["(ID=\"a\")","(ID=\"b\")","N_ARG_LIST"]},
+  {"id":"TC26","file":"TC26_array_parameter_decay.c","category":"functions","kind":"normal","purpose":"배열 인자의 포인터 decay","expected":"정상 종료, 배열과 함수 호출 출력","diagnostic":"","checks":["N_EXP_FUNCTION_CALL","N_EXP_ARRAY","POINTER"]},
+  {"id":"TC27","file":"TC27_pointer_return.c","category":"functions","kind":"normal","purpose":"포인터 함수 반환식과 호출","expected":"정상 종료, POINTER와 함수 호출 출력","diagnostic":"","checks":["POINTER","N_EXP_FUNCTION_CALL","N_EXP_STAR"]},
+  {"id":"TC28","file":"TC28_too_many_arguments.c","category":"functions","kind":"error","purpose":"과다 함수 인자 검출","expected":"오류 종료, too many arguments","diagnostic":"too many arguments in function call","checks":[]},
+  {"id":"TC29","file":"TC29_too_few_arguments.c","category":"functions","kind":"error","purpose":"부족한 함수 인자 검출","expected":"오류 종료, too few arguments","diagnostic":"too few arguments in function call","checks":[]},
+  {"id":"TC30","file":"TC30_argument_conversion_warning.c","category":"functions","kind":"warning","purpose":"함수 인자의 대입 호환 변환","expected":"경고 후 정상 종료, argument conversion cast","diagnostic":"incompatible types in argument or return expr","checks":["N_EXP_CAST","LITERAL: 2.500000"]},
+
+  {"id":"TC31","file":"TC31_nested_switch_context.c","category":"statements","kind":"normal","purpose":"중첩 if·while의 switch 문맥 전파","expected":"정상 종료, case 문맥 오류 없이 SWITCH·IF·WHILE 출력","diagnostic":"","checks":["N_STMT_SWITCH","N_STMT_IF","N_STMT_WHILE","N_STMT_LABEL_CASE"]},
+  {"id":"TC32","file":"TC32_loop_break_continue.c","category":"statements","kind":"normal","purpose":"반복문 내부 break·continue 문맥","expected":"정상 종료, FOR·BREAK·CONTINUE 출력","diagnostic":"","checks":["N_STMT_FOR","N_STMT_BREAK","N_STMT_CONTINUE"]},
+  {"id":"TC33","file":"TC33_void_return.c","category":"statements","kind":"normal","purpose":"void 함수의 값 없는 return","expected":"정상 종료, void 타입과 RETURN 출력","diagnostic":"","checks":["(void)","N_STMT_RETURN","(ID=\"done\")"]},
+  {"id":"TC34","file":"TC34_case_outside_switch.c","category":"statements","kind":"error","purpose":"switch 밖 case 레이블 검출","expected":"오류 종료, case label not within a switch","diagnostic":"case label not within a switch statement","checks":[]},
+  {"id":"TC35","file":"TC35_continue_outside_loop.c","category":"statements","kind":"error","purpose":"반복문 밖 continue 검출","expected":"오류 종료, continue statement not within a loop","diagnostic":"continue statement not within a loop","checks":[]},
+  {"id":"TC36","file":"TC36_value_return_from_void.c","category":"statements","kind":"error","purpose":"void 함수의 값 반환 검출","expected":"오류 종료, return type mismatch","diagnostic":"return statement does not match function return type","checks":[]},
+  {"id":"TC37","file":"TC37_float_condition_warning.c","category":"statements","kind":"warning","purpose":"실수 조건식의 정수 변환","expected":"경고 후 정상 종료, integer expression warning","diagnostic":"integer type expression is required","checks":["N_EXP_CAST","N_STMT_IF"]},
+
+  {"id":"TC38","file":"TC38_literal_table.c","category":"literals","kind":"normal","purpose":"float·string·char 리터럴 테이블","expected":"정상 종료, 세 리터럴 값 출력","diagnostic":"","checks":["LITERAL: 1.250000","LITERAL: \"abc\"","INT=65"]},
+  {"id":"TC39","file":"TC39_string_add_error.c","category":"literals","kind":"error","purpose":"문자열 리터럴 간 덧셈 검출","expected":"오류 종료, incompatible additive expression","diagnostic":"incompatible type in additive expression","checks":[]},
+  {"id":"TC40","file":"TC40_float_return_warning.c","category":"literals","kind":"warning","purpose":"float 리터럴의 int 반환 변환","expected":"경고 후 정상 종료, return conversion cast","diagnostic":"incompatible types in argument or return expr","checks":["N_EXP_CAST","LITERAL: 3.750000"]}
+]

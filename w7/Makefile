@@ -1,6 +1,7 @@
 CC ?= cc
 BISON ?= bison
 FLEX ?= flex
+PYTHON ?= python3
 
 CPPFLAGS += -D_POSIX_C_SOURCE=200809L -I.
 CFLAGS ?= -std=c11 -Wall -Wextra -pedantic -O0 -g
@@ -31,8 +32,8 @@ $(OBJECTS): $(HEADERS)
 
 lex.yy.o: CFLAGS += -Wno-sign-compare
 
-test: $(TARGET)
-	@bash ../w4/tests/ch5/run.sh ./$(TARGET)
+test:
+	@$(PYTHON) tests/ch7/run.py
 
 clean:
 	rm -f $(TARGET) $(TARGET).exe $(OBJECTS) $(GENERATED)

@@ -1,0 +1,41 @@
+id,category,kind,purpose,expected,actual,analyzer_exit,compiler_exit,compiler_comparison,passed,reasons,timeout,crash
+TC01,variables,normal,지역 정수 초기화와 주소 배치,"정상 종료, int 타입·초기화·ADDR=12 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC02,variables,normal,다중 선언자 초기화와 순차 주소 배치,"정상 종료, a와 b 및 ADDR=16 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC03,variables,normal,전역·지역 초기화와 식별자 연결,"정상 종료, g와 x의 초기화 트리 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC04,variables,error,초기화식의 미선언 식별자 검출,"오류 종료, undefined identifier unknown","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC05,variables,error,스칼라의 과다 중괄호 초기값 검출,"오류 종료, excess elements in scalar initializer","exit=1, warning=no, semantic_ast=no",1,0,차이,True,,False,False
+TC06,variables,warning,float에서 int로의 초기화 변환,"경고 후 정상 종료, assignment conversion cast","exit=0, warning=yes, semantic_ast=yes",0,0,일치,True,,False,False
+TC07,arrays,normal,고정 크기 배열과 원소 초기화,"정상 종료, ARRAY와 INDEX=3 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC08,arrays,normal,빈 배열 크기의 초기화 원소 수 추론,"정상 종료, 추론된 INDEX=3 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC09,arrays,normal,포인터 주소 연산과 역참조,"정상 종료, POINTER·AMP·STAR 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC10,arrays,error,0인 배열 크기 검출,"오류 종료, illegal array size of type","exit=1, warning=no, semantic_ast=no",1,0,차이,True,,False,False
+TC11,arrays,error,배열 크기보다 많은 초기값 검출,"오류 종료, excess elements in array initializer","exit=1, warning=no, semantic_ast=no",1,0,차이,True,,False,False
+TC12,arrays,error,실수에서 포인터로의 잘못된 대입 검출,"오류 종료, not permitted type casting","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC13,aggregates,normal,구조체 필드 타입과 주소 계산,"정상 종료, STRUCT와 N_EXP_STRUCT 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC14,aggregates,normal,공용체 필드 타입과 공용 주소 계산,"정상 종료, UNION과 n.i 참조 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC15,aggregates,normal,enum 시프트 상수식과 자동 증가,"정상 종료, A=4와 B=5 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC16,aggregates,error,존재하지 않는 구조체 필드 검출,"오류 종료, illegal struct field identifier","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC17,aggregates,error,enum의 비정수 초기값 검출,"오류 종료, integer type expression required in enumerator","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC18,expressions,normal,산술 우선순위와 이항 타입 결정,"정상 종료, ADD와 MUL AST 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC19,expressions,normal,정수 좌·우 시프트 분석,"정상 종료, LSHIFT와 RSHIFT 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC20,expressions,normal,콤마 표현식 타입 전파,"정상 종료, N_EXP_COMMA 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC21,expressions,normal,명시적 float-int 형변환,"정상 종료, N_EXP_CAST와 int 타입 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC22,expressions,error,실수 시프트 피연산자 검출,"오류 종료, integral type expression required","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC23,expressions,error,실수 나머지 연산 피연산자 검출,"오류 종료, integral type expression required","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC24,expressions,warning,정수·실수 이항 산술 변환,"경고 후 정상 종료, binary conversion cast","exit=0, warning=yes, semantic_ast=yes",0,0,일치,True,,False,False
+TC25,functions,normal,고정 매개변수 호출과 인자 크기,"정상 종료, 두 매개변수와 인자 목록 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC26,functions,normal,배열 인자의 포인터 decay,"정상 종료, 배열과 함수 호출 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC27,functions,normal,포인터 함수 반환식과 호출,"정상 종료, POINTER와 함수 호출 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC28,functions,error,과다 함수 인자 검출,"오류 종료, too many arguments","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC29,functions,error,부족한 함수 인자 검출,"오류 종료, too few arguments","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC30,functions,warning,함수 인자의 대입 호환 변환,"경고 후 정상 종료, argument conversion cast","exit=0, warning=yes, semantic_ast=yes",0,0,일치,True,,False,False
+TC31,statements,normal,중첩 if·while의 switch 문맥 전파,"정상 종료, case 문맥 오류 없이 SWITCH·IF·WHILE 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC32,statements,normal,반복문 내부 break·continue 문맥,"정상 종료, FOR·BREAK·CONTINUE 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC33,statements,normal,void 함수의 값 없는 return,"정상 종료, void 타입과 RETURN 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC34,statements,error,switch 밖 case 레이블 검출,"오류 종료, case label not within a switch","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC35,statements,error,반복문 밖 continue 검출,"오류 종료, continue statement not within a loop","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC36,statements,error,void 함수의 값 반환 검출,"오류 종료, return type mismatch","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC37,statements,warning,실수 조건식의 정수 변환,"경고 후 정상 종료, integer expression warning","exit=0, warning=yes, semantic_ast=yes",0,0,일치,True,,False,False
+TC38,literals,normal,float·string·char 리터럴 테이블,"정상 종료, 세 리터럴 값 출력","exit=0, warning=no, semantic_ast=yes",0,0,일치,True,,False,False
+TC39,literals,error,문자열 리터럴 간 덧셈 검출,"오류 종료, incompatible additive expression","exit=1, warning=no, semantic_ast=no",1,1,일치,True,,False,False
+TC40,literals,warning,float 리터럴의 int 반환 변환,"경고 후 정상 종료, return conversion cast","exit=0, warning=yes, semantic_ast=yes",0,0,일치,True,,False,False
