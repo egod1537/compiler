@@ -455,7 +455,7 @@ int sem_statement(A_NODE *node, int addr, A_TYPE *ret, BOOLEAN sw, BOOLEAN brk,
       node->llink = convertScalarToInteger(node->llink);
     else
       semantic_error(50, node->line);
-    local_size = sem_statement(node->rlink, addr, ret, FALSE, brk, cnt);
+    local_size = sem_statement(node->rlink, addr, ret, sw, brk, cnt);
     break;
   case N_STMT_IF_ELSE:
     t = sem_expression(node->llink);
@@ -463,8 +463,8 @@ int sem_statement(A_NODE *node, int addr, A_TYPE *ret, BOOLEAN sw, BOOLEAN brk,
       node->llink = convertScalarToInteger(node->llink);
     else
       semantic_error(50, node->line);
-    local_size = sem_statement(node->clink, addr, ret, FALSE, brk, cnt);
-    i = sem_statement(node->rlink, addr, ret, FALSE, brk, cnt);
+    local_size = sem_statement(node->clink, addr, ret, sw, brk, cnt);
+    i = sem_statement(node->rlink, addr, ret, sw, brk, cnt);
     if (local_size < i)
       local_size = i;
     break;
@@ -480,10 +480,10 @@ int sem_statement(A_NODE *node, int addr, A_TYPE *ret, BOOLEAN sw, BOOLEAN brk,
       node->llink = convertScalarToInteger(node->llink);
     else
       semantic_error(50, node->line);
-    local_size = sem_statement(node->rlink, addr, ret, FALSE, TRUE, TRUE);
+    local_size = sem_statement(node->rlink, addr, ret, sw, TRUE, TRUE);
     break;
   case N_STMT_DO:
-    local_size = sem_statement(node->llink, addr, ret, FALSE, TRUE, TRUE);
+    local_size = sem_statement(node->llink, addr, ret, sw, TRUE, TRUE);
     t = sem_expression(node->rlink);
     if (isScalarType(t))
       node->rlink = convertScalarToInteger(node->rlink);
@@ -492,7 +492,7 @@ int sem_statement(A_NODE *node, int addr, A_TYPE *ret, BOOLEAN sw, BOOLEAN brk,
     break;
   case N_STMT_FOR:
     sem_for_expression(node->llink);
-    local_size = sem_statement(node->rlink, addr, ret, FALSE, TRUE, TRUE);
+    local_size = sem_statement(node->rlink, addr, ret, sw, TRUE, TRUE);
     break;
   case N_STMT_CONTINUE:
     if (cnt == FALSE)
