@@ -1,4 +1,21 @@
 cc -std=c11 -Wall -Wextra -pedantic -O0 -g -D_POSIX_C_SOURCE=200809L -I.  -c -o semantic.o semantic.c
+In file included from semantic.c:2:
+./support.h:12:26: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   12 | A_ID *makeDummyIdentifier();
+      |                          ^
+      |                           void
+./support.h:18:27: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   18 | void checkForwardReference();
+      |                           ^
+      |                            void
+./support.h:43:18: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   43 | void syntax_error();
+      |                  ^
+      |                   void
+./support.h:44:16: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   44 | void initialize();
+      |                ^
+      |                 void
 semantic.c:53:20: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
    53 | void semantic_error();
       |                    ^
@@ -27,24 +44,9 @@ semantic.c:108:8: warning: incompatible pointer types assigning to 'A_ID *' (aka
 semantic.c:123:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   123 |       semantic_error(38, node->line, id->name);
       |                     ^
-semantic.c:132:19: error: call to undeclared function 'INT_TO_NODE'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-  132 |     lit.value.f = INT_TO_NODE(atof(node->clink));
-      |                   ^
-semantic.c:132:36: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'const char *' [-Wincompatible-pointer-types]
-  132 |     lit.value.f = INT_TO_NODE(atof(node->clink));
-      |                                    ^~~~~~~~~~~
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdlib.h:154:26: note: passing argument to parameter here
-  154 | double   atof(const char *);
-      |                           ^
-semantic.c:133:17: error: incompatible integer to pointer conversion assigning to 'struct s_node *' from 'int' [-Wint-conversion]
-  133 |     node->clink = put_literal(lit, node->line);
-      |                 ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 semantic.c:141:17: warning: incompatible pointer types assigning to 'char *' from 'struct s_node *' [-Wincompatible-pointer-types]
   141 |     lit.value.s = node->clink;
       |                 ^ ~~~~~~~~~~~
-semantic.c:142:17: error: incompatible integer to pointer conversion assigning to 'struct s_node *' from 'int' [-Wint-conversion]
-  142 |     node->clink = put_literal(lit, node->line);
-      |                 ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 semantic.c:154:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   154 |       semantic_error(32, node->line);
       |                     ^
@@ -103,9 +105,6 @@ semantic.c:210:24: note: place parentheses around the '&&' expression to silence
 semantic.c:211:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   211 |       semantic_error(39, node->line);
       |                     ^
-semantic.c:213:19: error: incompatible integer to pointer conversion assigning to 'struct s_node *' from 'int' [-Wint-conversion]
-  213 |       node->clink = i;
-      |                   ^ ~
 semantic.c:220:25: warning: '&&' within '||' [-Wlogical-op-parentheses]
   220 |         (isArrayType(t) && t->size == 0 || isFunctionType(t)))
       |          ~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~ ~~
@@ -116,9 +115,6 @@ semantic.c:220:25: note: place parentheses around the '&&' expression to silence
 semantic.c:221:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   221 |       semantic_error(39, node->line);
       |                     ^
-semantic.c:223:19: error: incompatible integer to pointer conversion assigning to 'struct s_node *' from 'int' [-Wint-conversion]
-  223 |       node->clink = t->size;
-      |                   ^ ~~~~~~~
 semantic.c:233:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   233 |       semantic_error(13, node->line);
       |                     ^
@@ -191,9 +187,6 @@ semantic.c:370:9: warning: unused variable 'a' [-Wunused-variable]
 semantic.c:419:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   419 |       semantic_error(71, node->line);
       |                     ^
-semantic.c:422:19: error: incompatible integer to pointer conversion assigning to 'struct s_node *' from 'int' [-Wint-conversion]
-  422 |       node->llink = lit.value.i;
-      |                   ^ ~~~~~~~~~~~
 semantic.c:424:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   424 |       semantic_error(51, node->line);
       |                     ^
@@ -242,24 +235,25 @@ semantic.c:529:19: warning: passing arguments to 'semantic_error' without a prot
 semantic.c:547:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   547 |     semantic_error(90, node->line);
       |                   ^
+semantic.c:546:3: warning: variable 'size' is used uninitialized whenever switch default is taken [-Wsometimes-uninitialized]
+  546 |   default:
+      |   ^~~~~~~
+semantic.c:550:17: note: uninitialized use occurs here
+  550 |   node->value = size;
+      |                 ^~~~
+semantic.c:535:11: note: initialize the variable 'size' to silence this warning
+  535 |   int size, i;
+      |           ^
+      |            = 0
 semantic.c:563:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   563 |     semantic_error(80, t->line);
       |                   ^
 semantic.c:572:25: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   572 |           semantic_error(81, id->line);
       |                         ^
-semantic.c:575:16: error: incompatible integer to pointer conversion assigning to 'A_NODE *' (aka 'struct s_node *') from 'int' [-Wint-conversion]
-  575 |       id->init = i++;
-      |                ^ ~~~
 semantic.c:584:23: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   584 |         semantic_error(82, t->line);
       |                       ^
-semantic.c:587:17: error: incompatible integer to pointer conversion assigning to 'struct s_node *' from 'int' [-Wint-conversion]
-  587 |         t->expr = lit.value.i;
-      |                 ^ ~~~~~~~~~~~
-semantic.c:589:39: warning: cast to smaller integer type 'int' from 'struct s_node *' [-Wpointer-to-int-cast]
-  589 |     i = sem_A_TYPE(t->element_type) * (int)t->expr;
-      |                                       ^~~~~~~~~~~~
 semantic.c:591:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   591 |       semantic_error(83, t->line);
       |                     ^
@@ -357,21 +351,6 @@ semantic.c:967:8: warning: incompatible pointer types assigning to 'A_ID *' (aka
 semantic.c:969:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   969 |       semantic_error(19, node->line, id->name);
       |                     ^
-semantic.c:972:22: error: incompatible pointer to integer conversion assigning to 'int' from 'A_NODE *' (aka 'struct s_node *') [-Wint-conversion]
-  972 |       result.value.i = id->init;
-      |                      ^ ~~~~~~~~
-semantic.c:977:22: warning: cast to smaller integer type 'int' from 'struct s_node *' [-Wpointer-to-int-cast]
-  977 |     result.value.i = (int)node->clink;
-      |                      ^~~~~~~~~~~~~~~~
-semantic.c:981:22: warning: cast to smaller integer type 'char' from 'struct s_node *' [-Wpointer-to-int-cast]
-  981 |     result.value.c = (char)node->clink;
-      |                      ^~~~~~~~~~~~~~~~~
-semantic.c:985:27: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'const char *' [-Wincompatible-pointer-types]
-  985 |     result.value.f = atof(node->clink);
-      |                           ^~~~~~~~~~~
-/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdlib.h:154:26: note: passing argument to parameter here
-  154 | double   atof(const char *);
-      |                           ^
 semantic.c:999:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   999 |     semantic_error(18, node->line);
       |                   ^
@@ -411,5 +390,4 @@ semantic.c:53:6: warning: a function declaration without a prototype is deprecat
 semantic.c:1121:6: note: conflicting prototype is here
  1121 | void semantic_error(int i, int ll, char *s) {
       |      ^
-105 warnings and 9 errors generated.
-make: *** [semantic.o] Error 1
+105 warnings generated.
