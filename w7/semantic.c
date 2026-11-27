@@ -686,6 +686,10 @@ int sem_declaration(A_ID *id, int addr) {
     }
 
     i = sem_A_TYPE(id->type);
+
+    if (id->name[0] == '\0')
+      break;
+
     if (isArrayType(id->type) && id->type->expr == NIL)
       semantic_error(86, id->line);
     if (i % 4)
