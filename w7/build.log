@@ -1,14 +1,113 @@
-cc -std=c11 -Wall -Wextra -pedantic -O0 -g -D_POSIX_C_SOURCE=200809L -I.  -c -o main.o main.c
-main.c:10:16: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
-   10 | void initialize();
+cc -std=c11 -Wall -Wextra -pedantic -O0 -g -D_POSIX_C_SOURCE=200809L -I.  -c -o support.o support.c
+In file included from support.c:1:
+./support.h:12:26: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   12 | A_ID *makeDummyIdentifier();
+      |                          ^
+      |                           void
+./support.h:18:27: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   18 | void checkForwardReference();
+      |                           ^
+      |                            void
+./support.h:43:18: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   43 | void syntax_error();
+      |                  ^
+      |                   void
+./support.h:44:16: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   44 | void initialize();
       |                ^
       |                 void
-main.c:11:12: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
-   11 | int yyparse();
-      |            ^
-      |             void
-main.c:20:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
-   20 | int main() {
-      |         ^
-      |          void
-3 warnings generated.
+support.c:62:26: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   62 | A_ID *makeDummyIdentifier() {
+      |                          ^
+      |                           void
+support.c:121:27: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+  121 | void checkForwardReference() {
+      |                           ^
+      |                            void
+support.c:130:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  130 |       syntax_error(31, id->name);
+      |                   ^
+support.c:132:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  132 |       syntax_error(32, id->name);
+      |                   ^
+support.c:150:21: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  150 |         syntax_error(24);
+      |                     ^
+support.c:159:21: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  159 |         syntax_error(24);
+      |                     ^
+support.c:180:17: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  180 |     syntax_error(13, s);
+      |                 ^
+support.c:193:21: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  193 |         syntax_error(32, s);
+      |                     ^
+support.c:196:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  196 |       syntax_error(11, s);
+      |                   ^
+support.c:202:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  202 |       syntax_error(31, s);
+      |                   ^
+support.c:222:17: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  222 |     syntax_error(12, id->name);
+      |                 ^
+support.c:254:17: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  254 |     syntax_error(25);
+      |                 ^
+support.c:257:17: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  257 |     syntax_error(21);
+      |                 ^
+support.c:266:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  266 |       syntax_error(12, id->name);
+      |                   ^
+support.c:269:21: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  269 |         syntax_error(22, id->name);
+      |                     ^
+support.c:271:21: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  271 |         syntax_error(26, a->name);
+      |                     ^
+support.c:279:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  279 |       syntax_error(23);
+      |                   ^
+support.c:297:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  297 |       syntax_error(12, a->name);
+      |                   ^
+support.c:315:17: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  315 |     syntax_error(12, id->name);
+      |                 ^
+support.c:318:17: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  318 |     syntax_error(14);
+      |                 ^
+support.c:324:17: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  324 |     syntax_error(14);
+      |                 ^
+support.c:338:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  338 |       syntax_error(14);
+      |                   ^
+support.c:350:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  350 |       syntax_error(12, a->name);
+      |                   ^
+support.c:360:17: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  360 |     syntax_error(20);
+      |                 ^
+support.c:394:21: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  394 |         syntax_error(12, s);
+      |                     ^
+support.c:399:19: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  399 |       syntax_error(12, s);
+      |                   ^
+support.c:411:17: warning: passing arguments to 'syntax_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  411 |     syntax_error(12, id->name);
+      |                 ^
+support.c:443:16: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+  443 | void initialize() {
+      |                ^
+      |                 void
+In file included from support.c:1:
+./support.h:43:6: warning: a function declaration without a prototype is deprecated in all versions of C and is treated as a zero-parameter prototype in C23, conflicting with a subsequent definition [-Wdeprecated-non-prototype]
+   43 | void syntax_error();
+      |      ^
+support.c:491:6: note: conflicting prototype is here
+  491 | void syntax_error(int i, char *s) {
+      |      ^
+33 warnings generated.

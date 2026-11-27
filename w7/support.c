@@ -84,6 +84,9 @@ A_TYPE *makeType(T_KIND k) {
   t->field = NIL;
   t->expr = NIL;
   t->prt = FALSE;
+  t->local_var_size = 0;
+  t->check = FALSE;
+  t->line = line_no;
   return (t);
 }
 
@@ -448,6 +451,16 @@ void initialize() {
                                          makeIdentifier("void"));
   string_type = setTypeElementType(makeType(T_POINTER), char_type);
   char_type->size = 1;
+  int_type->size = 4;
+  int_type->check = TRUE;
+  float_type->size = 4;
+  float_type->check = TRUE;
+  char_type->size = 1;
+  char_type->check = TRUE;
+  void_type->size = 0;
+  void_type->check = TRUE;
+  string_type->size = 4;
+  string_type->check = TRUE;
 
   setDeclaratorTypeAndKind(
       makeIdentifier("printf"),
