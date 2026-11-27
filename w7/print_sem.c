@@ -365,14 +365,11 @@ void prt_sem_A_ID(A_ID *id, int s) {
     printf("|  TYPE\n");
     prt_sem_A_TYPE(id->type, s + 2);
   }
-  if (id->init) {
+  if (id->init || id->kind == ID_ENUM_LITERAL) {
     print_space(s);
     printf("|  INIT\n");
     if (id->kind == ID_ENUM_LITERAL)
-      if (id->init)
-        prt_sem_integer(NODE_TO_INT(id->init), s + 2);
-      else
-        ;
+      prt_sem_integer(NODE_TO_INT(id->init), s + 2);
     else
       prt_sem_initializer(id->init, s + 2);
   }
