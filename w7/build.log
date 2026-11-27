@@ -266,143 +266,140 @@ semantic.c:637:19: warning: passing arguments to 'semantic_error' without a prot
 semantic.c:659:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   659 |       semantic_error(86, id->line);
       |                     ^
-semantic.c:684:23: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
-  684 |         semantic_error(58, id->line);
-      |                       ^
-semantic.c:691:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
-  691 |       semantic_error(84, id->line);
+semantic.c:679:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  679 |       semantic_error(84, id->line);
       |                     ^
-semantic.c:724:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
-  724 |     semantic_error(89, id->line, id->name);
+semantic.c:712:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  712 |     semantic_error(89, id->line, id->name);
       |                   ^
 semantic.c:654:13: warning: unused variable 'lit' [-Wunused-variable]
   654 |   A_LITERAL lit;
       |             ^~~
-semantic.c:740:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
-  740 |       semantic_error(58, node->line);
+semantic.c:728:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  728 |       semantic_error(58, node->line);
       |                     ^
-semantic.c:745:23: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
-  745 |         semantic_error(87, node->line);
+semantic.c:733:23: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  733 |         semantic_error(87, node->line);
       |                       ^
-semantic.c:824:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
-  824 |     node = makeNode(N_EXP_CAST, int_type, NIL, node);
+semantic.c:812:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
+  812 |     node = makeNode(N_EXP_CAST, int_type, NIL, node);
       |                                 ^~~~~~~~
 semantic.c:56:37: note: passing argument to parameter here
    56 | A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
       |                                     ^
-semantic.c:834:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
-  834 |     node = makeNode(N_EXP_CAST, t1, NIL, node);
+semantic.c:822:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
+  822 |     node = makeNode(N_EXP_CAST, t1, NIL, node);
       |                                 ^~
 semantic.c:56:37: note: passing argument to parameter here
    56 | A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
       |                                     ^
-semantic.c:844:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
-  844 |     node = makeNode(N_EXP_CAST, t, NIL, node);
+semantic.c:832:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
+  832 |     node = makeNode(N_EXP_CAST, t, NIL, node);
       |                                 ^
 semantic.c:56:37: note: passing argument to parameter here
    56 | A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
       |                                     ^
-semantic.c:849:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
-  849 |     node = makeNode(N_EXP_CAST, t, NIL, node);
+semantic.c:837:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
+  837 |     node = makeNode(N_EXP_CAST, t, NIL, node);
       |                                 ^
 semantic.c:56:37: note: passing argument to parameter here
    56 | A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
       |                                     ^
-semantic.c:865:40: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
-  865 |     node->rlink = makeNode(N_EXP_CAST, t1, NIL, node->rlink);
+semantic.c:853:40: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
+  853 |     node->rlink = makeNode(N_EXP_CAST, t1, NIL, node->rlink);
       |                                        ^~
 semantic.c:56:37: note: passing argument to parameter here
    56 | A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
       |                                     ^
-semantic.c:870:40: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
-  870 |     node->llink = makeNode(N_EXP_CAST, t2, NIL, node->llink);
+semantic.c:858:40: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
+  858 |     node->llink = makeNode(N_EXP_CAST, t2, NIL, node->llink);
       |                                        ^~
 semantic.c:56:37: note: passing argument to parameter here
    56 | A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
       |                                     ^
-semantic.c:884:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
-  884 |     node = makeNode(N_EXP_CAST, t1, NIL, node);
+semantic.c:872:33: warning: incompatible pointer types passing 'A_TYPE *' (aka 'struct s_type *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
+  872 |     node = makeNode(N_EXP_CAST, t1, NIL, node);
       |                                 ^~
 semantic.c:56:37: note: passing argument to parameter here
    56 | A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
       |                                     ^
-semantic.c:988:31: warning: '&&' within '||' [-Wlogical-op-parentheses]
-  988 |   if (result.type == int_type && int_type ||
+semantic.c:976:31: warning: '&&' within '||' [-Wlogical-op-parentheses]
+  976 |   if (result.type == int_type && int_type ||
       |       ~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~ ~~
-semantic.c:988:31: note: place parentheses around the '&&' expression to silence this warning
-  988 |   if (result.type == int_type && int_type ||
+semantic.c:976:31: note: place parentheses around the '&&' expression to silence this warning
+  976 |   if (result.type == int_type && int_type ||
       |                               ^
       |       (                                  )
-semantic.c:989:32: warning: '&&' within '||' [-Wlogical-op-parentheses]
-  988 |   if (result.type == int_type && int_type ||
+semantic.c:977:32: warning: '&&' within '||' [-Wlogical-op-parentheses]
+  976 |   if (result.type == int_type && int_type ||
       |                                           ~~
-  989 |       result.type == char_type && t == char_type ||
+  977 |       result.type == char_type && t == char_type ||
       |       ~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~
-semantic.c:989:32: note: place parentheses around the '&&' expression to silence this warning
-  989 |       result.type == char_type && t == char_type ||
+semantic.c:977:32: note: place parentheses around the '&&' expression to silence this warning
+  977 |       result.type == char_type && t == char_type ||
       |                                ^
       |       (                                         )
-semantic.c:990:33: warning: '&&' within '||' [-Wlogical-op-parentheses]
-  989 |       result.type == char_type && t == char_type ||
+semantic.c:978:33: warning: '&&' within '||' [-Wlogical-op-parentheses]
+  977 |       result.type == char_type && t == char_type ||
       |                                                  ~~
-  990 |       result.type == float_type && t == float_type)
+  978 |       result.type == float_type && t == float_type)
       |       ~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
-semantic.c:990:33: note: place parentheses around the '&&' expression to silence this warning
-  990 |       result.type == float_type && t == float_type)
+semantic.c:978:33: note: place parentheses around the '&&' expression to silence this warning
+  978 |       result.type == float_type && t == float_type)
       |                                 ^                 
       |       (                                           )
-semantic.c:1005:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1005 |     semantic_error(41, ll);
+semantic.c:993:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+  993 |     semantic_error(41, ll);
       |                   ^
-semantic.c:1015:8: warning: incompatible pointer types assigning to 'A_ID *' (aka 'struct s_id *') from 'struct s_node *' [-Wincompatible-pointer-types]
- 1015 |     id = node->clink;
+semantic.c:1003:8: warning: incompatible pointer types assigning to 'A_ID *' (aka 'struct s_id *') from 'struct s_node *' [-Wincompatible-pointer-types]
+ 1003 |     id = node->clink;
       |        ^ ~~~~~~~~~~~
-semantic.c:1017:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1017 |       semantic_error(19, node->line, id->name);
+semantic.c:1005:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1005 |       semantic_error(19, node->line, id->name);
       |                     ^
-semantic.c:1047:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1047 |     semantic_error(18, node->line);
+semantic.c:1035:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1035 |     semantic_error(18, node->line);
       |                   ^
-semantic.c:1056:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1056 |       semantic_error(18, node->line);
+semantic.c:1044:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1044 |       semantic_error(18, node->line);
       |                     ^
-semantic.c:1065:33: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_TYPE *' (aka 'struct s_type *') [-Wincompatible-pointer-types]
- 1065 |     result.value.i = sem_A_TYPE(node->clink);
+semantic.c:1053:33: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_TYPE *' (aka 'struct s_type *') [-Wincompatible-pointer-types]
+ 1053 |     result.value.i = sem_A_TYPE(node->clink);
       |                                 ^~~~~~~~~~~
 semantic.c:561:24: note: passing argument to parameter 't' here
   561 | int sem_A_TYPE(A_TYPE *t) {
       |                        ^
-semantic.c:1088:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1088 |       semantic_error(18, node->line);
+semantic.c:1076:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1076 |       semantic_error(18, node->line);
       |                     ^
-semantic.c:1106:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1106 |       semantic_error(18, node->line);
+semantic.c:1094:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1094 |       semantic_error(18, node->line);
       |                     ^
-semantic.c:1125:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1125 |       semantic_error(18, node->line);
+semantic.c:1113:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1113 |       semantic_error(18, node->line);
       |                     ^
-semantic.c:1129:23: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1129 |         semantic_error(18, node->line);
+semantic.c:1117:23: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1117 |         semantic_error(18, node->line);
       |                       ^
-semantic.c:1143:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1143 |       semantic_error(18, node->line);
+semantic.c:1131:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1131 |       semantic_error(18, node->line);
       |                     ^
-semantic.c:1161:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1161 |       semantic_error(18, node->line);
+semantic.c:1149:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1149 |       semantic_error(18, node->line);
       |                     ^
-semantic.c:1179:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1179 |       semantic_error(18, node->line);
+semantic.c:1167:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1167 |       semantic_error(18, node->line);
       |                     ^
-semantic.c:1191:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1191 |     semantic_error(18, node->line);
+semantic.c:1179:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1179 |     semantic_error(18, node->line);
       |                   ^
-semantic.c:1194:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
- 1194 |     semantic_error(90, node->line);
+semantic.c:1182:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+ 1182 |     semantic_error(90, node->line);
       |                   ^
 semantic.c:55:6: warning: a function declaration without a prototype is deprecated in all versions of C and is treated as a zero-parameter prototype in C23, conflicting with a subsequent definition [-Wdeprecated-non-prototype]
    55 | void semantic_error();
       |      ^
-semantic.c:1199:6: note: conflicting prototype is here
- 1199 | void semantic_error(int i, int ll, char *s) {
+semantic.c:1187:6: note: conflicting prototype is here
+ 1187 | void semantic_error(int i, int ll, char *s) {
       |      ^
-110 warnings generated.
+109 warnings generated.

@@ -671,18 +671,6 @@ int sem_declaration(A_ID *id, int addr) {
 
     if (id->init)
       sem_initializer(id->init, id->type);
-
-    if (id->init && id->init->name == N_INIT_LIST_ONE &&
-        isScalarType(id->type)) {
-      t = sem_expression(id->init->clink);
-
-      if (isAllowableAssignmentConversion(id->type, t, id->init->clink)) {
-        if (isArithmeticType(id->type) && isArithmeticType(t))
-          id->init->clink =
-              convertUsualAssignmentConversion(id->type, id->init->clink);
-      } else
-        semantic_error(58, id->line);
-    }
     break;
   case ID_FIELD:
     i = sem_A_TYPE(id->type);
