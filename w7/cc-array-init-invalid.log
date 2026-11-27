@@ -1,0 +1,5 @@
+<stdin>:1:36: error: excess elements in array initializer [-Werror,-Wexcess-initializers]
+    1 | int main(void) { int a[2] = {1, 2, 3}; return 0; }
+      |                                    ^
+1 error generated.
+cc exit: 1
