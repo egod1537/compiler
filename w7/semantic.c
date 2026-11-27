@@ -1,8 +1,8 @@
 #include "type.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-float atof();
 void semantic_analysis(A_NODE *);
 void set_literal_address(A_NODE *);
 int put_literal(A_LITERAL, int);

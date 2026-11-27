@@ -1,8 +1,4 @@
 cc -std=c11 -Wall -Wextra -pedantic -O0 -g -D_POSIX_C_SOURCE=200809L -I.  -c -o semantic.o semantic.c
-semantic.c:5:11: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
-    5 | float atof();
-      |           ^
-      |            void
 semantic.c:52:20: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
    52 | void semantic_error();
       |                    ^
@@ -31,9 +27,12 @@ semantic.c:107:8: warning: incompatible pointer types assigning to 'A_ID *' (aka
 semantic.c:122:21: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
   122 |       semantic_error(38, node->line, id->name);
       |                     ^
-semantic.c:131:23: warning: passing arguments to 'atof' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+semantic.c:131:24: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'const char *' [-Wincompatible-pointer-types]
   131 |     lit.value.f = atof(node->clink);
-      |                       ^
+      |                        ^~~~~~~~~~~
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdlib.h:154:26: note: passing argument to parameter here
+  154 | double   atof(const char *);
+      |                           ^
 semantic.c:132:17: error: incompatible integer to pointer conversion assigning to 'struct s_node *' from 'int' [-Wint-conversion]
   132 |     node->clink = put_literal(lit, node->line);
       |                 ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -364,9 +363,12 @@ semantic.c:981:22: warning: cast to smaller integer type 'int' from 'struct s_no
 semantic.c:985:22: warning: cast to smaller integer type 'char' from 'struct s_node *' [-Wpointer-to-int-cast]
   985 |     result.value.c = (char)node->clink;
       |                      ^~~~~~~~~~~~~~~~~
-semantic.c:989:26: warning: passing arguments to 'atof' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
+semantic.c:989:27: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'const char *' [-Wincompatible-pointer-types]
   989 |     result.value.f = atof(node->clink);
-      |                          ^
+      |                           ^~~~~~~~~~~
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/_stdlib.h:154:26: note: passing argument to parameter here
+  154 | double   atof(const char *);
+      |                           ^
 semantic.c:1003:19: warning: passing arguments to 'semantic_error' without a prototype is deprecated in all versions of C and is not supported in C23 [-Wdeprecated-non-prototype]
  1003 |     semantic_error(18, node->line);
       |                   ^
@@ -406,5 +408,5 @@ semantic.c:52:6: warning: a function declaration without a prototype is deprecat
 semantic.c:1125:6: note: conflicting prototype is here
  1125 | void semantic_error(int i, int ll, char *s) {
       |      ^
-106 warnings and 8 errors generated.
+105 warnings and 8 errors generated.
 make: *** [semantic.o] Error 1
