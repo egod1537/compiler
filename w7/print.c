@@ -376,6 +376,9 @@ void prt_A_ID_LIST(A_ID *id, int s) {
 }
 char *id_kind_name[] = {"NULL", "VAR",  "FUNC",   "PARM",        "FIELD",
                         "TYPE", "ENUM", "STRUCT", "ENUM_LITERAL"};
+
+char *spec_name[] = {"NULL", "AUTO", "STATIC", "TYPEDEF", "EXTERN", "REGISTER"};
+
 void prt_A_ID_NAME(A_ID *id, int s) {
   print_space(s);
   printf("(ID=\"%s\") TYPE:%p KIND:%s LEV=%d VAL=%d ADDR=%d \n", id->name,

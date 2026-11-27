@@ -1,7 +1,62 @@
-Undefined symbols for architecture arm64:
-  "_spec_name", referenced from:
-      _prt_sem_A_ID_NAME in print_sem.o
-      _prt_sem_A_ID in print_sem.o
-ld: symbol(s) not found for architecture arm64
+cc -std=c11 -Wall -Wextra -pedantic -O0 -g -D_POSIX_C_SOURCE=200809L -I.  -c -o print.o print.c
+print.c:100:19: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_ID *' (aka 'struct s_id *') [-Wincompatible-pointer-types]
+  100 |     prt_A_ID_LIST(node->clink, s + 1);
+      |                   ^~~~~~~~~~~
+print.c:74:26: note: passing argument to parameter here
+   74 | void prt_A_ID_LIST(A_ID *, int);
+      |                          ^
+print.c:110:19: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_ID *' (aka 'struct s_id *') [-Wincompatible-pointer-types]
+  110 |     prt_A_ID_NAME(node->clink, s + 1);
+      |                   ^~~~~~~~~~~
+print.c:76:26: note: passing argument to parameter here
+   76 | void prt_A_ID_NAME(A_ID *, int);
+      |                          ^
+print.c:113:17: warning: cast to smaller integer type 'int' from 'struct s_node *' [-Wpointer-to-int-cast]
+  113 |     prt_integer((int)node->clink, s + 1);
+      |                 ^~~~~~~~~~~~~~~~
+print.c:116:16: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'char *' [-Wincompatible-pointer-types]
+  116 |     prt_STRING(node->clink, s + 1);
+      |                ^~~~~~~~~~~
+print.c:77:23: note: passing argument to parameter here
+   77 | void prt_STRING(char *, int);
+      |                       ^
+print.c:119:17: warning: cast to smaller integer type 'int' from 'struct s_node *' [-Wpointer-to-int-cast]
+  119 |     prt_integer((int)node->clink, s + 1);
+      |                 ^~~~~~~~~~~~~~~~
+print.c:122:16: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'char *' [-Wincompatible-pointer-types]
+  122 |     prt_STRING(node->clink, s + 1);
+      |                ^~~~~~~~~~~
+print.c:77:23: note: passing argument to parameter here
+   77 | void prt_STRING(char *, int);
+      |                       ^
+print.c:135:16: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'char *' [-Wincompatible-pointer-types]
+  135 |     prt_STRING(node->rlink, s + 1);
+      |                ^~~~~~~~~~~
+print.c:77:23: note: passing argument to parameter here
+   77 | void prt_STRING(char *, int);
+      |                       ^
+print.c:150:16: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_TYPE *' (aka 'struct s_type *') [-Wincompatible-pointer-types]
+  150 |     prt_A_TYPE(node->clink, s + 1);
+      |                ^~~~~~~~~~~
+print.c:73:25: note: passing argument to parameter here
+   73 | void prt_A_TYPE(A_TYPE *, int);
+      |                         ^
+print.c:153:16: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_TYPE *' (aka 'struct s_type *') [-Wincompatible-pointer-types]
+  153 |     prt_A_TYPE(node->llink, s + 1);
+      |                ^~~~~~~~~~~
+print.c:73:25: note: passing argument to parameter here
+   73 | void prt_A_TYPE(A_TYPE *, int);
+      |                         ^
+print.c:206:21: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_ID *' (aka 'struct s_id *') [-Wincompatible-pointer-types]
+  206 |       prt_A_ID_LIST(node->llink, s + 1);
+      |                     ^~~~~~~~~~~
+print.c:74:26: note: passing argument to parameter here
+   74 | void prt_A_ID_LIST(A_ID *, int);
+      |                          ^
+10 warnings generated.
+duplicate symbol '_isPointerOrArrayType' in:
+    /Users/yang/proj/compiler/w7/support.o
+    /Users/yang/proj/compiler/w7/semantic.o
+ld: 1 duplicate symbols
 clang: error: linker command failed with exit code 1 (use -v to see invocation)
 make: *** [parser] Error 1
