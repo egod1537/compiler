@@ -505,11 +505,16 @@ int sem_statement(A_NODE *node, int addr, A_TYPE *ret, BOOLEAN sw, BOOLEAN brk,
   case N_STMT_RETURN:
     if (node->clink) {
       t = sem_expression(node->clink);
-      if (isAllowableCastingConversion(ret, t))
+
+      if (isVoidType(ret))
+        semantic_error(75, node->line);
+      else if (isAllowableCastingConversion(ret, t))
         node->clink = convertCastingConversion(node->clink, ret);
       else
         semantic_error(57, node->line);
-    }
+    } else if (!isVoidType(ret))
+      semantic_error(75, node->line);
+
     break;
   default:
     semantic_error(90, node->line);
@@ -1291,6 +1296,9 @@ void semantic_error(int i, int ll, char *s) {
     break;
   case 74:
     printf("continue statement not within a loop \n");
+    break;
+  case 75:
+    printf("return statement does not match function return type\n");
     break;
   case 80:
     printf("undefined type\n");
