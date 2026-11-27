@@ -20,6 +20,7 @@ A_NODE *makeNode(NODE_NAME n, A_NODE *a, A_NODE *b, A_NODE *c) {
   m->clink = b;
   m->rlink = c;
   m->type = NIL;
+  m->line = line_no;
   m->value = 0;
   return (m);
 }
@@ -35,6 +36,7 @@ A_NODE *makeNodeList(NODE_NAME n, A_NODE *a, A_NODE *b) {
   m->clink = NIL;
   m->rlink = NIL;
   m->type = NIL;
+  m->line = line_no;
   m->value = 0;
   k->name = n;
   k->llink = b;
@@ -53,6 +55,7 @@ A_ID *makeIdentifier(char *s) {
   id->init = NIL;
   id->type = NIL;
   id->link = NIL;
+  id->line = line_no;
   id->value = 0;
   id->prev = current_id;
   current_id = id;
@@ -70,6 +73,7 @@ A_ID *makeDummyIdentifier() {
   id->init = NIL;
   id->type = NIL;
   id->link = NIL;
+  id->line = line_no;
   id->value = 0;
   id->prev = 0;
   return (id);
@@ -95,6 +99,7 @@ A_SPECIFIER *makeSpecifier(A_TYPE *t, S_KIND s) {
   p = malloc(sizeof(A_SPECIFIER));
   p->type = t;
   p->stor = s;
+  p->line = line_no;
   return (p);
 }
 
