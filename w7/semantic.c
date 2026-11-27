@@ -386,7 +386,8 @@ void sem_arg_expr_list(A_NODE *node, A_ID *id) {
       if (id->type) {
         t = sem_expression(node->llink);
         node->llink = convertUsualUnaryConversion(node->llink);
-        if (isAllowableCastingConversion(id->type, node->llink->type))
+        if (isAllowableAssignmentConversion(id->type, node->llink->type,
+                                            node->llink))
           node->llink = convertCastingConversion(node->llink, id->type);
         else
           semantic_error(59, node->line);
@@ -395,7 +396,10 @@ void sem_arg_expr_list(A_NODE *node, A_ID *id) {
         t = sem_expression(node->llink);
         sem_arg_expr_list(node->rlink, id);
       }
-      arg_size = node->llink->type->size + node->rlink->value;
+      arg_size = node->rlink->value;
+
+      if (node->llink->type)
+        arg_size += node->llink->type->size;
     }
     break;
   case N_ARG_LIST_NIL:
@@ -508,10 +512,17 @@ int sem_statement(A_NODE *node, int addr, A_TYPE *ret, BOOLEAN sw, BOOLEAN brk,
 
       if (isVoidType(ret))
         semantic_error(75, node->line);
-      else if (isAllowableCastingConversion(ret, t))
-        node->clink = convertCastingConversion(node->clink, ret);
-      else
-        semantic_error(57, node->line);
+      else {
+        if (isArrayType(t) || isFunctionType(t)) {
+          node->clink = convertUsualUnaryConversion(node->clink);
+          t = node->clink->type;
+        }
+
+        if (isAllowableAssignmentConversion(ret, t, node->clink))
+          node->clink = convertCastingConversion(node->clink, ret);
+        else
+          semantic_error(57, node->line);
+      }
     } else if (!isVoidType(ret))
       semantic_error(75, node->line);
 
