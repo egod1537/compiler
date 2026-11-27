@@ -7,7 +7,7 @@ CFLAGS ?= -std=c11 -Wall -Wextra -pedantic -O0 -g
 
 TARGET := parser
 GENERATED := y.tab.c y.tab.h lex.yy.c
-SOURCES := y.tab.c lex.yy.c support.c print.c main.c
+SOURCES := y.tab.c lex.yy.c support.c print.c semantic.c print_sem.c main.c
 OBJECTS := $(SOURCES:.c=.o)
 HEADERS := type.h support.h
 
