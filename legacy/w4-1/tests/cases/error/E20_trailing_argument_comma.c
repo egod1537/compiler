@@ -1,9 +1,0 @@
-int identity(int value)
-{
-    return value;
-}
-
-int main()
-{
-    return identity(1,);
-}

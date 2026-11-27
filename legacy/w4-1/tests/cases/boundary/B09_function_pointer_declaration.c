@@ -1,1 +1,0 @@
-int (*handler)(int value);
