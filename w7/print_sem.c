@@ -1,4 +1,5 @@
 #include "type.h"
+#include "support.h"
 #include <stdio.h>
 
 extern char *node_name[];
@@ -73,16 +74,16 @@ void prt_sem_expression(A_NODE *node, int s) {
     prt_sem_A_ID_NAME(node->clink, s + 1);
     break;
   case N_EXP_INT_CONST:
-    prt_sem_integer(node->clink, s + 1);
+    prt_sem_integer(NODE_TO_INT(node->clink), s + 1);
     break;
   case N_EXP_FLOAT_CONST:
-    prt_sem_LITERAL(node->clink, s + 1);
+    prt_sem_LITERAL(NODE_TO_INT(node->clink), s + 1);
     break;
   case N_EXP_CHAR_CONST:
-    prt_sem_integer(node->clink, s + 1);
+    prt_sem_integer(NODE_TO_INT(node->clink), s + 1);
     break;
   case N_EXP_STRING_LITERAL:
-    prt_sem_LITERAL(node->clink, s + 1);
+    prt_sem_LITERAL(NODE_TO_INT(node->clink), s + 1);
     break;
   case N_EXP_ARRAY:
     prt_sem_expression(node->llink, s + 1);
@@ -113,7 +114,7 @@ void prt_sem_expression(A_NODE *node, int s) {
     break;
   case N_EXP_SIZE_EXP:
   case N_EXP_SIZE_TYPE:
-    prt_sem_integer(node->clink, s + 1);
+    prt_sem_integer(NODE_TO_INT(node->clink), s + 1);
     break;
   case N_EXP_CAST:
     prt_sem_A_TYPE(node->llink, s + 1);
@@ -162,7 +163,7 @@ void prt_sem_statement(A_NODE *node, int s) {
 
   switch (node->name) {
   case N_STMT_LABEL_CASE:
-    prt_sem_integer(node->llink, s + 1);
+    prt_sem_integer(NODE_TO_INT(node->llink), s + 1);
     prt_sem_statement(node->rlink, s + 1);
     break;
   case N_STMT_LABEL_DEFAULT:
@@ -301,7 +302,7 @@ void prt_sem_A_TYPE(A_TYPE *t, int s) {
       printf("ARRAY\n");
       print_space(s);
       printf("|  INDEX\n");
-      prt_sem_integer(t->expr, s + 2);
+      prt_sem_integer(NODE_TO_INT(t->expr), s + 2);
       print_space(s);
       printf("|  ELEMENT_TYPE\n");
       prt_sem_A_TYPE(t->element_type, s + 2);
@@ -366,7 +367,7 @@ void prt_sem_A_ID(A_ID *id, int s) {
     printf("|  INIT\n");
     if (id->kind == ID_ENUM_LITERAL)
       if (id->init)
-        prt_sem_integer(id->init, s + 2);
+        prt_sem_integer(NODE_TO_INT(id->init), s + 2);
       else
         ;
     else
