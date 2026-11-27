@@ -1,5 +1,6 @@
-#include "type.h"
 #include "support.h"
+#include "type.h"
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1058,6 +1059,35 @@ A_LITERAL getTypeAndValueOfExpression(A_NODE *node) {
       result.value.f = result.value.f / r.value.f;
     } else
       semantic_error(18, node->line);
+    break;
+  case N_EXP_LSHIFT:
+  case N_EXP_RSHIFT:
+    result = getTypeAndValueOfExpression(node->llink);
+    r = getTypeAndValueOfExpression(node->rlink);
+
+    if (result.type == char_type) {
+      result.value.i = result.value.c;
+      result.type = int_type;
+    }
+
+    if (r.type == char_type) {
+      r.value.i = r.value.c;
+      r.type = int_type;
+    }
+
+    if (result.type != int_type || r.type != int_type || r.value.i < 0 ||
+        r.value.i >= 32) {
+      semantic_error(18, node->line);
+      result.type = NIL;
+    } else if (node->name == N_EXP_LSHIFT) {
+      if (result.value.i < 0 || result.value.i > (INT_MAX >> r.value.i)) {
+        semantic_error(18, node->line);
+        result.type = NIL;
+      } else
+        result.value.i = result.value.i << r.value.i;
+    } else
+      result.value.i = result.value.i >> r.value.i;
+
     break;
   case N_EXP_MOD:
     result = getTypeAndValueOfExpression(node->llink);

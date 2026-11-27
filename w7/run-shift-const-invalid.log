@@ -1,0 +1,31 @@
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="a") TYPE:0x102b0a3e0 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  ARRAY
+|  |  |  |  INDEX
+|  |  |  |  |  N_EXP_LSHIFT (0x0,0)
+|  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  1
+|  |  |  |  |  |  N_EXP_MINUS (0x0,0)
+|  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  1
+|  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  (int)
+|  (ID="main") TYPE:0x102b0a4f0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 1: illegal constant expression 
+*** semantic error at line 1: illegal array size of type
+*** semantic error at line 1: illegal array size or empty array 
+run exit: 1
