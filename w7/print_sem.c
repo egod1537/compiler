@@ -135,6 +135,7 @@ void prt_sem_expression(A_NODE *node, int s) {
   case N_EXP_EQL:
   case N_EXP_AND:
   case N_EXP_OR:
+  case N_EXP_COMMA:
   case N_EXP_ASSIGN:
     prt_sem_expression(node->llink, s + 1);
     prt_sem_expression(node->rlink, s + 1);

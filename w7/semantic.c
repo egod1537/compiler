@@ -349,6 +349,10 @@ A_TYPE *sem_expression(A_NODE *node) {
       semantic_error(27, node->line);
     result = int_type;
     break;
+  case N_EXP_COMMA:
+    sem_expression(node->llink);
+    result = sem_expression(node->rlink);
+    break;
   case N_EXP_ASSIGN:
     result = sem_expression(node->llink);
     if (!isModifiableLvalue(node->llink))
@@ -1141,6 +1145,7 @@ A_LITERAL getTypeAndValueOfExpression(A_NODE *node) {
   case N_EXP_EQL:
   case N_EXP_AND:
   case N_EXP_OR:
+  case N_EXP_COMMA:
   case N_EXP_ASSIGN:
     semantic_error(18, node->line);
     break;
