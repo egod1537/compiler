@@ -740,6 +740,11 @@ void sem_initializer(A_NODE *node, A_TYPE *t) {
         node->clink = convertUsualAssignmentConversion(t, node->clink);
     } else
       semantic_error(58, node->line);
+  } else if (node->name == N_INIT_LIST && isScalarType(t)) {
+    if (node->rlink->name != N_INIT_LIST_NIL)
+      semantic_error(88, node->line);
+    else
+      sem_initializer(node->llink, t);
   } else if (node->name == N_INIT_LIST && isArrayType(t) && t->expr &&
              isScalarType(t->element_type)) {
     while (node->name == N_INIT_LIST) {
@@ -1309,6 +1314,9 @@ void semantic_error(int i, int ll, char *s) {
     break;
   case 87:
     printf("excess elements in array initializer\n");
+    break;
+  case 88:
+    printf("excess elements in scalar initializer\n");
     break;
   case 89:
     printf("unknown identifier kind: %s\n", s);
