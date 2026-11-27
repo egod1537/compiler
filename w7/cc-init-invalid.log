@@ -1,0 +1,5 @@
+<stdin>:1:23: error: incompatible integer to pointer conversion initializing 'int *' with an expression of type 'int' [-Wint-conversion]
+    1 | int main(void) { int *p = 1; return 0; }
+      |                       ^   ~
+1 error generated.
+cc exit: 1
