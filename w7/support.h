@@ -3,6 +3,9 @@
 
 #include "type.h"
 
+#define INT_TO_NODE(n) ((A_NODE *)(long)(n))
+#define NODE_TO_INT(p) ((int)(long)(p))
+
 A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
 A_NODE *makeNodeList(NODE_NAME, A_NODE *, A_NODE *);
 A_ID *makeIdentifier(char *);
