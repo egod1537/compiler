@@ -1,5 +1,5 @@
-#include "type.h"
 #include "support.h"
+#include "type.h"
 #include <stdio.h>
 
 extern char *node_name[];
@@ -125,6 +125,8 @@ void prt_sem_expression(A_NODE *node, int s) {
   case N_EXP_MOD:
   case N_EXP_ADD:
   case N_EXP_SUB:
+  case N_EXP_LSHIFT:
+  case N_EXP_RSHIFT:
   case N_EXP_LSS:
   case N_EXP_GTR:
   case N_EXP_LEQ:

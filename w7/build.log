@@ -1,1 +1,61 @@
-make: Nothing to be done for `all'.
+cc -std=c11 -Wall -Wextra -pedantic -O0 -g -D_POSIX_C_SOURCE=200809L -I.  -c -o print_sem.o print_sem.c
+In file included from print_sem.c:1:
+./support.h:12:26: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   12 | A_ID *makeDummyIdentifier();
+      |                          ^
+      |                           void
+./support.h:18:27: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   18 | void checkForwardReference();
+      |                           ^
+      |                            void
+./support.h:43:18: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   43 | void syntax_error();
+      |                  ^
+      |                   void
+./support.h:44:16: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   44 | void initialize();
+      |                ^
+      |                 void
+print_sem.c:43:23: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_ID *' (aka 'struct s_id *') [-Wincompatible-pointer-types]
+   43 |     prt_sem_A_ID_LIST(node->clink, s + 1);
+      |                       ^~~~~~~~~~~
+print_sem.c:20:30: note: passing argument to parameter here
+   20 | void prt_sem_A_ID_LIST(A_ID *, int);
+      |                              ^
+print_sem.c:74:23: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_ID *' (aka 'struct s_id *') [-Wincompatible-pointer-types]
+   74 |     prt_sem_A_ID_NAME(node->clink, s + 1);
+      |                       ^~~~~~~~~~~
+print_sem.c:22:30: note: passing argument to parameter here
+   22 | void prt_sem_A_ID_NAME(A_ID *, int);
+      |                              ^
+print_sem.c:98:23: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_ID *' (aka 'struct s_id *') [-Wincompatible-pointer-types]
+   98 |     prt_sem_A_ID_NAME(node->rlink, s + 1);
+      |                       ^~~~~~~~~~~
+print_sem.c:22:30: note: passing argument to parameter here
+   22 | void prt_sem_A_ID_NAME(A_ID *, int);
+      |                              ^
+print_sem.c:102:23: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_ID *' (aka 'struct s_id *') [-Wincompatible-pointer-types]
+  102 |     prt_sem_A_ID_NAME(node->rlink, s + 1);
+      |                       ^~~~~~~~~~~
+print_sem.c:22:30: note: passing argument to parameter here
+   22 | void prt_sem_A_ID_NAME(A_ID *, int);
+      |                              ^
+print_sem.c:120:20: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_TYPE *' (aka 'struct s_type *') [-Wincompatible-pointer-types]
+  120 |     prt_sem_A_TYPE(node->llink, s + 1);
+      |                    ^~~~~~~~~~~
+print_sem.c:19:29: note: passing argument to parameter here
+   19 | void prt_sem_A_TYPE(A_TYPE *, int);
+      |                             ^
+print_sem.c:176:25: warning: incompatible pointer types passing 'struct s_node *' to parameter of type 'A_ID *' (aka 'struct s_id *') [-Wincompatible-pointer-types]
+  176 |       prt_sem_A_ID_LIST(node->llink, s + 1);
+      |                         ^~~~~~~~~~~
+print_sem.c:20:30: note: passing argument to parameter here
+   20 | void prt_sem_A_ID_LIST(A_ID *, int);
+      |                              ^
+print_sem.c:287:13: warning: enumeration values 'T_NULL' and 'T_VOID' not handled in switch [-Wswitch]
+  287 |     switch (t->kind) {
+      |             ^~~~~~~
+print_sem.c:287:13: note: add missing switch cases
+  287 |     switch (t->kind) {
+      |             ^
+11 warnings generated.
