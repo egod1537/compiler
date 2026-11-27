@@ -1,0 +1,44 @@
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="a") TYPE:0x1053ee450 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  ARRAY
+|  |  |  |  INDEX
+|  |  |  |  |  N_EXP_LSHIFT (0x0,0)
+|  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  1
+|  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  2
+|  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  (int)
+|  (ID="b") TYPE:0x1053ee590 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  ARRAY
+|  |  |  |  INDEX
+|  |  |  |  |  N_EXP_RSHIFT (0x0,0)
+|  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  8
+|  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  1
+|  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  (int)
+|  (ID="main") TYPE:0x1053ee6a0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 1: fatal compiler error in parse result
+*** semantic error at line 1: illegal array size of type
+*** semantic error at line 1: illegal array size or empty array 
+*** semantic error at line 1: fatal compiler error in parse result
+*** semantic error at line 1: illegal array size of type
+*** semantic error at line 1: illegal array size or empty array 
+run exit: 1
