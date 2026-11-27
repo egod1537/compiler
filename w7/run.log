@@ -1,5 +1,31 @@
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x104b5e3e0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
 =======  semantic tree  ==========
 N_PROGRAM (0x0,12)
-|  (ID="main") TYPE:99a440 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  (ID="main") TYPE:4b5e3e0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
 |  |  TYPE
-|  |  |  (DONE:99a440)
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x104b5d850,0)
+|  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+run exit: 0

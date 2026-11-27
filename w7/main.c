@@ -23,6 +23,7 @@ int main() {
   if (yyparse() || syntax_err)
     return (1);
 
+  print_ast(root);
   semantic_analysis(root);
 
   if (semantic_err)

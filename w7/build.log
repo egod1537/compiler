@@ -1,1 +1,14 @@
-make: Nothing to be done for `all'.
+cc -std=c11 -Wall -Wextra -pedantic -O0 -g -D_POSIX_C_SOURCE=200809L -I.  -c -o main.o main.c
+main.c:10:16: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   10 | void initialize();
+      |                ^
+      |                 void
+main.c:11:12: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   11 | int yyparse();
+      |            ^
+      |             void
+main.c:20:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+   20 | int main() {
+      |         ^
+      |          void
+3 warnings generated.
