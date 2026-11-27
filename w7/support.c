@@ -455,7 +455,6 @@ void initialize() {
   void_type = setTypeAndKindOfDeclarator(makeType(T_VOID), ID_TYPE,
                                          makeIdentifier("void"));
   string_type = setTypeElementType(makeType(T_POINTER), char_type);
-  char_type->size = 1;
   int_type->size = 4;
   int_type->check = TRUE;
   float_type->size = 4;
