@@ -1,5 +1,9 @@
 #include "type.h"
 
+extern int semantic_err;
+void semantic_analysis(A_NODE *);
+void print_sem_ast(A_NODE *);
+
 extern int syntax_err;
 extern A_NODE *root;
 
@@ -19,6 +23,11 @@ int main() {
   if (yyparse() || syntax_err)
     return (1);
 
-  print_ast(root);
+  semantic_analysis(root);
+
+  if (semantic_err)
+    return (1);
+
+  print_sem_ast(root);
   return (0);
 }

@@ -1,0 +1,5 @@
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:99a440 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  (DONE:99a440)
