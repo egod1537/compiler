@@ -1,15 +1,6 @@
 =======  syntax tree  ==========
 N_PROGRAM (0x0,0)
-|  (ID="c") TYPE:0x102a81e40 KIND:VAR LEV=0 VAL=0 ADDR=0 
-|  |  TYPE
-|  |  |  (char 1)
-|  (ID="i") TYPE:0x102a81950 KIND:VAR LEV=0 VAL=0 ADDR=0 
-|  |  TYPE
-|  |  |  (int)
-|  (ID="f") TYPE:0x102a818c0 KIND:VAR LEV=0 VAL=0 ADDR=0 
-|  |  TYPE
-|  |  |  (float)
-|  (ID="main") TYPE:0x102a82530 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  (ID="main") TYPE:0x10030e3e0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
 |  |  TYPE
 |  |  |  FUNCTION
 |  |  |  |  PARAMETER
@@ -19,31 +10,12 @@ N_PROGRAM (0x0,0)
 |  |  |  |  |  N_STMT_COMPOUND (0x0,0)
 |  |  |  |  |  |  N_STMT_LIST (0x0,0)
 |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
-|  |  |  |  |  |  |  |  N_EXP_SIZE_TYPE (0x0,0)
-|  |  |  |  |  |  |  |  |  (char 1)
+|  |  |  |  |  |  |  |  N_EXP_LSHIFT (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  2
 |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
-=======  semantic tree  ==========
-N_PROGRAM (0x0,24)
-|  (ID="c") TYPE:0x102a81e40 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=12 
-|  |  TYPE
-|  |  |  (char 1)
-|  (ID="i") TYPE:0x102a81950 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=16 
-|  |  TYPE
-|  |  |  (int)
-|  (ID="f") TYPE:0x102a818c0 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=20 
-|  |  TYPE
-|  |  |  (float)
-|  (ID="main") TYPE:0x102a82530 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
-|  |  TYPE
-|  |  |  FUNCTION
-|  |  |  |  PARAMETER
-|  |  |  |  TYPE
-|  |  |  |  |  (int)
-|  |  |  |  BODY
-|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
-|  |  |  |  |  |  N_STMT_LIST (0x0,0)
-|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
-|  |  |  |  |  |  |  |  N_EXP_SIZE_TYPE (0x102a81950,0)
-|  |  |  |  |  |  |  |  |  INT=1
-|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
-run exit: 0
+*** semantic error at line 1: fatal compiler error in parse result
+*** semantic error at line 1: not permitted type casting in expression
+run exit: 1
