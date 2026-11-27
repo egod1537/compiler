@@ -58,7 +58,7 @@ extern A_TYPE *int_type, *float_type, *char_type, *string_type, *void_type;
 int global_address = 12;
 int semantic_err = 0;
 #define LIT_MAX 100
-A_LITERAL literal_table[LIT_MAX];
+A_LITERAL literal_table[LIT_MAX + 1];
 int literal_no = 0;
 int literal_size = 0;
 void semantic_analysis(A_NODE *node) {
@@ -85,9 +85,10 @@ void sem_program(A_NODE *node) {
 }
 int put_literal(A_LITERAL lit, int ll) {
   float ff;
-  if (literal_no >= LIT_MAX)
+  if (literal_no >= LIT_MAX) {
     semantic_error(93, ll);
-  else
+    return (0);
+  } else
     literal_no++;
   literal_table[literal_no] = lit;
   literal_table[literal_no].addr = literal_size;
