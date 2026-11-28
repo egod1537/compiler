@@ -731,8 +731,15 @@ int sem_declaration(A_ID *id, int addr) {
       size = i;
     }
 
-    if (id->init)
+    if (id->init) {
+      if (id->level == 0 && isArithmeticType(id->type) &&
+          id->init->name == N_INIT_LIST_ONE &&
+          id->init->clink->name == N_EXP_IDENT &&
+          ((A_ID *)id->init->clink->clink)->kind != ID_ENUM_LITERAL)
+        semantic_error(92, id->line);
+
       sem_initializer(id->init, id->type);
+    }
     break;
   case ID_FIELD:
     i = sem_A_TYPE(id->type);
@@ -1409,6 +1416,9 @@ void semantic_error(int i, int ll, char *s) {
     break;
   case 91:
     printf("excess elements in struct initializer\n");
+    break;
+  case 92:
+    printf("initializer element is not a compile-time constant\n");
     break;
   case 93:
     printf("too many literals in source program \n");
