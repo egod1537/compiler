@@ -819,7 +819,7 @@ void sem_initializer(A_NODE *node, A_TYPE *t) {
       sem_initializer(node->llink, element_type);
       node = node->rlink;
     }
-  } else if (node->name == N_INIT_LIST && t->kind == T_STRUCT) {
+  } else if (node->name == N_INIT_LIST && t && t->kind == T_STRUCT) {
     id = t->field;
 
     while (node->name == N_INIT_LIST && id) {
@@ -829,7 +829,7 @@ void sem_initializer(A_NODE *node, A_TYPE *t) {
     }
 
     if (node->name == N_INIT_LIST)
-      semantic_error(88, node->line);
+      semantic_error(91, node->line);
   }
 }
 A_ID *getStructFieldIdentifier(A_TYPE *t, char *s) {
