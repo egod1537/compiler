@@ -331,7 +331,7 @@ A_TYPE *sem_expression(A_NODE *node) {
     else if (isPointerType(t1) && isIntegralType(t2))
       result = t1;
     else if (isCompatiblePointerType(t1, t2))
-      result = t1;
+      result = int_type;
     else
       semantic_error(24, node->line);
     break;
