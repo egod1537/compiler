@@ -1,6 +1,6 @@
 과제7 시멘틱 분석기 전체 테스트 로그
-시각: 2026-11-27T23:34:35+09:00
-과제7 TC: 40, 과제6 회귀: 48
+시각: 2026-11-28T11:18:35+09:00
+과제7 TC: 51, 과제6 회귀: 48
 
 ==============================================================================
 TC01 [normal/변수 선언 및 초기화] 지역 정수 초기화와 주소 배치
@@ -2896,6 +2896,963 @@ exit=0 timeout=False crash=False
 2 warnings generated.
 
 ==============================================================================
+TC41 [normal/배열 및 포인터] 중첩 배열의 외측 크기 추론과 재귀 초기화
+source: tests/ch7/cases/TC41_nested_array_inferred_size.c
+result: PASS
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=0 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  (none)
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  4
+|  |  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,12)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,16)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  INT=4
+|  |  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC41_nested_array_inferred_size.c
+exit=0 timeout=False crash=False
+<no output>
+
+==============================================================================
+TC42 [warning/배열 및 포인터] 중첩 배열 float 초기화의 재귀 분석
+source: tests/ch7/cases/TC42_nested_array_float_initializer.c
+result: PASS
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=0 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1.5
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+--- warning at line 2:incompatible types in assignment expression
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,16)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,4)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_CAST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  LITERAL: 1.500000
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC42_nested_array_float_initializer.c
+exit=0 timeout=False crash=False
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC42_nested_array_float_initializer.c:2:19: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    2 |   int a[1][1] = {{1.5}};
+      |                  ~^~~
+1 warning generated.
+
+==============================================================================
+TC43 [warning/배열 및 포인터] 중괄호를 생략한 중첩 배열 초기화
+source: tests/ch7/cases/TC43_flat_nested_array_initializer.c
+result: PASS
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=0 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  1.5
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2.5
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+--- warning at line 2:incompatible types in assignment expression
+--- warning at line 2:incompatible types in assignment expression
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,20)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,8)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  LITERAL: 1.500000
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_CAST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  LITERAL: 2.500000
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC43_flat_nested_array_initializer.c
+exit=0 timeout=False crash=False
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC43_flat_nested_array_initializer.c:2:18: warning: suggest braces around initialization of subobject [-Wmissing-braces]
+    2 |   int a[1][2] = {1.5, 2.5};
+      |                  ^~~~~~~~
+      |                  {       }
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC43_flat_nested_array_initializer.c:2:23: warning: implicit conversion from 'double' to 'int' changes value from 2.5 to 2 [-Wliteral-conversion]
+    2 |   int a[1][2] = {1.5, 2.5};
+      |                  ~~~  ^~~
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC43_flat_nested_array_initializer.c:2:18: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    2 |   int a[1][2] = {1.5, 2.5};
+      |                  ^~~
+3 warnings generated.
+
+==============================================================================
+TC44 [error/배열 및 포인터] 내측 배열의 과다 초기값 검출
+source: tests/ch7/cases/TC44_excess_inner_array_initializer.c
+result: PASS
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=1 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+*** semantic error at line 2: excess elements in array initializer
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC44_excess_inner_array_initializer.c
+exit=0 timeout=False crash=False
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC44_excess_inner_array_initializer.c:2:22: warning: excess elements in array initializer [-Wexcess-initializers]
+    2 |   int a[1][1] = {{1, 2}};
+      |                      ^
+1 warning generated.
+
+==============================================================================
+TC45 [normal/배열 및 포인터] 대입식에서 배열의 포인터 decay
+source: tests/ch7/cases/TC45_array_decay_assignment.c
+result: PASS
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=0 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="p") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,12)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,16)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="p") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  |  |  N_EXP_CAST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  (DONE:<ADDR>)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC45_array_decay_assignment.c
+exit=0 timeout=False crash=False
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC45_array_decay_assignment.c:3:8: warning: variable 'p' set but not used [-Wunused-but-set-variable]
+    3 |   int *p;
+      |        ^
+1 warning generated.
+
+==============================================================================
+TC46 [normal/배열 및 포인터] 포인터 덧셈에서 배열 decay
+source: tests/ch7/cases/TC46_array_pointer_arithmetic.c
+result: PASS
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=0 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="p") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_ADD (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,12)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,16)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="p") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  |  |  N_EXP_ADD (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (DONE:<ADDR>)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC46_array_pointer_arithmetic.c
+exit=0 timeout=False crash=False
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC46_array_pointer_arithmetic.c:3:8: warning: variable 'p' set but not used [-Wunused-but-set-variable]
+    3 |   int *p;
+      |        ^
+1 warning generated.
+
+==============================================================================
+TC47 [normal/배열 및 포인터] 호환 포인터 냄셈의 정수 결과 타입
+source: tests/ch7/cases/TC47_pointer_subtraction.c
+result: PASS
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=0 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="d") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  (ID="d") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_SUB (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_AMP (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  N_EXP_AMP (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  (ID="d") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,12)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,16)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="d") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  |  (ID="d") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  |  |  N_EXP_SUB (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_AMP (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  N_EXP_AMP (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  |  (ID="d") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC47_pointer_subtraction.c
+exit=0 timeout=False crash=False
+<no output>
+
+==============================================================================
+TC48 [error/명령문] 하나의 switch 내 중복 case 값 검출
+source: tests/ch7/cases/TC48_duplicate_case.c
+result: FAIL
+reasons:
+  - 종료 코드 기대 1, 실제 0
+  - 필수 진단 누락: duplicate case value
+  - 오류 TC에 오류 진단이 없음
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=0 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_SWITCH (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,12)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_SWITCH (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC48_duplicate_case.c
+exit=1 timeout=False crash=False
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC48_duplicate_case.c:5:8: error: duplicate case value '1'
+    5 |   case 1:
+      |        ^
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC48_duplicate_case.c:3:8: note: previous case defined here
+    3 |   case 1:
+      |        ^
+1 error generated.
+
+==============================================================================
+TC49 [error/명령문] 하나의 switch 내 중복 default 검출
+source: tests/ch7/cases/TC49_duplicate_default.c
+result: FAIL
+reasons:
+  - 종료 코드 기대 1, 실제 0
+  - 필수 진단 누락: multiple default labels
+  - 오류 TC에 오류 진단이 없음
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=0 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_SWITCH (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,12)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_SWITCH (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC49_duplicate_default.c
+exit=1 timeout=False crash=False
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC49_duplicate_default.c:3:3: error: multiple default labels in one switch
+    3 |   default:
+      |   ^
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC49_duplicate_default.c:5:3: note: previous case defined here
+    5 |   default:
+      |   ^
+1 error generated.
+
+==============================================================================
+TC50 [error/변수 선언 및 초기화] 전역 변수의 비상수 초기화식 검출
+source: tests/ch7/cases/TC50_nonconstant_global_initializer.c
+result: PASS
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=1 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="x") TYPE:<ADDR> KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  (int)
+|  (ID="y") TYPE:<ADDR> KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  (int)
+|  |  INITIALIZER
+|  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  (ID="x") TYPE:<ADDR> KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  (ID="y") TYPE:<ADDR> KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+*** semantic error at line 2: initializer element is not a compile-time constant
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC50_nonconstant_global_initializer.c
+exit=1 timeout=False crash=False
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC50_nonconstant_global_initializer.c:2:9: error: initializer element is not a compile-time constant
+    2 | int y = x;
+      |         ^
+1 error generated.
+
+==============================================================================
+TC51 [warning/구조체·공용체·enum] 구조체 필드 float→int 초기화 분석
+source: tests/ch7/cases/TC51_struct_float_initializer.c
+result: PASS
+
+[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
+exit=0 timeout=False crash=False
+=======  syntax tree  ==========
+N_PROGRAM (<ADDR>,0)
+|  (ID="") TYPE:<ADDR> KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  STRUCT
+|  |  |  |  FIELD
+|  |  |  |  |  (ID="x") TYPE:<ADDR> KIND:FIELD LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  (ID="s") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (DONE:<ADDR>)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  1.5
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_STRUCT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  (ID="s") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  x
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+--- warning at line 6:incompatible types in assignment expression
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,16)
+|  (ID="") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  STRUCT
+|  |  |  |  FIELD
+|  |  |  |  |  (ID="x") TYPE:<ADDR> KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,4)
+|  |  |  |  |  |  (ID="s") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (DONE:<ADDR>)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  LITERAL: 1.500000
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_STRUCT (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  |  (ID="s") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:<ADDR> KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+
+[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC51_struct_float_initializer.c
+exit=0 timeout=False crash=False
+/Users/yang/proj/compiler/w7/tests/ch7/cases/TC51_struct_float_initializer.c:6:17: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    6 |   struct S s = {1.5};
+      |                ~^~~
+1 warning generated.
+
+==============================================================================
 CH6-1-1 [과제6 회귀, expected exit=0]
 source: tests/1/1.c
 result: PASS
@@ -5593,12 +6550,10 @@ exit=0 timeout=False crash=False
 ==============================================================================
 CH6-4-4 [과제6 회귀, expected exit=0]
 source: tests/4/4.c
-result: FAIL
-reasons:
-  - 종료 코드 기대 0, 실제 1
+result: PASS
 
 [semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
-exit=1 timeout=False crash=False
+exit=0 timeout=False crash=False
 =======  syntax tree  ==========
 N_PROGRAM (<ADDR>,0)
 |  (ID="f") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
@@ -5640,7 +6595,52 @@ N_PROGRAM (<ADDR>,0)
 |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR LEV=1 VAL=0 ADDR=0 
 |  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (<ADDR>,0)
 |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
-*** semantic error at line 7: not permitted type conversion in argument
+--- warning at line 7:incompatible types in argument or return expr
+=======  semantic tree  ==========
+N_PROGRAM (<ADDR>,12)
+|  (ID="f") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="p") TYPE:<ADDR> KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  (void)
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
+|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,4)
+|  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  N_EXP_AMP (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="f") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST (<ADDR>,4)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  (DONE:<ADDR>)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_AMP (<ADDR>,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (<ADDR>,1)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:<ADDR> KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (<ADDR>,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
 
 [system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/4/4.c
 exit=0 timeout=False crash=False
