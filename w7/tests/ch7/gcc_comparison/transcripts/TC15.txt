@@ -1,0 +1,7 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC15_enum_shift_constant.c
+tests/ch7/cases/TC15_enum_shift_constant.c:6:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    6 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+[exit=0]

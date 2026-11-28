@@ -1,0 +1,6 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC42_nested_array_float_initializer.c
+tests/ch7/cases/TC42_nested_array_float_initializer.c:2:19: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    2 |   int a[1][1] = {{1.5}};
+      |                  ~^~~
+1 warning generated.
+[exit=0]

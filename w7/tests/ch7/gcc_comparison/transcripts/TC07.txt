@@ -1,0 +1,7 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC07_array_initializer.c
+tests/ch7/cases/TC07_array_initializer.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+[exit=0]

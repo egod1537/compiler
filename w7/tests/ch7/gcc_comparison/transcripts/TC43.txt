@@ -1,0 +1,13 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC43_flat_nested_array_initializer.c
+tests/ch7/cases/TC43_flat_nested_array_initializer.c:2:18: warning: suggest braces around initialization of subobject [-Wmissing-braces]
+    2 |   int a[1][2] = {1.5, 2.5};
+      |                  ^~~~~~~~
+      |                  {       }
+tests/ch7/cases/TC43_flat_nested_array_initializer.c:2:23: warning: implicit conversion from 'double' to 'int' changes value from 2.5 to 2 [-Wliteral-conversion]
+    2 |   int a[1][2] = {1.5, 2.5};
+      |                  ~~~  ^~~
+tests/ch7/cases/TC43_flat_nested_array_initializer.c:2:18: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    2 |   int a[1][2] = {1.5, 2.5};
+      |                  ^~~
+3 warnings generated.
+[exit=0]

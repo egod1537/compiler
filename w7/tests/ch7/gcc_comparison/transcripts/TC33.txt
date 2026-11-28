@@ -1,0 +1,11 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC33_void_return.c
+tests/ch7/cases/TC33_void_return.c:1:10: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | void done() {
+      |          ^
+      |           void
+tests/ch7/cases/TC33_void_return.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+2 warnings generated.
+[exit=0]

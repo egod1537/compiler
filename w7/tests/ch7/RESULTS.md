@@ -4,7 +4,7 @@
 
 - 기준 브랜치: `w7` (작업 시작 HEAD `af3dbb1`)
 - 실행일: 2026-11-28 (KST)
-- 환경: macOS arm64, Apple Clang 17.0.0, Python 3.15.2, Bison 2.3, Flex 2.6.4
+- 환경: macOS arm64, Apple Clang 17.0.0, Python 3.15.2, Bison 3.8.2, Flex 2.6.4
 - 실행 명령: `make clean`, `make test`
 - 빌드 순서: 명시적 `make clean` 후 테스트 러너의 `make clean`, `make`
 - 비교 컴파일러: `cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only`
@@ -208,3 +208,26 @@ TC48(중복 `case`), TC49(중복 `default`), CH6-5-10(불완전 구조체 포인
 회귀 47개, 전체 96개가 모두 runner 기준을 통과했다. TC48, TC49, CH6-5-10은 교재
 기반 구현의 지원 범위에서 제외했으며, 기존 TC 번호와 남은 테스트의 입력·기대 결과,
 컴파일러 구현은 변경하지 않았다.
+
+## 7. GCC(cc) 비교 실험
+
+`/usr/bin/cc`의 Apple Clang 17.0.0에
+`-std=c11 -Wall -Wextra -pedantic -fsyntax-only`를 적용하여 과제7 TC 49개를 다시
+실행했다. 수락·거부 판정은 45/49(91.84%), 부수 경고를 제외한 정상·오류·경고
+수준은 43/49(87.76%)가 일치했다.
+
+- TC05·TC11·TC44: 과다 초기값을 분석기는 오류, cc는 경고로 처리했다.
+- TC10: 0 길이 배열을 분석기는 오류, cc는 확장 기능 경고로 처리했다.
+- TC16: 없는 구조체 필드 진단은 같지만 분석기가 후속 형변환 오류를 추가 출력했다.
+- TC20: 콤마식은 모두 수락했지만 cc만 버려지는 왼쪽 피연산자를 경고했다.
+- TC24: 분석기는 일반 산술 변환을 경고했지만 cc는 표준 변환으로 진단하지 않았다.
+- TC37: 분석기는 정수 조건식을 요구하고 cc는 `double`에서 `_Bool`로의 변환을
+  경고했다.
+
+문자열이 아닌 의미를 기준으로 41건은 일치, 4건은 같은 현상의 진단 수준만 달랐고,
+4건은 부분 일치했다. `main()`의 엄격한 프로토타입과 미사용 변수 경고는 원문에
+보존하되 시멘틱 분석 핵심 판정과 분리했다. 전체 근거는
+[`gcc_comparison/comparison.json`](gcc_comparison/comparison.json),
+[`gcc_comparison/comparison.csv`](gcc_comparison/comparison.csv),
+[`gcc_comparison/comparison.log`](gcc_comparison/comparison.log)에 있으며 보고서용 49개
+실행 화면은 [`gcc_comparison/screenshots`](gcc_comparison/screenshots)에 있다.

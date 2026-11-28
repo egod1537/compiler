@@ -1,0 +1,10 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC37_float_condition_warning.c
+tests/ch7/cases/TC37_float_condition_warning.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC37_float_condition_warning.c:2:7: warning: implicit conversion from 'double' to '_Bool' changes value from 1.5 to true [-Wliteral-conversion]
+    2 |   if (1.5)
+      |   ~~  ^~~
+2 warnings generated.
+[exit=0]

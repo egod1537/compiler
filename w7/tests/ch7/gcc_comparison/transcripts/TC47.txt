@@ -1,0 +1,2 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC47_pointer_subtraction.c
+[exit=0] compile success

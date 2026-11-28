@@ -1,11 +1,12 @@
 과제7 빌드 로그
-시각: 2026-11-28T11:37:11+09:00
+시각: 2026-11-28T13:51:42+09:00
 $ make clean
 rm -f parser parser.exe y.tab.o lex.yy.o support.o print.o semantic.o print_sem.o main.o y.tab.c y.tab.h lex.yy.c
 [exit=0]
 
 $ make
-c.y: conflicts: 1 shift/reduce
+c.y: warning: 1 shift/reduce conflict [-Wconflicts-sr]
+c.y: note: rerun with option '-Wcounterexamples' to generate conflict counterexamples
 cc -std=c11 -Wall -Wextra -pedantic -O0 -g -D_POSIX_C_SOURCE=200809L -I.  -c -o y.tab.o y.tab.c
 In file included from c.y:6:
 ./support.h:12:26: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
@@ -24,9 +25,9 @@ In file included from c.y:6:
    44 | void initialize();
       |                ^
       |                 void
-c.y:507:40: warning: incompatible pointer types passing 'A_ID *' (aka 'struct s_id *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
-  507 |     { (yyval)=makeNode(N_EXP_IDENT,NIL,getIdentifierDeclared((yyvsp[(1) - (1)])),NIL); ;}
-      |                                        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+c.y:507:38: warning: incompatible pointer types passing 'A_ID *' (aka 'struct s_id *') to parameter of type 'A_NODE *' (aka 'struct s_node *') [-Wincompatible-pointer-types]
+  507 |     { yyval=makeNode(N_EXP_IDENT,NIL,getIdentifierDeclared(yyvsp[0]),NIL); }
+      |                                      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ./support.h:9:47: note: passing argument to parameter here
     9 | A_NODE *makeNode(NODE_NAME, A_NODE *, A_NODE *, A_NODE *);
       |                                               ^

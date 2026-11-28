@@ -1,0 +1,9 @@
+실행 시각: 2026-11-28T13:58:54+09:00
+브랜치: w7
+커밋: b31db54879f742d866fb9d8aaf52513fcd50dcc2
+컴파일러:
+Apple clang version 17.0.0 (clang-1700.6.4.2)
+Target: arm64-apple-darwin25.3.0
+Thread model: posix
+InstalledDir: /Library/Developer/CommandLineTools/usr/bin
+실행 옵션: -std=c11 -Wall -Wextra -pedantic -fsyntax-only

@@ -38,6 +38,22 @@ python3 tests/ch7/run.py
 
 `RESULTS.md`는 실제 실행 결과를 바탕으로 작성한 한국어 분석 보고서다.
 
+## GCC(cc) 비교 산출물
+
+과제7 TC 49개만 대상으로 분석기와 cc의 실제 진단을 다시 수집하고 보고서용
+터미널 이미지를 생성하려면 다음을 실행한다.
+
+```sh
+CC=cc python3 tests/ch7/generate_gcc_comparison.py
+swift tests/ch7/render_cc_screenshots.swift \
+  tests/ch7/gcc_comparison/transcripts \
+  tests/ch7/gcc_comparison/screenshots
+```
+
+`gcc_comparison/`에는 컴파일러 버전과 옵션, 전체 로그, JSON/CSV 비교표, 49개 원문
+transcript와 PNG 실행 화면이 저장된다. PNG는 실제 transcript를 Menlo 글꼴과 기존
+보고서의 어두운 터미널 배경으로 렌더링하며 진단 원문을 생략하지 않는다.
+
 ## 지원 범위에서 제외한 항목
 
 교재 기반 구현의 현재 지원 범위에 맞춰 다음 입력은 테스트 소스와 실행 목록에서

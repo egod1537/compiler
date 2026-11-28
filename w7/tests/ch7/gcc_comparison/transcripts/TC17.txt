@@ -1,0 +1,10 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC17_float_enum_value.c
+tests/ch7/cases/TC17_float_enum_value.c:2:9: error: integer constant expression must have integer type, not 'double'
+    2 |   BAD = 1.5
+      |         ^~~
+tests/ch7/cases/TC17_float_enum_value.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+1 warning and 1 error generated.
+[exit=1]

@@ -1,0 +1,10 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC34_case_outside_switch.c
+tests/ch7/cases/TC34_case_outside_switch.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC34_case_outside_switch.c:2:3: error: 'case' statement not in switch statement
+    2 |   case 1:
+      |   ^
+1 warning and 1 error generated.
+[exit=1]

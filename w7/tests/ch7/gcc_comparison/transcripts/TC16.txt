@@ -1,0 +1,10 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC16_missing_struct_field.c
+tests/ch7/cases/TC16_missing_struct_field.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC16_missing_struct_field.c:7:12: error: no member named 'missing' in 'struct Item'
+    7 |   return x.missing;
+      |          ~ ^
+1 warning and 1 error generated.
+[exit=1]

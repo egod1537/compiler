@@ -1,0 +1,3347 @@
+====================================================================================================
+TC01 지역 정수 초기화와 주소 배치
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x102ce2660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x102ce1b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  10
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x102ce1b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x102ce2660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="a") TYPE:0x102ce1b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x102ce1b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=10
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x102ce1b30,1)
+|  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x102ce1b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC01_scalar_init.c
+tests/ch7/cases/TC01_scalar_init.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC02 다중 선언자 초기화와 순차 주소 배치
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x1047be660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x1047bdb30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  (ID="b") TYPE:0x1047bdb30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x1047bdb30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="b") TYPE:0x1047bdb30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x1047be660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,8)
+|  |  |  |  |  |  (ID="a") TYPE:0x1047bdb30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1047bdb30,0)
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  (ID="b") TYPE:0x1047bdb30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=16 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ADD (0x1047bdb30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1047bdb30,1)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x1047bdb30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1047bdb30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x1047bdb30,1)
+|  |  |  |  |  |  |  |  |  (ID="b") TYPE:0x1047bdb30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=16 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC02_multi_init.c
+tests/ch7/cases/TC02_multi_init.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC03 전역·지역 초기화와 식별자 연결
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="g") TYPE:0x1034e5b30 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  (int)
+|  |  INITIALIZER
+|  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  7
+|  (ID="main") TYPE:0x1034e6730 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="x") TYPE:0x1034e5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="g") TYPE:0x1034e5b30 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x1034e5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,16)
+|  (ID="g") TYPE:0x1034e5b30 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=12 
+|  |  TYPE
+|  |  |  (int)
+|  |  INIT
+|  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  N_EXP_INT_CONST (0x1034e5b30,0)
+|  |  |  |  |  INT=7
+|  (ID="main") TYPE:0x1034e6730 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="x") TYPE:0x1034e5b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1034e5b30,1)
+|  |  |  |  |  |  |  |  |  |  (ID="g") TYPE:0x1034e5b30 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=12 
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x1034e5b30,1)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x1034e5b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC03_global_local_init.c
+tests/ch7/cases/TC03_global_local_init.c:3:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    3 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC04 초기화식의 미선언 식별자 검출
+[analyzer exit=1]
+line 2: syntax error: undefined identifier unknown near unknown
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC04_undeclared_initializer.c
+tests/ch7/cases/TC04_undeclared_initializer.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC04_undeclared_initializer.c:2:11: error: use of undeclared identifier 'unknown'
+    2 |   int x = unknown;
+      |           ^
+1 warning and 1 error generated.
+====================================================================================================
+TC05 스칼라의 과다 중괄호 초기값 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x1009c6660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="x") TYPE:0x1009c5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x1009c5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: excess elements in scalar initializer
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC05_excess_scalar_initializer.c
+tests/ch7/cases/TC05_excess_scalar_initializer.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC05_excess_scalar_initializer.c:2:15: warning: excess elements in scalar initializer [-Wexcess-initializers]
+    2 |   int x = {1, 2};
+      |               ^
+2 warnings generated.
+====================================================================================================
+TC06 float에서 int로의 초기화 변환
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x103186660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="x") TYPE:0x103185b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1.5
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x103185b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+--- warning at line 2:incompatible types in assignment expression
+=======  semantic tree  ==========
+N_PROGRAM (0x0,16)
+|  (ID="main") TYPE:0x103186660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="x") TYPE:0x103185b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_CAST (0x103185b30,0)
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x103185bc0,0)
+|  |  |  |  |  |  |  |  |  |  |  LITERAL: 1.500000
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x103185b30,1)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x103185b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC06_float_to_int_init_warning.c
+tests/ch7/cases/TC06_float_to_int_init_warning.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC06_float_to_int_init_warning.c:2:11: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    2 |   int x = 1.5;
+      |       ~   ^~~
+2 warnings generated.
+====================================================================================================
+TC07 고정 크기 배열과 원소 초기화
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x100e5e660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x100e5e740 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x100e5e740 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x100e5e740 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x100e5e740 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x100e5e660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,12)
+|  |  |  |  |  |  (ID="a") TYPE:0x100e5e740 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100e5db30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100e5db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100e5db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x100e5db30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ADD (0x100e5db30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x100e5db30,1)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x100e5e740,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x100e5e740 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100e5db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x100e5db30,1)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x100e5e740,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x100e5e740 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100e5db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x100e5db30,1)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x100e5e740,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x100e5e740 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100e5db30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC07_array_initializer.c
+tests/ch7/cases/TC07_array_initializer.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC08 빈 배열 크기의 초기화 원소 수 추론
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x100902660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x100902710 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  (none)
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  4
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  5
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  6
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x100902710 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x100902660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,12)
+|  |  |  |  |  |  (ID="a") TYPE:0x100902710 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100901b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=4
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100901b30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=5
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100901b30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=6
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x100901b30,1)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x100902710,0)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x100902710 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100901b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC08_inferred_array_size.c
+tests/ch7/cases/TC08_inferred_array_size.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC09 포인터 주소 연산과 역참조
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x1015e2660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="x") TYPE:0x1015e1b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  (ID="p") TYPE:0x1015e2790 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1015e2790 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_AMP (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x1015e1b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STAR (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1015e2790 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x1015e2660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,8)
+|  |  |  |  |  |  (ID="x") TYPE:0x1015e1b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1015e1b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  (ID="p") TYPE:0x1015e2790 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=16 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x1015e2790,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1015e2790,1)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1015e2790 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=16 
+|  |  |  |  |  |  |  |  |  N_EXP_AMP (0x1015e2a90,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1015e1b30,1)
+|  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x1015e1b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STAR (0x1015e1b30,1)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1015e2790,1)
+|  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1015e2790 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=16 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC09_pointer_dereference.c
+tests/ch7/cases/TC09_pointer_dereference.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC10 0인 배열 크기 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x1008be660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x1008be740 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: illegal array size of type
+*** semantic error at line 2: illegal array size or empty array 
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC10_zero_array_size.c
+tests/ch7/cases/TC10_zero_array_size.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC10_zero_array_size.c:2:9: warning: zero size arrays are an extension [-Wzero-length-array]
+    2 |   int a[0];
+      |         ^
+tests/ch7/cases/TC10_zero_array_size.c:2:7: warning: unused variable 'a' [-Wunused-variable]
+    2 |   int a[0];
+      |       ^
+3 warnings generated.
+====================================================================================================
+TC11 배열 크기보다 많은 초기값 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x100d4a660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x100d4a740 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x100d4a740 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: excess elements in array initializer
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC11_excess_array_initializer.c
+tests/ch7/cases/TC11_excess_array_initializer.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC11_excess_array_initializer.c:2:21: warning: excess elements in array initializer [-Wexcess-initializers]
+    2 |   int a[2] = {1, 2, 3};
+      |                     ^
+2 warnings generated.
+====================================================================================================
+TC12 실수에서 포인터로의 잘못된 대입 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x102c52660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="p") TYPE:0x102c526c0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="f") TYPE:0x102c51bc0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x102c526c0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="f") TYPE:0x102c51bc0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 4: not permitted type casting inexpression
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC12_incompatible_pointer_assignment.c
+tests/ch7/cases/TC12_incompatible_pointer_assignment.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC12_incompatible_pointer_assignment.c:4:5: error: assigning to 'int *' from incompatible type 'float'
+    4 |   p = f;
+      |     ^ ~
+1 warning and 1 error generated.
+====================================================================================================
+TC13 구조체 필드 타입과 주소 계산
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="") TYPE:0x1051ae650 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  STRUCT
+|  |  |  |  FIELD
+|  |  |  |  |  (ID="left") TYPE:0x1051adb30 KIND:FIELD LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  |  (ID="right") TYPE:0x1051adb30 KIND:FIELD LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  (ID="main") TYPE:0x1051ae820 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (DONE:0x1051ae650)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  left
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  right
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  |  left
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  |  right
+|  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="") TYPE:0x1051ae650 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  STRUCT
+|  |  |  |  FIELD
+|  |  |  |  |  (ID="left") TYPE:0x1051adb30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  |  (ID="right") TYPE:0x1051adb30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=4 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  (ID="main") TYPE:0x1051ae820 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,8)
+|  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (DONE:0x1051ae650)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x1051adb30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x1051adb30,1)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1051ae650,1)
+|  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  (ID="left") TYPE:0x1051adb30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1051adb30,0)
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x1051adb30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x1051adb30,1)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1051ae650,1)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  (ID="right") TYPE:0x1051adb30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=4 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1051adb30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_ADD (0x1051adb30,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x1051adb30,1)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1051ae650,1)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="left") TYPE:0x1051adb30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x1051adb30,1)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1051ae650,1)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x1051ae650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="right") TYPE:0x1051adb30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=4 
+|  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC13_struct_fields.c
+tests/ch7/cases/TC13_struct_fields.c:6:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    6 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC14 공용체 필드 타입과 공용 주소 계산
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="") TYPE:0x1047ba650 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  UNION
+|  |  |  |  FIELD
+|  |  |  |  |  (ID="i") TYPE:0x1047b9b30 KIND:FIELD LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  |  (ID="f") TYPE:0x1047b9bc0 KIND:FIELD LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (float)
+|  (ID="main") TYPE:0x1047ba820 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="n") TYPE:0x1047ba650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (DONE:0x1047ba650)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="n") TYPE:0x1047ba650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  i
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  4
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="n") TYPE:0x1047ba650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  i
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="") TYPE:0x1047ba650 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  UNION
+|  |  |  |  FIELD
+|  |  |  |  |  (ID="i") TYPE:0x1047b9b30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  |  (ID="f") TYPE:0x1047b9bc0 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (float)
+|  (ID="main") TYPE:0x1047ba820 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="n") TYPE:0x1047ba650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (DONE:0x1047ba650)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x1047b9b30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x1047b9b30,1)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1047ba650,1)
+|  |  |  |  |  |  |  |  |  |  |  (ID="n") TYPE:0x1047ba650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1047b9b30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1047b9b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=4
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STRUCT (0x1047b9b30,1)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1047ba650,1)
+|  |  |  |  |  |  |  |  |  |  |  (ID="n") TYPE:0x1047ba650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1047b9b30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC14_union_fields.c
+tests/ch7/cases/TC14_union_fields.c:6:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    6 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC15 enum 시프트 상수식과 자동 증가
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="") TYPE:0x10355a650 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  ENUM
+|  |  |  |  ENUMERATORS
+|  |  |  |  |  (ID="A") TYPE:0x0 KIND:ENUM_LITERAL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  (ID="B") TYPE:0x0 KIND:ENUM_LITERAL LEV=0 VAL=0 ADDR=0 
+|  (ID="main") TYPE:0x10355a8b0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="B") TYPE:0x0 KIND:ENUM_LITERAL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="") TYPE:0x10355a650 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  ENUM
+|  |  |  |  ENUMERATORS
+|  |  |  |  |  (ID="A") TYPE:0x0 KIND:ENUM_LITERAL SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  INT=4
+|  |  |  |  |  (ID="B") TYPE:0x0 KIND:ENUM_LITERAL SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  INT=5
+|  (ID="main") TYPE:0x10355a8b0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x103559b30,0)
+|  |  |  |  |  |  |  |  |  (ID="B") TYPE:0x0 KIND:ENUM_LITERAL SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC15_enum_shift_constant.c
+tests/ch7/cases/TC15_enum_shift_constant.c:6:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    6 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC16 존재하지 않는 구조체 필드 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="") TYPE:0x105536650 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  STRUCT
+|  |  |  |  FIELD
+|  |  |  |  |  (ID="value") TYPE:0x105535b30 KIND:FIELD LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  (ID="main") TYPE:0x1055367c0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="x") TYPE:0x105536650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (DONE:0x105536650)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_STRUCT (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105536650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  missing
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 7: illegal struct field identifier in struct reference expr
+*** semantic error at line 7: not permitted type casting in expression
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC16_missing_struct_field.c
+tests/ch7/cases/TC16_missing_struct_field.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC16_missing_struct_field.c:7:12: error: no member named 'missing' in 'struct Item'
+    7 |   return x.missing;
+      |          ~ ^
+1 warning and 1 error generated.
+====================================================================================================
+TC17 enum의 비정수 초기값 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="") TYPE:0x1028d2650 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  ENUM
+|  |  |  |  ENUMERATORS
+|  |  |  |  |  (ID="BAD") TYPE:0x0 KIND:ENUM_LITERAL LEV=0 VAL=0 ADDR=0 
+|  (ID="main") TYPE:0x1028d2800 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: integer type expression required in enumerator
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC17_float_enum_value.c
+tests/ch7/cases/TC17_float_enum_value.c:2:9: error: integer constant expression must have integer type, not 'double'
+    2 |   BAD = 1.5
+      |         ^~~
+tests/ch7/cases/TC17_float_enum_value.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+1 warning and 1 error generated.
+====================================================================================================
+TC18 산술 우선순위와 이항 타입 결정
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x10535a660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_EXP_MUL (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x10535a660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x105359b30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x105359b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  N_EXP_MUL (0x105359b30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x105359b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x105359b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC18_arithmetic_precedence.c
+tests/ch7/cases/TC18_arithmetic_precedence.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC19 정수 좌·우 시프트 분석
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x100786660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_LSHIFT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  N_EXP_RSHIFT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  16
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x100786660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x100785b30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_LSHIFT (0x100785b30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100785b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100785b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  N_EXP_RSHIFT (0x100785b30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100785b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=16
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x100785b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC19_integer_shifts.c
+tests/ch7/cases/TC19_integer_shifts.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC20 콤마 표현식 타입 전파
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x1031be660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="x") TYPE:0x1031bdb30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x1031bdb30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_COMMA (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_COMMA (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x1031bdb30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x1031be660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="x") TYPE:0x1031bdb30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x1031bdb30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1031bdb30,1)
+|  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x1031bdb30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  N_EXP_COMMA (0x1031bdb30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_COMMA (0x1031bdb30,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1031bdb30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1031bdb30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1031bdb30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1031bdb30,1)
+|  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x1031bdb30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC20_comma_expression.c
+tests/ch7/cases/TC20_comma_expression.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC20_comma_expression.c:3:8: warning: left operand of comma operator has no effect [-Wunused-value]
+    3 |   x = (1, 2, 3);
+      |        ^
+tests/ch7/cases/TC20_comma_expression.c:3:11: warning: left operand of comma operator has no effect [-Wunused-value]
+    3 |   x = (1, 2, 3);
+      |           ^
+3 warnings generated.
+====================================================================================================
+TC21 명시적 float-int 형변환
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x100dc6660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="f") TYPE:0x100dc5bc0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  3.5
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_CAST (0x0,0)
+|  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="f") TYPE:0x100dc5bc0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,16)
+|  (ID="main") TYPE:0x100dc6660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="f") TYPE:0x100dc5bc0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x100dc5bc0,0)
+|  |  |  |  |  |  |  |  |  |  LITERAL: 3.500000
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_CAST (0x100dc5b30,0)
+|  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x100dc5bc0,1)
+|  |  |  |  |  |  |  |  |  |  (ID="f") TYPE:0x100dc5bc0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC21_explicit_cast.c
+tests/ch7/cases/TC21_explicit_cast.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC22 실수 시프트 피연산자 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x10412a660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_LSHIFT (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1.0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: integral type expression required in expression
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC22_float_shift_error.c
+tests/ch7/cases/TC22_float_shift_error.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC22_float_shift_error.c:2:14: error: invalid operands to binary expression ('double' and 'int')
+    2 |   return 1.0 << 2;
+      |          ~~~ ^  ~
+1 warning and 1 error generated.
+====================================================================================================
+TC23 실수 나머지 연산 피연산자 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x101162660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_MOD (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  5.0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: integral type expression required in expression
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC23_float_mod_error.c
+tests/ch7/cases/TC23_float_mod_error.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC23_float_mod_error.c:2:14: error: invalid operands to binary expression ('double' and 'int')
+    2 |   return 5.0 % 2;
+      |          ~~~ ^ ~
+1 warning and 1 error generated.
+====================================================================================================
+TC24 정수·실수 이항 산술 변환
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="add") TYPE:0x1049be660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (float)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  2.5
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x1049be870 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+--- warning at line 2:incompatible types in binary expression
+=======  semantic tree  ==========
+N_PROGRAM (0x0,16)
+|  (ID="add") TYPE:0x1049be660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (float)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x1049bdbc0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_CAST (0x1049bdbc0,0)
+|  |  |  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1049bdb30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x1049bdbc0,0)
+|  |  |  |  |  |  |  |  |  |  LITERAL: 2.500000
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x1049be870 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1049bdb30,0)
+|  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC24_mixed_arithmetic_warning.c
+tests/ch7/cases/TC24_mixed_arithmetic_warning.c:1:10: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | float add() {
+      |          ^
+      |           void
+tests/ch7/cases/TC24_mixed_arithmetic_warning.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+2 warnings generated.
+====================================================================================================
+TC25 고정 매개변수 호출과 인자 크기
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="add") TYPE:0x10529a740 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="a") TYPE:0x105299b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  |  (ID="b") TYPE:0x105299b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x105299b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="b") TYPE:0x105299b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x10529a940 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="add") TYPE:0x10529a740 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="add") TYPE:0x10529a740 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="a") TYPE:0x105299b30 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  |  (ID="b") TYPE:0x105299b30 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=16 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x105299b30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x105299b30,1)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x105299b30 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x105299b30,1)
+|  |  |  |  |  |  |  |  |  |  (ID="b") TYPE:0x105299b30 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=16 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x10529a940 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x105299b30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_AMP (0x10529abc0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10529a740,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="add") TYPE:0x10529a740 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,8)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x105299b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,4)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x105299b30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC25_fixed_parameter_call.c
+tests/ch7/cases/TC25_fixed_parameter_call.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC26 배열 인자의 포인터 decay
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="first") TYPE:0x1014ee710 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="a") TYPE:0x1014ee6d0 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  (none)
+|  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x1014ee6d0 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x1014ee910 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="values") TYPE:0x1014ee9f0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  7
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  8
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="first") TYPE:0x1014ee710 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="values") TYPE:0x1014ee9f0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="first") TYPE:0x1014ee710 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="a") TYPE:0x1014ee6d0 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x1014edb30,1)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1014ee6d0,1)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x1014ee6d0 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1014edb30,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x1014ee910 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,8)
+|  |  |  |  |  |  (ID="values") TYPE:0x1014ee9f0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1014edb30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=7
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1014edb30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=8
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x1014edb30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_AMP (0x1014eed60,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1014ee710,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="first") TYPE:0x1014ee710 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,4)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (0x1014eedd0,0)
+|  |  |  |  |  |  |  |  |  |  |  (DONE:0x1014eedd0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1014ee9f0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="values") TYPE:0x1014ee9f0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC26_array_parameter_decay.c
+tests/ch7/cases/TC26_array_parameter_decay.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC27 포인터 함수 반환식과 호출
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="identity") TYPE:0x10550e750 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="p") TYPE:0x10550e6c0 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  POINTER
+|  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x10550e6c0 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x10550e8f0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="x") TYPE:0x10550db30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  9
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_STAR (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="identity") TYPE:0x10550e750 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_AMP (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x10550db30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="identity") TYPE:0x10550e750 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="p") TYPE:0x10550e6c0 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  POINTER
+|  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x10550e6c0,1)
+|  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x10550e6c0 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x10550e8f0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="x") TYPE:0x10550db30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10550db30,0)
+|  |  |  |  |  |  |  |  |  |  INT=9
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_STAR (0x10550db30,1)
+|  |  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x10550e610,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_AMP (0x10550ec40,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10550e750,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="identity") TYPE:0x10550e750 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,4)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_AMP (0x10550ecb0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10550db30,1)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x10550db30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC27_pointer_return.c
+tests/ch7/cases/TC27_pointer_return.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC28 과다 함수 인자 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="one") TYPE:0x104fb66d0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="x") TYPE:0x104fb5b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x104fb5b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x104fb6870 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="one") TYPE:0x104fb66d0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 6: too many arguments in function call
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC28_too_many_arguments.c
+tests/ch7/cases/TC28_too_many_arguments.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC28_too_many_arguments.c:6:17: error: too many arguments to function call, expected single argument 'x', have 2 arguments
+    6 |   return one(1, 2);
+      |          ~~~    ^
+tests/ch7/cases/TC28_too_many_arguments.c:1:5: note: 'one' declared here
+    1 | int one(int x) {
+      |     ^   ~~~~~
+1 warning and 1 error generated.
+====================================================================================================
+TC29 부족한 함수 인자 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="add") TYPE:0x1009da740 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="a") TYPE:0x1009d9b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  |  (ID="b") TYPE:0x1009d9b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x1009d9b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="b") TYPE:0x1009d9b30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x1009da940 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="add") TYPE:0x1009da740 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 6: too few arguments in function call
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC29_too_few_arguments.c
+tests/ch7/cases/TC29_too_few_arguments.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC29_too_few_arguments.c:6:15: error: too few arguments to function call, expected 2, have 1
+    6 |   return add(1);
+      |          ~~~  ^
+tests/ch7/cases/TC29_too_few_arguments.c:1:5: note: 'add' declared here
+    1 | int add(int a, int b) {
+      |     ^   ~~~~~~~~~~~~
+1 warning and 1 error generated.
+====================================================================================================
+TC30 함수 인자의 대입 호환 변환
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="take") TYPE:0x102e2e6d0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="x") TYPE:0x102e2db30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x102e2db30 KIND:PARM LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x102e2e870 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="take") TYPE:0x102e2e6d0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  2.5
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+--- warning at line 6:incompatible types in argument or return expr
+=======  semantic tree  ==========
+N_PROGRAM (0x0,16)
+|  (ID="take") TYPE:0x102e2e6d0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  |  (ID="x") TYPE:0x102e2db30 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x102e2db30,1)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x102e2db30 KIND:PARM SPEC=NULL LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x102e2e870 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x102e2db30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_AMP (0x102e2eaa0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x102e2e6d0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="take") TYPE:0x102e2e6d0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST (0x0,4)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (0x102e2db30,0)
+|  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x102e2dbc0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  LITERAL: 2.500000
+|  |  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC30_argument_conversion_warning.c
+tests/ch7/cases/TC30_argument_conversion_warning.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC30_argument_conversion_warning.c:6:15: warning: implicit conversion from 'double' to 'int' changes value from 2.5 to 2 [-Wliteral-conversion]
+    6 |   return take(2.5);
+      |          ~~~~ ^~~
+2 warnings generated.
+====================================================================================================
+TC31 중첩 if·while의 switch 문맥 전파
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x105166660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_SWITCH (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_IF (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_WHILE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x105166660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x105165b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_SWITCH (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x105165b30,1)
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_IF (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x105165b30,1)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_WHILE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x105165b30,1)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x105165b30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x105165b30,1)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x105165b30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x105165b30,1)
+|  |  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x105165b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC31_nested_switch_context.c
+tests/ch7/cases/TC31_nested_switch_context.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC32 반복문 내부 break·continue 문맥
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x1012b6660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_FOR (0x0,0)
+|  |  |  |  |  |  |  |  N_FOR_EXP (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  N_EXP_LSS (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  N_EXP_POST_INC (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_IF_ELSE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_CONTINUE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x1012b6660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_FOR (0x0,0)
+|  |  |  |  |  |  |  |  N_FOR_EXP (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x1012b5b30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1012b5b30,1)
+|  |  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1012b5b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  |  N_EXP_LSS (0x1012b5b30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1012b5b30,1)
+|  |  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1012b5b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  N_EXP_POST_INC (0x1012b5b30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1012b5b30,1)
+|  |  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_IF_ELSE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1012b5b30,1)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_CONTINUE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1012b5b30,1)
+|  |  |  |  |  |  |  |  |  |  (ID="i") TYPE:0x1012b5b30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC32_loop_break_continue.c
+tests/ch7/cases/TC32_loop_break_continue.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+1 warning generated.
+====================================================================================================
+TC33 void 함수의 값 없는 return
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="done") TYPE:0x1008aa660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (void)|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x1008aa7d0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="done") TYPE:0x1008aa660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="done") TYPE:0x1008aa660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (void)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x1008aa7d0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x1008aa190,0)
+|  |  |  |  |  |  |  |  |  N_EXP_AMP (0x1008aaa20,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x1008aa660,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="done") TYPE:0x1008aa660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1008a9b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC33_void_return.c
+tests/ch7/cases/TC33_void_return.c:1:10: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | void done() {
+      |          ^
+      |           void
+tests/ch7/cases/TC33_void_return.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+2 warnings generated.
+====================================================================================================
+TC34 switch 밖 case 레이블 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x105196660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LABEL_CASE (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 3: case label not within a switch statement
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC34_case_outside_switch.c
+tests/ch7/cases/TC34_case_outside_switch.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC34_case_outside_switch.c:2:3: error: 'case' statement not in switch statement
+    2 |   case 1:
+      |   ^
+1 warning and 1 error generated.
+====================================================================================================
+TC35 반복문 밖 continue 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x105582660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_CONTINUE (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: continue statement not within a loop 
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC35_continue_outside_loop.c
+tests/ch7/cases/TC35_continue_outside_loop.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC35_continue_outside_loop.c:2:3: error: 'continue' statement not in loop statement
+    2 |   continue;
+      |   ^
+1 warning and 1 error generated.
+====================================================================================================
+TC36 void 함수의 값 반환 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="bad") TYPE:0x1033be660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (void)|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+|  (ID="main") TYPE:0x1033be800 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FUNCTION_CALL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="bad") TYPE:0x1033be660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_ARG_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: return statement does not match function return type
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC36_value_return_from_void.c
+tests/ch7/cases/TC36_value_return_from_void.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | void bad() {
+      |         ^
+      |          void
+tests/ch7/cases/TC36_value_return_from_void.c:2:3: error: void function 'bad' should not return a value [-Wreturn-mismatch]
+    2 |   return 1;
+      |   ^      ~
+tests/ch7/cases/TC36_value_return_from_void.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+2 warnings and 1 error generated.
+====================================================================================================
+TC37 실수 조건식의 정수 변환
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x10543a660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_IF (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  1.5
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+--- warning at line 2:integer type expression is required
+=======  semantic tree  ==========
+N_PROGRAM (0x0,16)
+|  (ID="main") TYPE:0x10543a660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_IF (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_CAST (0x105439b30,0)
+|  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x105439bc0,0)
+|  |  |  |  |  |  |  |  |  |  LITERAL: 1.500000
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x105439b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x105439b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC37_float_condition_warning.c
+tests/ch7/cases/TC37_float_condition_warning.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC37_float_condition_warning.c:2:7: warning: implicit conversion from 'double' to '_Bool' changes value from 1.5 to true [-Wliteral-conversion]
+    2 |   if (1.5)
+      |   ~~  ^~~
+2 warnings generated.
+====================================================================================================
+TC38 float·string·char 리터럴 테이블
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x1051ca660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="f") TYPE:0x1051c9bc0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1.25
+|  |  |  |  |  |  (ID="s") TYPE:0x1051ca7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (char 1)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STRING_LITERAL (0x0,0)
+|  |  |  |  |  |  |  |  |  |  "abc"
+|  |  |  |  |  |  (ID="c") TYPE:0x1051c9c00 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (char 1)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_CHAR_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  65
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_IF (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="s") TYPE:0x1051ca7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,24)
+|  (ID="main") TYPE:0x1051ca660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,12)
+|  |  |  |  |  |  (ID="f") TYPE:0x1051c9bc0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (float)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x1051c9bc0,0)
+|  |  |  |  |  |  |  |  |  |  LITERAL: 1.250000
+|  |  |  |  |  |  (ID="s") TYPE:0x1051ca7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=16 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (char 1)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STRING_LITERAL (0x1051ca220,0)
+|  |  |  |  |  |  |  |  |  |  LITERAL: "abc"
+|  |  |  |  |  |  (ID="c") TYPE:0x1051c9c00 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=20 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (char 1)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_CHAR_CONST (0x1051c9c00,0)
+|  |  |  |  |  |  |  |  |  |  INT=65
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_IF (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x1051c9b30,1)
+|  |  |  |  |  |  |  |  |  (ID="s") TYPE:0x1051ca7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=16 
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1051c9b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x1051c9b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC38_literal_table.c
+tests/ch7/cases/TC38_literal_table.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC38_literal_table.c:2:9: warning: unused variable 'f' [-Wunused-variable]
+    2 |   float f = 1.25;
+      |         ^
+tests/ch7/cases/TC38_literal_table.c:4:8: warning: unused variable 'c' [-Wunused-variable]
+    4 |   char c = 'A';
+      |        ^
+3 warnings generated.
+====================================================================================================
+TC39 문자열 리터럴 간 덧셈 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x101362660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_STRING_LITERAL (0x0,0)
+|  |  |  |  |  |  |  |  |  |  "a"
+|  |  |  |  |  |  |  |  |  N_EXP_STRING_LITERAL (0x0,0)
+|  |  |  |  |  |  |  |  |  |  "b"
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: incompatible type in additive expression
+*** semantic error at line 2: not permitted type casting in expression
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC39_string_add_error.c
+tests/ch7/cases/TC39_string_add_error.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC39_string_add_error.c:2:14: error: invalid operands to binary expression ('char[2]' and 'char[2]')
+    2 |   return "a" + "b";
+      |          ~~~ ^ ~~~
+1 warning and 1 error generated.
+====================================================================================================
+TC40 float 리터럴의 int 반환 변환
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x102762660 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  3.75
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+--- warning at line 2:incompatible types in argument or return expr
+=======  semantic tree  ==========
+N_PROGRAM (0x0,16)
+|  (ID="main") TYPE:0x102762660 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_CAST (0x102761b30,0)
+|  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x102761bc0,0)
+|  |  |  |  |  |  |  |  |  |  LITERAL: 3.750000
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC40_float_return_warning.c
+tests/ch7/cases/TC40_float_return_warning.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC40_float_return_warning.c:2:10: warning: implicit conversion from 'double' to 'int' changes value from 3.75 to 3 [-Wliteral-conversion]
+    2 |   return 3.75;
+      |   ~~~~~~ ^~~~
+2 warnings generated.
+====================================================================================================
+TC41 중첩 배열의 외측 크기 추론과 재귀 초기화
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x10565e6c0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x10565e770 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  (none)
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  4
+|  |  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10565e770 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x10565e6c0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,16)
+|  |  |  |  |  |  (ID="a") TYPE:0x10565e770 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10565db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10565db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10565db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10565db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  |  INT=4
+|  |  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x10565db30,1)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x10565e7e0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10565e770,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10565e770 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10565db30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10565db30,0)
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC41_nested_array_inferred_size.c
+====================================================================================================
+TC42 중첩 배열 float 초기화의 재귀 분석
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x10476e6c0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x10476e7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1.5
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10476e7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+--- warning at line 2:incompatible types in assignment expression
+=======  semantic tree  ==========
+N_PROGRAM (0x0,16)
+|  (ID="main") TYPE:0x10476e6c0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="a") TYPE:0x10476e7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_CAST (0x10476db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x10476dbc0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  LITERAL: 1.500000
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x10476db30,1)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x10476e810,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10476e7a0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10476e7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10476db30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10476db30,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC42_nested_array_float_initializer.c
+tests/ch7/cases/TC42_nested_array_float_initializer.c:2:19: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    2 |   int a[1][1] = {{1.5}};
+      |                  ~^~~
+1 warning generated.
+====================================================================================================
+TC43 중괄호를 생략한 중첩 배열 초기화
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x10340e6c0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x10340e7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1.5
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  2.5
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10340e7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+--- warning at line 2:incompatible types in assignment expression
+--- warning at line 2:incompatible types in assignment expression
+=======  semantic tree  ==========
+N_PROGRAM (0x0,20)
+|  (ID="main") TYPE:0x10340e6c0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,8)
+|  |  |  |  |  |  (ID="a") TYPE:0x10340e7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (0x10340db30,0)
+|  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x10340dbc0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  LITERAL: 1.500000
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_CAST (0x10340db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x10340dbc0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  LITERAL: 2.500000
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x10340db30,1)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x10340e810,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10340e7a0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10340e7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10340db30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10340db30,0)
+|  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC43_flat_nested_array_initializer.c
+tests/ch7/cases/TC43_flat_nested_array_initializer.c:2:18: warning: suggest braces around initialization of subobject [-Wmissing-braces]
+    2 |   int a[1][2] = {1.5, 2.5};
+      |                  ^~~~~~~~
+      |                  {       }
+tests/ch7/cases/TC43_flat_nested_array_initializer.c:2:23: warning: implicit conversion from 'double' to 'int' changes value from 2.5 to 2 [-Wliteral-conversion]
+    2 |   int a[1][2] = {1.5, 2.5};
+      |                  ~~~  ^~~
+tests/ch7/cases/TC43_flat_nested_array_initializer.c:2:18: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    2 |   int a[1][2] = {1.5, 2.5};
+      |                  ^~~
+3 warnings generated.
+====================================================================================================
+TC44 내측 배열의 과다 초기값 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x1057da6c0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x1057da7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x1057da7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: excess elements in array initializer
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC44_excess_inner_array_initializer.c
+tests/ch7/cases/TC44_excess_inner_array_initializer.c:2:22: warning: excess elements in array initializer [-Wexcess-initializers]
+    2 |   int a[1][1] = {{1, 2}};
+      |                      ^
+1 warning generated.
+====================================================================================================
+TC45 대입식에서 배열의 포인터 decay
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x102a4a6c0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x102a4a7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="p") TYPE:0x102a4a800 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x102a4a800 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x102a4a7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x102a4a6c0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,16)
+|  |  |  |  |  |  (ID="a") TYPE:0x102a4a7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="p") TYPE:0x102a4a800 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x102a4a800,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x102a4a800,1)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x102a4a800 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  |  |  N_EXP_CAST (0x102a4aaa0,0)
+|  |  |  |  |  |  |  |  |  |  (DONE:0x102a4aaa0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x102a4a7a0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x102a4a7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x102a49b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC45_array_decay_assignment.c
+tests/ch7/cases/TC45_array_decay_assignment.c:3:8: warning: variable 'p' set but not used [-Wunused-but-set-variable]
+    3 |   int *p;
+      |        ^
+1 warning generated.
+====================================================================================================
+TC46 포인터 덧셈에서 배열 decay
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x10146a6c0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x10146a7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="p") TYPE:0x10146a800 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x10146a800 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_ADD (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10146a7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x10146a6c0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,16)
+|  |  |  |  |  |  (ID="a") TYPE:0x10146a7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="p") TYPE:0x10146a800 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  POINTER
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x10146a800,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10146a800,1)
+|  |  |  |  |  |  |  |  |  |  (ID="p") TYPE:0x10146a800 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  |  |  N_EXP_ADD (0x10146ab00,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (0x10146ab00,0)
+|  |  |  |  |  |  |  |  |  |  |  (DONE:0x10146ab00)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10146a7a0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10146a7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x101469b30,0)
+|  |  |  |  |  |  |  |  |  |  |  INT=1
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x101469b30,0)
+|  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC46_array_pointer_arithmetic.c
+tests/ch7/cases/TC46_array_pointer_arithmetic.c:3:8: warning: variable 'p' set but not used [-Wunused-but-set-variable]
+    3 |   int *p;
+      |        ^
+1 warning generated.
+====================================================================================================
+TC47 호환 포인터 냄셈의 정수 결과 타입
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="main") TYPE:0x10349e6c0 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="a") TYPE:0x10349e7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="d") TYPE:0x10349db30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="d") TYPE:0x10349db30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  N_EXP_SUB (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_AMP (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10349e7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  2
+|  |  |  |  |  |  |  |  |  |  N_EXP_AMP (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10349e7a0 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  0
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="d") TYPE:0x10349db30 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+=======  semantic tree  ==========
+N_PROGRAM (0x0,12)
+|  (ID="main") TYPE:0x10349e6c0 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,16)
+|  |  |  |  |  |  (ID="a") TYPE:0x10349e7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  ARRAY
+|  |  |  |  |  |  |  |  |  INDEX
+|  |  |  |  |  |  |  |  |  |  INT=3
+|  |  |  |  |  |  |  |  |  ELEMENT_TYPE
+|  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  (ID="d") TYPE:0x10349db30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_EXPRESSION (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_ASSIGN (0x10349db30,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10349db30,1)
+|  |  |  |  |  |  |  |  |  |  (ID="d") TYPE:0x10349db30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  |  |  N_EXP_SUB (0x10349db30,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_AMP (0x10349ebe0,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x10349db30,1)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10349e7a0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10349e7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10349db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=2
+|  |  |  |  |  |  |  |  |  |  N_EXP_AMP (0x10349ec20,0)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_ARRAY (0x10349db30,1)
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10349e7a0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  (ID="a") TYPE:0x10349e7a0 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (0x10349db30,0)
+|  |  |  |  |  |  |  |  |  |  |  |  |  INT=0
+|  |  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x10349db30,1)
+|  |  |  |  |  |  |  |  |  |  (ID="d") TYPE:0x10349db30 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=24 
+|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC47_pointer_subtraction.c
+====================================================================================================
+TC50 전역 변수의 비상수 초기화식 검출
+[analyzer exit=1]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="x") TYPE:0x103541b30 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  (int)
+|  (ID="y") TYPE:0x103541b30 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  (int)
+|  |  INITIALIZER
+|  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  (ID="x") TYPE:0x103541b30 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  (ID="main") TYPE:0x103542800 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  (ID="y") TYPE:0x103541b30 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+*** semantic error at line 2: initializer element is not a compile-time constant
+[cc exit=1] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC50_nonconstant_global_initializer.c
+tests/ch7/cases/TC50_nonconstant_global_initializer.c:2:9: error: initializer element is not a compile-time constant
+    2 | int y = x;
+      |         ^
+1 error generated.
+====================================================================================================
+TC51 구조체 필드 float→int 초기화 분석
+[analyzer exit=0]
+=======  syntax tree  ==========
+N_PROGRAM (0x0,0)
+|  (ID="") TYPE:0x100d2e650 KIND:VAR LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  STRUCT
+|  |  |  |  FIELD
+|  |  |  |  |  (ID="x") TYPE:0x100d2db30 KIND:FIELD LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  (ID="main") TYPE:0x100d2e820 KIND:FUNC LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,0)
+|  |  |  |  |  |  (ID="s") TYPE:0x100d2e650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (DONE:0x100d2e650)
+|  |  |  |  |  |  |  INITIALIZER
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x0,0)
+|  |  |  |  |  |  |  |  |  |  |  1.5
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_STRUCT (0x0,0)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x0,0)
+|  |  |  |  |  |  |  |  |  |  (ID="s") TYPE:0x100d2e650 KIND:VAR LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  |  |  x
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+--- warning at line 6:incompatible types in assignment expression
+=======  semantic tree  ==========
+N_PROGRAM (0x0,16)
+|  (ID="") TYPE:0x100d2e650 KIND:VAR SPEC=AUTO LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  STRUCT
+|  |  |  |  FIELD
+|  |  |  |  |  (ID="x") TYPE:0x100d2db30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  (int)
+|  (ID="main") TYPE:0x100d2e820 KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
+|  |  TYPE
+|  |  |  FUNCTION
+|  |  |  |  PARAMETER
+|  |  |  |  TYPE
+|  |  |  |  |  (int)
+|  |  |  |  BODY
+|  |  |  |  |  N_STMT_COMPOUND (0x0,4)
+|  |  |  |  |  |  (ID="s") TYPE:0x100d2e650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  TYPE
+|  |  |  |  |  |  |  |  (DONE:0x100d2e650)
+|  |  |  |  |  |  |  INIT
+|  |  |  |  |  |  |  |  N_INIT_LIST (0x0,0)
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_ONE (0x0,0)
+|  |  |  |  |  |  |  |  |  |  N_EXP_CAST (0x100d2db30,0)
+|  |  |  |  |  |  |  |  |  |  |  (int)
+|  |  |  |  |  |  |  |  |  |  |  N_EXP_FLOAT_CONST (0x100d2dbc0,0)
+|  |  |  |  |  |  |  |  |  |  |  |  LITERAL: 1.500000
+|  |  |  |  |  |  |  |  |  N_INIT_LIST_NIL (0x0,0)
+|  |  |  |  |  |  N_STMT_LIST (0x0,0)
+|  |  |  |  |  |  |  N_STMT_RETURN (0x0,0)
+|  |  |  |  |  |  |  |  N_EXP_STRUCT (0x100d2db30,1)
+|  |  |  |  |  |  |  |  |  N_EXP_IDENT (0x100d2e650,1)
+|  |  |  |  |  |  |  |  |  |  (ID="s") TYPE:0x100d2e650 KIND:VAR SPEC=AUTO LEV=1 VAL=0 ADDR=12 
+|  |  |  |  |  |  |  |  |  (ID="x") TYPE:0x100d2db30 KIND:FIELD SPEC=NULL LEV=1 VAL=0 ADDR=0 
+|  |  |  |  |  |  |  N_STMT_LIST_NIL (0x0,0)
+[cc exit=0] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC51_struct_float_initializer.c
+tests/ch7/cases/TC51_struct_float_initializer.c:6:17: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    6 |   struct S s = {1.5};
+      |                ~^~~
+1 warning generated.

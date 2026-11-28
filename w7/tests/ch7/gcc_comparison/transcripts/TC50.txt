@@ -1,0 +1,6 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC50_nonconstant_global_initializer.c
+tests/ch7/cases/TC50_nonconstant_global_initializer.c:2:9: error: initializer element is not a compile-time constant
+    2 | int y = x;
+      |         ^
+1 error generated.
+[exit=1]

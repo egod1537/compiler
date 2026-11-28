@@ -1,0 +1,10 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC30_argument_conversion_warning.c
+tests/ch7/cases/TC30_argument_conversion_warning.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC30_argument_conversion_warning.c:6:15: warning: implicit conversion from 'double' to 'int' changes value from 2.5 to 2 [-Wliteral-conversion]
+    6 |   return take(2.5);
+      |          ~~~~ ^~~
+2 warnings generated.
+[exit=0]

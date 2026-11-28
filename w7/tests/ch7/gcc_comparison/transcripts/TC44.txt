@@ -1,0 +1,6 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC44_excess_inner_array_initializer.c
+tests/ch7/cases/TC44_excess_inner_array_initializer.c:2:22: warning: excess elements in array initializer [-Wexcess-initializers]
+    2 |   int a[1][1] = {{1, 2}};
+      |                      ^
+1 warning generated.
+[exit=0]

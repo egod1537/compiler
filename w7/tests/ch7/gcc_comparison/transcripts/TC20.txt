@@ -1,0 +1,13 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC20_comma_expression.c
+tests/ch7/cases/TC20_comma_expression.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC20_comma_expression.c:3:8: warning: left operand of comma operator has no effect [-Wunused-value]
+    3 |   x = (1, 2, 3);
+      |        ^
+tests/ch7/cases/TC20_comma_expression.c:3:11: warning: left operand of comma operator has no effect [-Wunused-value]
+    3 |   x = (1, 2, 3);
+      |           ^
+3 warnings generated.
+[exit=0]

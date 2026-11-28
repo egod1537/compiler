@@ -1,0 +1,6 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC51_struct_float_initializer.c
+tests/ch7/cases/TC51_struct_float_initializer.c:6:17: warning: implicit conversion from 'double' to 'int' changes value from 1.5 to 1 [-Wliteral-conversion]
+    6 |   struct S s = {1.5};
+      |                ~^~~
+1 warning generated.
+[exit=0]

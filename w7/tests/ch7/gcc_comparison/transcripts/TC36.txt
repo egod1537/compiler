@@ -1,0 +1,14 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC36_value_return_from_void.c
+tests/ch7/cases/TC36_value_return_from_void.c:1:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    1 | void bad() {
+      |         ^
+      |          void
+tests/ch7/cases/TC36_value_return_from_void.c:2:3: error: void function 'bad' should not return a value [-Wreturn-mismatch]
+    2 |   return 1;
+      |   ^      ~
+tests/ch7/cases/TC36_value_return_from_void.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+2 warnings and 1 error generated.
+[exit=1]

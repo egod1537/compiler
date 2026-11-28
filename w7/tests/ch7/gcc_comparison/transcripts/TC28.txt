@@ -1,0 +1,13 @@
+yang@yangseongjun-ui-Macmini w7 % cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only tests/ch7/cases/TC28_too_many_arguments.c
+tests/ch7/cases/TC28_too_many_arguments.c:5:9: warning: a function declaration without a prototype is deprecated in all versions of C [-Wstrict-prototypes]
+    5 | int main() {
+      |         ^
+      |          void
+tests/ch7/cases/TC28_too_many_arguments.c:6:17: error: too many arguments to function call, expected single argument 'x', have 2 arguments
+    6 |   return one(1, 2);
+      |          ~~~    ^
+tests/ch7/cases/TC28_too_many_arguments.c:1:5: note: 'one' declared here
+    1 | int one(int x) {
+      |     ^   ~~~~~
+1 warning and 1 error generated.
+[exit=1]
