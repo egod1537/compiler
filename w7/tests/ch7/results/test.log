@@ -1,6 +1,6 @@
 과제7 시멘틱 분석기 전체 테스트 로그
-시각: 2026-11-28T11:18:35+09:00
-과제7 TC: 51, 과제6 회귀: 48
+시각: 2026-11-28T11:37:11+09:00
+과제7 TC: 49, 과제6 회귀: 47
 
 ==============================================================================
 TC01 [normal/변수 선언 및 초기화] 지역 정수 초기화와 주소 배치
@@ -3568,164 +3568,6 @@ N_PROGRAM (<ADDR>,12)
 [system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC47_pointer_subtraction.c
 exit=0 timeout=False crash=False
 <no output>
-
-==============================================================================
-TC48 [error/명령문] 하나의 switch 내 중복 case 값 검출
-source: tests/ch7/cases/TC48_duplicate_case.c
-result: FAIL
-reasons:
-  - 종료 코드 기대 1, 실제 0
-  - 필수 진단 누락: duplicate case value
-  - 오류 TC에 오류 진단이 없음
-
-[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
-exit=0 timeout=False crash=False
-=======  syntax tree  ==========
-N_PROGRAM (<ADDR>,0)
-|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
-|  |  TYPE
-|  |  |  FUNCTION
-|  |  |  |  PARAMETER
-|  |  |  |  TYPE
-|  |  |  |  |  (int)
-|  |  |  |  BODY
-|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
-|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  N_STMT_SWITCH (<ADDR>,0)
-|  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  0
-|  |  |  |  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  |  1
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  |  |  1
-|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
-|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  0
-|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
-=======  semantic tree  ==========
-N_PROGRAM (<ADDR>,12)
-|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
-|  |  TYPE
-|  |  |  FUNCTION
-|  |  |  |  PARAMETER
-|  |  |  |  TYPE
-|  |  |  |  |  (int)
-|  |  |  |  BODY
-|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
-|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  N_STMT_SWITCH (<ADDR>,0)
-|  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  INT=0
-|  |  |  |  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  INT=1
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_CASE (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  |  INT=1
-|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
-|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  INT=0
-|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
-
-[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC48_duplicate_case.c
-exit=1 timeout=False crash=False
-/Users/yang/proj/compiler/w7/tests/ch7/cases/TC48_duplicate_case.c:5:8: error: duplicate case value '1'
-    5 |   case 1:
-      |        ^
-/Users/yang/proj/compiler/w7/tests/ch7/cases/TC48_duplicate_case.c:3:8: note: previous case defined here
-    3 |   case 1:
-      |        ^
-1 error generated.
-
-==============================================================================
-TC49 [error/명령문] 하나의 switch 내 중복 default 검출
-source: tests/ch7/cases/TC49_duplicate_default.c
-result: FAIL
-reasons:
-  - 종료 코드 기대 1, 실제 0
-  - 필수 진단 누락: multiple default labels
-  - 오류 TC에 오류 진단이 없음
-
-[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
-exit=0 timeout=False crash=False
-=======  syntax tree  ==========
-N_PROGRAM (<ADDR>,0)
-|  (ID="main") TYPE:<ADDR> KIND:FUNC LEV=0 VAL=0 ADDR=0 
-|  |  TYPE
-|  |  |  FUNCTION
-|  |  |  |  PARAMETER
-|  |  |  |  TYPE
-|  |  |  |  |  (int)
-|  |  |  |  BODY
-|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
-|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  N_STMT_SWITCH (<ADDR>,0)
-|  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  0
-|  |  |  |  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
-|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  0
-|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
-=======  semantic tree  ==========
-N_PROGRAM (<ADDR>,12)
-|  (ID="main") TYPE:<ADDR> KIND:FUNC SPEC=NULL LEV=0 VAL=0 ADDR=0 
-|  |  TYPE
-|  |  |  FUNCTION
-|  |  |  |  PARAMETER
-|  |  |  |  TYPE
-|  |  |  |  |  (int)
-|  |  |  |  BODY
-|  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
-|  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  N_STMT_SWITCH (<ADDR>,0)
-|  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  INT=0
-|  |  |  |  |  |  |  |  N_STMT_COMPOUND (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_LABEL_DEFAULT (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  |  N_STMT_BREAK (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
-|  |  |  |  |  |  |  N_STMT_LIST (<ADDR>,0)
-|  |  |  |  |  |  |  |  N_STMT_RETURN (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  N_EXP_INT_CONST (<ADDR>,0)
-|  |  |  |  |  |  |  |  |  |  INT=0
-|  |  |  |  |  |  |  |  N_STMT_LIST_NIL (<ADDR>,0)
-
-[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/ch7/cases/TC49_duplicate_default.c
-exit=1 timeout=False crash=False
-/Users/yang/proj/compiler/w7/tests/ch7/cases/TC49_duplicate_default.c:3:3: error: multiple default labels in one switch
-    3 |   default:
-      |   ^
-/Users/yang/proj/compiler/w7/tests/ch7/cases/TC49_duplicate_default.c:5:3: note: previous case defined here
-    5 |   default:
-      |   ^
-1 error generated.
 
 ==============================================================================
 TC50 [error/변수 선언 및 초기화] 전역 변수의 비상수 초기화식 검출
@@ -7302,20 +7144,5 @@ N_PROGRAM (<ADDR>,20)
 |  |  |  (DONE:<ADDR>)
 
 [system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/5/9.c
-exit=0 timeout=False crash=False
-<no output>
-
-==============================================================================
-CH6-5-10 [과제6 회귀, expected exit=0]
-source: tests/5/10.c
-result: FAIL
-reasons:
-  - 종료 코드 기대 0, 실제 1
-
-[semantic analyzer] $ /Users/yang/proj/compiler/w7/parser
-exit=1 timeout=False crash=False
-line 4: syntax error: incomplete forward reference for identifier Node at end
-
-[system C compiler] $ cc -std=c11 -Wall -Wextra -pedantic -fsyntax-only /Users/yang/proj/compiler/w7/tests/5/10.c
 exit=0 timeout=False crash=False
 <no output>

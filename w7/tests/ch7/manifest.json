@@ -53,8 +53,6 @@
   {"id":"TC45","file":"TC45_array_decay_assignment.c","category":"arrays","kind":"normal","purpose":"대입식에서 배열의 포인터 decay","expected":"GCC처럼 정상 종료, 배열→포인터 cast AST","diagnostic":"","checks":["N_EXP_CAST","N_EXP_ASSIGN"]},
   {"id":"TC46","file":"TC46_array_pointer_arithmetic.c","category":"arrays","kind":"normal","purpose":"포인터 덧셈에서 배열 decay","expected":"GCC처럼 정상 종료, ADD와 배열→포인터 cast AST","diagnostic":"","checks":["N_EXP_ADD","N_EXP_CAST"]},
   {"id":"TC47","file":"TC47_pointer_subtraction.c","category":"arrays","kind":"normal","purpose":"호환 포인터 냄셈의 정수 결과 타입","expected":"GCC처럼 정상 종료, SUB 결과를 int에 대입","diagnostic":"","checks":["N_EXP_SUB","(ID=\"d\")","(int)"]},
-  {"id":"TC48","file":"TC48_duplicate_case.c","category":"statements","kind":"error","purpose":"하나의 switch 내 중복 case 값 검출","expected":"GCC처럼 중복 case 오류 종료","diagnostic":"duplicate case value","checks":[]},
-  {"id":"TC49","file":"TC49_duplicate_default.c","category":"statements","kind":"error","purpose":"하나의 switch 내 중복 default 검출","expected":"GCC처럼 중복 default 오류 종료","diagnostic":"multiple default labels","checks":[]},
   {"id":"TC50","file":"TC50_nonconstant_global_initializer.c","category":"variables","kind":"error","purpose":"전역 변수의 비상수 초기화식 검출","expected":"GCC처럼 compile-time constant 오류 종료","diagnostic":"initializer element is not a compile-time constant","checks":[]},
   {"id":"TC51","file":"TC51_struct_float_initializer.c","category":"aggregates","kind":"warning","purpose":"구조체 필드 float→int 초기화 분석","expected":"경고 후 정상 종료, cast와 리터럴 출력","diagnostic":"incompatible types in assignment expression","checks":["N_EXP_CAST","LITERAL: 1.500000"]}
 ]

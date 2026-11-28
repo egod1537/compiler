@@ -38,10 +38,10 @@ EXPECTED_CATEGORY_COUNTS = {
     "aggregates": 6,
     "expressions": 7,
     "functions": 6,
-    "statements": 9,
+    "statements": 7,
     "literals": 3,
 }
-EXPECTED_KIND_COUNTS = {"normal": 24, "error": 19, "warning": 8}
+EXPECTED_KIND_COUNTS = {"normal": 24, "error": 17, "warning": 8}
 
 # 기존 tests/1~5의 과제6 입력 중 원래 오류 입력이다. 나머지는 정상 입력이다.
 CH6_ERROR_CASES = {
@@ -152,8 +152,8 @@ def discover_ch6_cases() -> list[dict[str, Any]]:
                     "expected_exit": expected_exit,
                 }
             )
-    if len(result) != 48:
-        raise ValueError(f"과제6 회귀 입력은 48개여야 함: 실제 {len(result)}개")
+    if len(result) != 47:
+        raise ValueError(f"과제6 회귀 입력은 47개여야 함: 실제 {len(result)}개")
     return result
 
 

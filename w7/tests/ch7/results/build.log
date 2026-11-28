@@ -1,5 +1,5 @@
 과제7 빌드 로그
-시각: 2026-11-28T11:18:34+09:00
+시각: 2026-11-28T11:37:11+09:00
 $ make clean
 rm -f parser parser.exe y.tab.o lex.yy.o support.o print.o semantic.o print_sem.o main.o y.tab.c y.tab.h lex.yy.c
 [exit=0]
