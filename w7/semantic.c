@@ -1407,6 +1407,9 @@ void semantic_error(int i, int ll, char *s) {
   case 90:
     printf("fatal compiler error in parse result\n");
     break;
+  case 91:
+    printf("excess elements in struct initializer\n");
+    break;
   case 93:
     printf("too many literals in source program \n");
     break;
