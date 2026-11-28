@@ -292,6 +292,17 @@ A_TYPE *sem_expression(A_NODE *node) {
   case N_EXP_ADD:
     t1 = sem_expression(node->llink);
     t2 = sem_expression(node->rlink);
+
+    if (isArrayType(t1)) {
+      node->llink = convertUsualUnaryConversion(node->llink);
+      t1 = node->llink->type;
+    }
+
+    if (isArrayType(t2)) {
+      node->rlink = convertUsualUnaryConversion(node->rlink);
+      t2 = node->rlink->type;
+    }
+
     if (isArithmeticType(t1) && isArithmeticType(t2))
       result = convertUsualBinaryConversion(node);
     else if (isPointerType(t1) && isIntegralType(t2))
@@ -304,6 +315,17 @@ A_TYPE *sem_expression(A_NODE *node) {
   case N_EXP_SUB:
     t1 = sem_expression(node->llink);
     t2 = sem_expression(node->rlink);
+
+    if (isArrayType(t1)) {
+      node->llink = convertUsualUnaryConversion(node->llink);
+      t1 = node->llink->type;
+    }
+
+    if (isArrayType(t2)) {
+      node->rlink = convertUsualUnaryConversion(node->rlink);
+      t2 = node->rlink->type;
+    }
+
     if (isArithmeticType(t1) && isArithmeticType(t2))
       result = convertUsualBinaryConversion(node);
     else if (isPointerType(t1) && isIntegralType(t2))
