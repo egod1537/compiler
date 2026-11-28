@@ -963,6 +963,12 @@ BOOLEAN isAllowableAssignmentConversion(A_TYPE *t1, A_TYPE *t2, A_NODE *node) {
   else if (isPointerType(t1) &&
            (isConstantZeroExp(node) || isCompatiblePointerType(t1, t2)))
     return (TRUE);
+  else if (isPointerType(t1) && isPointerType(t2) &&
+           ((isVoidType(t1->element_type) &&
+             !isFunctionType(t2->element_type)) ||
+            (isVoidType(t2->element_type) &&
+             !isFunctionType(t1->element_type))))
+    return (TRUE);
   else
     return (FALSE);
 }
