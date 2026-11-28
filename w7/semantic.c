@@ -672,8 +672,7 @@ int sem_declaration(A_ID *id, int addr) {
   switch (id->kind) {
   case ID_VAR:
     if (isArrayType(id->type) && !id->type->check && id->type->expr == NIL &&
-        id->init && id->init->name == N_INIT_LIST &&
-        isScalarType(id->type->element_type)) {
+        id->init && id->init->name == N_INIT_LIST) {
       A_NODE *node = id->init;
       int n = 0;
 
@@ -750,8 +749,8 @@ int sem_declaration(A_ID *id, int addr) {
   return (size);
 }
 void sem_initializer(A_NODE *node, A_TYPE *t) {
-  A_TYPE *tt;
-  int i = 0;
+  A_TYPE *tt, *element_type;
+  int i = 0, limit;
 
   if (node->name == N_INIT_LIST_ONE && isScalarType(t)) {
     tt = sem_expression(node->clink);
@@ -766,15 +765,29 @@ void sem_initializer(A_NODE *node, A_TYPE *t) {
       semantic_error(88, node->line);
     else
       sem_initializer(node->llink, t);
-  } else if (node->name == N_INIT_LIST && isArrayType(t) && t->expr &&
-             isScalarType(t->element_type)) {
+  } else if (node->name == N_INIT_LIST && isArrayType(t) && t->expr) {
+    element_type = t->element_type;
+    limit = NODE_TO_INT(t->expr);
+
+    if (isArrayType(element_type) && node->llink->name == N_INIT_LIST_ONE) {
+      tt = t;
+      limit = 1;
+
+      while (isArrayType(tt)) {
+        limit *= NODE_TO_INT(tt->expr);
+        tt = tt->element_type;
+      }
+
+      element_type = tt;
+    }
+
     while (node->name == N_INIT_LIST) {
-      if (++i > NODE_TO_INT(t->expr)) {
+      if (++i > limit) {
         semantic_error(87, node->line);
         break;
       }
 
-      sem_initializer(node->llink, t->element_type);
+      sem_initializer(node->llink, element_type);
       node = node->rlink;
     }
   }
