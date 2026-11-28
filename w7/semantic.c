@@ -778,6 +778,7 @@ int sem_declaration(A_ID *id, int addr) {
 }
 void sem_initializer(A_NODE *node, A_TYPE *t) {
   A_TYPE *tt, *element_type;
+  A_ID *id;
   int i = 0, limit;
 
   if (node->name == N_INIT_LIST_ONE && isScalarType(t)) {
@@ -818,6 +819,17 @@ void sem_initializer(A_NODE *node, A_TYPE *t) {
       sem_initializer(node->llink, element_type);
       node = node->rlink;
     }
+  } else if (node->name == N_INIT_LIST && t->kind == T_STRUCT) {
+    id = t->field;
+
+    while (node->name == N_INIT_LIST && id) {
+      sem_initializer(node->llink, id->type);
+      node = node->rlink;
+      id = id->link;
+    }
+
+    if (node->name == N_INIT_LIST)
+      semantic_error(88, node->line);
   }
 }
 A_ID *getStructFieldIdentifier(A_TYPE *t, char *s) {
