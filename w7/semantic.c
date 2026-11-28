@@ -360,6 +360,12 @@ A_TYPE *sem_expression(A_NODE *node) {
     if (!isModifiableLvalue(node->llink))
       semantic_error(60, node->line);
     t = sem_expression(node->rlink);
+
+    if (isArrayType(t) || isFunctionType(t)) {
+      node->rlink = convertUsualUnaryConversion(node->rlink);
+      t = node->rlink->type;
+    }
+
     if (isAllowableAssignmentConversion(result, t, node->rlink)) {
       if (isArithmeticType(result) && isArithmeticType(t))
         node->rlink = convertUsualAssignmentConversion(result, node->rlink);
