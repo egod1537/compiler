@@ -33,15 +33,15 @@ CATEGORY_LABELS = {
     "literals": "리터럴 테이블",
 }
 EXPECTED_CATEGORY_COUNTS = {
-    "variables": 6,
-    "arrays": 6,
-    "aggregates": 5,
+    "variables": 7,
+    "arrays": 13,
+    "aggregates": 6,
     "expressions": 7,
     "functions": 6,
-    "statements": 7,
+    "statements": 9,
     "literals": 3,
 }
-EXPECTED_KIND_COUNTS = {"normal": 20, "error": 15, "warning": 5}
+EXPECTED_KIND_COUNTS = {"normal": 24, "error": 19, "warning": 8}
 
 # 기존 tests/1~5의 과제6 입력 중 원래 오류 입력이다. 나머지는 정상 입력이다.
 CH6_ERROR_CASES = {
@@ -110,8 +110,11 @@ def run_process(
 
 def load_manifest() -> list[dict[str, Any]]:
     cases = json.loads(MANIFEST.read_text(encoding="utf-8"))
-    if len(cases) != 40:
-        raise ValueError(f"과제7 TC는 40개여야 함: 실제 {len(cases)}개")
+    expected_total = sum(EXPECTED_CATEGORY_COUNTS.values())
+    if len(cases) != expected_total:
+        raise ValueError(
+            f"과제7 TC는 {expected_total}개여야 함: 실제 {len(cases)}개"
+        )
 
     category_counts = {name: 0 for name in EXPECTED_CATEGORY_COUNTS}
     kind_counts = {name: 0 for name in EXPECTED_KIND_COUNTS}
@@ -445,7 +448,12 @@ def main() -> int:
         f"timeouts={summary['primary']['timeouts'] + summary['regression']['timeouts']} "
         f"crashes={summary['primary']['crashes'] + summary['regression']['crashes']}"
     )
-    return 0 if primary_passed == 40 and regression_passed == 48 else 1
+    return (
+        0
+        if primary_passed == len(primary_results)
+        and regression_passed == len(regression_results)
+        else 1
+    )
 
 
 if __name__ == "__main__":
